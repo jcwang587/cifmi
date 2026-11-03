@@ -1,0 +1,154 @@
+#------------------------------------------------------------------------------
+#$Date: 2016-02-25 13:57:03 +0200 (Thu, 25 Feb 2016) $
+#$Revision: 176965 $
+#$URL: svn://www.crystallography.net/cod/cif/1/10/02/1100217.cif $
+#------------------------------------------------------------------------------
+#
+# This file is available in the Crystallography Open Database (COD),
+# http://www.crystallography.net/
+#
+# All data on this site have been placed in the public domain by the
+# contributors.
+#
+data_1100217
+loop_
+_publ_author_name
+'Krieger, Matthias'
+'Gould, Robert O.'
+'Harms, Klaus'
+'Greiner, Andreas'
+'Dehnicke, Kurt'
+_publ_section_title
+;
+ Phosphaniminato- und Phosphanimin-Komplexe von Nickel(II). Die
+ Kristallstrukturen von [Ni(O~3~SCF~3~)(NPMe~3~)]~4~,
+ [Ni~4~Br~5~{NP(NMe~2~)~3~}~3~], [NiBr~2~{HNP(NMe~2~)~3~}~2~]
+ und [Ni(PMePh~2~)~4~]
+;
+_journal_coden_ASTM              ZAACAB
+_journal_issue                   4
+_journal_name_full
+;
+ Zeitschrift fuer Anorganische und Allgemeine Chemie
+;
+_journal_page_first              747
+_journal_page_last               754
+_journal_paper_doi
+10.1002/1521-3749(200104)627:4<747::AID-ZAAC747>3.0.CO;2-H
+_journal_volume                  627
+_journal_year                    2001
+_chemical_formula_moiety         'C12 H38 Br2 N8 Ni1 P2'
+_chemical_formula_sum            'C12 H38 Br2 N8 Ni P2'
+_chemical_name_systematic
+;
+Dibromo-bis(tris(dimethylamino)phosphaneimine)-nickel(ii)
+;
+_space_group_IT_number           15
+_symmetry_cell_setting           monoclinic
+_symmetry_space_group_name_Hall  '-C 2yc'
+_symmetry_space_group_name_H-M   'C 1 2/c 1'
+_cell_angle_alpha                90
+_cell_angle_beta                 94.74(1)
+_cell_angle_gamma                90
+_cell_formula_units_Z            4
+_cell_length_a                   18.407(1)
+_cell_length_b                   8.101(1)
+_cell_length_c                   16.072(2)
+_cell_volume                     2388.382
+_diffrn_ambient_temperature      203
+_exptl_crystal_colour            'deep blue'
+_exptl_crystal_density_diffrn    1.599
+_refine_ls_R_factor_gt           3.4
+_refine_ls_wR_factor_gt          3.4
+_cod_original_sg_symbol_H-M      'C 2/c'
+_cod_original_formula_sum        'C12 H38 Br2 N8 Ni1 P2'
+_cod_database_code               1100217
+loop_
+_symmetry_equiv_pos_site_id
+_symmetry_equiv_pos_as_xyz
+1 x,y,z
+2 1/2+x,1/2+y,z
+3 x,-y,1/2+z
+4 1/2+x,1/2-y,1/2+z
+5 -x,-y,-z
+6 -1/2-x,-1/2-y,-z
+7 -x,y,-1/2-z
+8 -1/2-x,-1/2+y,-1/2-z
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Br1 Br 0.09602(2) 0.16384(5) 0.33188(2)
+Ni1 Ni 0.00000 0.31450(7) 0.25000
+P1 P -0.09822(4) 0.55688(10) 0.35910(5)
+N1 N -0.03430(15) 0.4321(4) 0.34511(19)
+H1 H -0.0124(18) 0.408(5) 0.384(2)
+N2 N -0.06833(14) 0.7389(3) 0.38991(18)
+N3 N -0.14856(13) 0.4803(3) 0.42952(17)
+N4 N -0.14931(13) 0.5959(3) 0.27381(17)
+C1 C -0.1102(2) 0.8934(5) 0.3785(3)
+H2 H -0.08000 0.97760 0.35580
+H3 H -0.12530 0.92990 0.43190
+H4 H -0.15290 0.87440 0.34020
+C2 C -0.00367(18) 0.7599(5) 0.4471(2)
+H5 H 0.02720 0.84460 0.42600
+H6 H 0.02300 0.65660 0.45210
+H7 H -0.01800 0.79250 0.50150
+C3 C -0.19803(19) 0.5830(5) 0.4739(2)
+H8 H -0.20200 0.53850 0.52930
+H9 H -0.24580 0.58390 0.44340
+H10 H -0.17920 0.69480 0.47830
+C4 C -0.1657(2) 0.3037(4) 0.4318(3)
+H11 H -0.15800 0.26380 0.48870
+H12 H -0.13430 0.24380 0.39680
+H13 H -0.21620 0.28660 0.41130
+C5 C -0.21760(17) 0.5098(5) 0.2517(2)
+H14 H -0.25110 0.58310 0.21990
+H15 H -0.23890 0.47550 0.30220
+H16 H -0.20840 0.41350 0.21830
+C6 C -0.11782(19) 0.6734(5) 0.2029(2)
+H17 H -0.15180 0.75380 0.17750
+H18 H -0.10820 0.58960 0.16210
+H19 H -0.07260 0.72800 0.22200
+Br1F* Br -0.09602(2) 0.16384(5) 0.16812(2)
+N1F* N 0.03430(15) 0.4321(4) 0.15489(19)
+P1F* P 0.09822(4) 0.55688(10) 0.14090(5)
+N2F* N 0.06833(14) 0.7389(3) 0.11009(18)
+C1F* C 0.1102(2) 0.8934(5) 0.1215(3)
+H2F* H 0.08000 0.97760 0.14420
+H3F* H 0.12530 0.92990 0.06810
+H4F* H 0.15290 0.87440 0.15980
+C2F* C 0.00367(18) 0.7599(5) 0.0529(2)
+H5F* H -0.02720 0.84460 0.07400
+H6F* H -0.02300 0.65660 0.04790
+H7F* H 0.01800 0.79250 -0.00150
+N3F* N 0.14856(13) 0.4803(3) 0.07048(17)
+C3F* C 0.19803(19) 0.5830(5) 0.0261(2)
+H8F* H 0.20200 0.53850 -0.02930
+H9F* H 0.24580 0.58390 0.05660
+H10F* H 0.17920 0.69480 0.02170
+C4F* C 0.1657(2) 0.3037(4) 0.0682(3)
+H11F* H 0.15800 0.26380 0.01130
+H12F* H 0.13430 0.24380 0.10320
+H13F* H 0.21620 0.28660 0.08870
+N4F* N 0.14931(13) 0.5959(3) 0.22619(17)
+C5F* C 0.21760(17) 0.5098(5) 0.2483(2)
+H14F* H 0.25110 0.58310 0.28010
+H15F* H 0.23890 0.47550 0.19780
+H16F* H 0.20840 0.41350 0.28170
+C6F* C 0.11782(19) 0.6734(5) 0.2971(2)
+H17F* H 0.15180 0.75380 0.32250
+H18F* H 0.10820 0.58960 0.33790
+H19F* H 0.07260 0.72800 0.27800
+H1F* H 0.0124(18) 0.408(5) 0.116(2)
+loop_
+_atom_type_symbol
+_atom_type_radius_bond
+C 0.68
+H 0.23
+Br 1.21
+N 0.68
+Ni 1.50
+P 1.05

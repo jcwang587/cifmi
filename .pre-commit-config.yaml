@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.1
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+        # The fixtures are COD entries as published.
+        exclude: ^tests/data/
+      - id: trailing-whitespace
+        exclude: ^tests/data/
+
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: sh -c 'cargo fmt && cargo fmt --manifest-path node/Cargo.toml'
+        language: system
+        pass_filenames: false
+        types: [rust]

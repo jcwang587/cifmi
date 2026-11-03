@@ -1,0 +1,19 @@
+# Rust build artifacts
+/target
+node/target/
+
+# Python environments, caches and the built extension
+.venv/
+__pycache__/
+.pytest_cache/
+/dist/
+*.so
+
+# Node.js dependencies and build outputs
+node/node_modules/
+node/npm/
+node/artifacts/
+node/packages/
+node/*.node
+
+.claude/

@@ -1,0 +1,8 @@
+# The Xcode 27 linker (ld-27037) can leave a library's symbol string pool
+# 4 bytes off the 8-byte alignment the macOS 27 loader requires, which then
+# refuses to load it. Every macOS link goes through tools/macos-link, which
+# realigns the output; Cargo, maturin and napi-rs builds all pick it
+# up from here. Builds are not stripped, since stripping runs after the linker
+# and can misalign the pool again.
+[target.aarch64-apple-darwin]
+linker = "tools/macos-link"

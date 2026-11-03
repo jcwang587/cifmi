@@ -1,0 +1,24 @@
+[package]
+name = "cifmi-node"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.88"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cifmi = { path = ".." }
+napi = { version = "3", features = ["napi8"] }
+napi-derive = "3"
+
+[build-dependencies]
+napi-build = "2"
+
+# Not stripped, for the reason the root Cargo.toml gives.
+[profile.release]
+lto = true
+codegen-units = 1
+strip = "none"

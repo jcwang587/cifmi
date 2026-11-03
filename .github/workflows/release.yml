@@ -1,0 +1,78 @@
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: Ensure release trigger token is configured
+        env:
+          RELEASE_TRIGGER_TOKEN: ${{ secrets.RELEASE_TRIGGER_TOKEN }}
+        run: |
+          if [ -z "$RELEASE_TRIGGER_TOKEN" ]; then
+            echo "Missing secret RELEASE_TRIGGER_TOKEN."
+            echo "Create a PAT and add it as repo secret RELEASE_TRIGGER_TOKEN."
+            echo "Use a token that can push tags and trigger workflows."
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Validate all package versions and the requested release
+        id: version
+        env:
+          REQUESTED_RELEASE_VERSION: ${{ inputs.version }}
+        run: python tests/check_release_version.py --version "$REQUESTED_RELEASE_VERSION"
+
+      - name: Ensure tag does not already exist
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git fetch --tags origin
+          EXISTING_RELEASE_TAG="$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG")"
+          if [ -n "$EXISTING_RELEASE_TAG" ]; then
+            echo "Tag $RELEASE_TAG already exists on origin."
+            exit 1
+          fi
+
+  check-packages:
+    needs: preflight
+    uses: ./.github/workflows/check-packages.yml
+
+  create-tag:
+    needs: [preflight, check-packages]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the checked commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TRIGGER_TOKEN }}
+      - name: Create and push release tag
+        env:
+          RELEASE_TAG: ${{ needs.preflight.outputs.release_tag }}
+          CHECKED_COMMIT: ${{ github.sha }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$RELEASE_TAG" "$CHECKED_COMMIT" -m "release $RELEASE_TAG"
+          git push origin "$RELEASE_TAG"

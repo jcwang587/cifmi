@@ -1,0 +1,51 @@
+{
+  "name": "cifmi",
+  "version": "0.1.0",
+  "description": "Node.js bindings for cifmi, which reads CIF 1.1 and 2.0 files into crystal structures",
+  "keywords": [
+    "cif",
+    "crystallography",
+    "crystal structure",
+    "parser"
+  ],
+  "main": "index.js",
+  "types": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcwang587/cifmi.git"
+  },
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "napi": {
+    "binaryName": "cifmi",
+    "targets": [
+      "x86_64-pc-windows-msvc",
+      "aarch64-pc-windows-msvc",
+      "aarch64-apple-darwin",
+      "x86_64-unknown-linux-gnu",
+      "aarch64-unknown-linux-gnu"
+    ]
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "pack:release": "node ./scripts/pack-release.mjs",
+    "check:package": "node ./scripts/check-package.cjs",
+    "publish:packages": "node ./scripts/publish-packages.mjs",
+    "sync:version": "node ./scripts/sync-version.mjs",
+    "prepare:release": "cargo check --manifest-path ../Cargo.toml && cargo check --manifest-path ./Cargo.toml && npm run sync:version",
+    "build": "npm run sync:version && napi build --platform --release",
+    "version": "npm run sync:version && napi version",
+    "test": "node test.cjs"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.10.9"
+  }
+}

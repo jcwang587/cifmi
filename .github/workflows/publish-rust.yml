@@ -1,0 +1,41 @@
+name: publish rust
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      publishToCrates:
+        description: "Publish to crates.io?"
+        required: true
+        default: "no"
+
+permissions:
+  contents: read
+
+jobs:
+  checked-crate:
+    uses: ./.github/workflows/check-rust.yml
+
+  publish:
+    needs: checked-crate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || inputs.publishToCrates == 'yes'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Validate package versions and tag
+        run: python tests/check_release_version.py
+
+      - name: Publish crate to crates.io
+        run: cargo publish --locked
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

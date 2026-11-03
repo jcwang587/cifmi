@@ -1,0 +1,46 @@
+#!/bin/sh
+# The linker for macOS targets, set in .cargo/config.toml: link with the
+# system compiler driver as rustc would, then realign the output's symbol
+# string pool, which the Xcode 27 linker can leave where the macOS 27 loader
+# refuses it (see tools/macos_align_strtab.py). Aligned outputs are left as
+# they are, so the wrapper is harmless with other Xcode versions; remove it
+# once Apple's linker pads the pool itself.
+set -eu
+
+cc "$@"
+
+# The output follows -o, on the command line or, for long commands, in a
+# response file rustc passes as @path, one argument per line with every
+# backslash and space escaped by a backslash, as the compiler driver reads it.
+output=
+seen_output=
+next_is_output=
+take() {
+  if [ -n "$next_is_output" ]; then
+    output=$1
+    seen_output=1
+    next_is_output=
+  elif [ "$1" = "-o" ]; then
+    next_is_output=1
+  fi
+}
+for argument in "$@"; do
+  case $argument in
+    @*)
+      while IFS= read -r line || [ -n "$line" ]; do
+        take "$(printf '%s\n' "$line" | sed 's/\\\(.\)/\1/g')"
+      done < "${argument#@}"
+      ;;
+    *) take "$argument" ;;
+  esac
+done
+
+# An output that was linked but cannot be found would ship unaligned and be
+# refused by the loader with no build error, so that is an error here.
+if [ -n "$seen_output" ]; then
+  if [ ! -f "$output" ]; then
+    echo "macos-link: the linked output '$output' was not found, so it was not realigned" >&2
+    exit 1
+  fi
+  python3 "$(dirname "$0")/macos_align_strtab.py" --quiet "$output"
+fi
