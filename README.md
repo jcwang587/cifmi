@@ -46,17 +46,6 @@ cifmi.readCifFile('sample.cif').then((structure) => {
 })
 ```
 
-## What a structure holds
-
-| Part | Contents |
-|---|---|
-| Cell | Lengths and angles as the file gives them, and the cell vectors with c along z and a in the xz plane |
-| Space group | Number, Hermann-Mauguin and Hall symbols as written, and where the operations came from |
-| Sites | The asymmetric unit: label, fractional position, and species with occupancy, oxidation state and B |
-| Operations | The symmetry operations, listed in the file or taken from the space-group name |
-| Atoms | Every atom of the unit cell, each the image of a site |
-| Diagnostics | What the file left open or got wrong, reported rather than fixed quietly |
-
 Every file is read one way, by crystallographic rules, and a file cifmi
 cannot read is an error with the reason. See the
 [design](https://github.com/jcwang587/cifmi/blob/main/docs/design.md) for
