@@ -9,27 +9,66 @@ on:
         description: 'Publish to PyPI?'
         required: true
         default: 'no'
+      sourceRunId:
+        description: 'Recover original checked distributions from this PyPI release run (optional)'
+        required: false
+        type: string
 permissions:
   contents: read
 jobs:
   check:
+    if: github.event_name != 'workflow_dispatch' || inputs.sourceRunId == ''
     uses: ./.github/workflows/check-python.yml
   publish:
     runs-on: ubuntu-latest
     needs: check
-    if: github.event_name == 'push' || inputs.publishToPyPI == 'yes'
+    if: >-
+      !cancelled() &&
+      (github.event_name == 'push' || inputs.publishToPyPI == 'yes') &&
+      (needs.check.result == 'success' ||
+       (inputs.sourceRunId != '' && needs.check.result == 'skipped'))
     environment:
       name: pypi
       url: https://pypi.org/project/cifmi/
     permissions:
       contents: read
+      actions: read
       id-token: write
     steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Test distribution selection and recovery guards
+        run: python -m unittest discover -s tests -p python_publish_cases.py
+      - name: Verify original release checks and artifacts
+        if: inputs.sourceRunId != ''
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ inputs.sourceRunId }}
+        run: python tests/prepare_python_publish.py source "$SOURCE_RUN_ID"
       - name: Download checked distributions
+        if: inputs.sourceRunId == ''
         uses: actions/download-artifact@v8
         with:
           pattern: checked-python-*
-          path: dist
-          merge-multiple: true
+          path: checked-dists
+          # ABI3 builds have identical filenames across Python versions.
+          # Separate directories prevent concurrent extraction from corrupting them.
+          merge-multiple: false
+      - name: Download original checked distributions
+        if: inputs.sourceRunId != ''
+        uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ steps.source.outputs.artifact_ids }}
+          path: checked-dists
+          merge-multiple: false
+          run-id: ${{ inputs.sourceRunId }}
+          github-token: ${{ github.token }}
+      - name: Select unique distributions and verify existing PyPI files
+        id: prepare
+        run: python tests/prepare_python_publish.py prepare checked-dists dist
       - name: Publish package to PyPI
+        if: steps.prepare.outputs.pending_count != '0'
         uses: pypa/gh-action-pypi-publish@release/v1

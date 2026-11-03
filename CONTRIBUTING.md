@@ -139,3 +139,20 @@ run or rebuild them locally: a different binary or archive can have a
 different integrity even at the same version. Use this same recovery path
 after a partial npm publication. Subsequent releases publish automatically
 through the configured trusted publishers.
+
+### Recovering a partial Python publication
+
+Keep the original tag and checked artifacts. The PyPI workflow accepts a
+`sourceRunId` from a completed, tag-triggered `publish pypi` run whose package
+checks passed. Dispatch recovery from a ref containing the recovery workflow
+and the same package version; for the initial 0.1.0 release, use `main`:
+
+```sh
+gh workflow run publish-pypi.yml --ref main -f publishToPyPI=yes -f sourceRunId=RUN_ID
+```
+
+Recovery verifies the original repository, tag, commit, checks and artifact
+metadata. It downloads each artifact separately because the Python 3.10 and
+3.14 builds produce the same ABI3 wheel filename. It selects one intact
+wheel per platform, and excludes an existing PyPI file only when its SHA256
+matches an original checked artifact. It uploads only the missing files.
