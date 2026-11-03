@@ -99,12 +99,12 @@ jobs:
       fail-fast: false
       matrix:
         host: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
-        node-version: ["16", "24"]
+        node-version: ["18", "24"]
         exclude:
           - host: windows-11-arm
-            node-version: "16"
+            node-version: "18"
         include:
-          # Node 16 has no Windows ARM64 distribution.
+          # Node 18 has no Windows ARM64 distribution.
           - host: windows-11-arm
             node-version: "20"
     steps:

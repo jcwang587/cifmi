@@ -22,7 +22,7 @@ fn cif_options(block: Option<String>) -> CifOptions {
 }
 
 /// Cell edge lengths in Å and angles in degrees, as the file gives them.
-#[pyclass(module = "cifmi._core", frozen, get_all, skip_from_py_object)]
+#[pyclass(module = "cifmi._core", frozen, get_all)]
 #[derive(Clone)]
 pub struct Cell {
     a: f64,
@@ -34,7 +34,7 @@ pub struct Cell {
 }
 
 /// The space group as the file names it; what it leaves out is None.
-#[pyclass(module = "cifmi._core", frozen, get_all, skip_from_py_object)]
+#[pyclass(module = "cifmi._core", frozen, get_all)]
 #[derive(Clone)]
 pub struct SpaceGroup {
     /// Number in the International Tables, 1 to 230.
@@ -48,7 +48,7 @@ pub struct SpaceGroup {
 /// Where the operations came from: "listed" in the file under `tag`,
 /// looked up in a "table" from the name or number `value` given under `tag`,
 /// or "p1" when nothing usable was given.
-#[pyclass(module = "cifmi._core", frozen, get_all, skip_from_py_object)]
+#[pyclass(module = "cifmi._core", frozen, get_all)]
 #[derive(Clone)]
 pub struct SymmetrySource {
     kind: &'static str,
@@ -57,7 +57,7 @@ pub struct SymmetrySource {
 }
 
 /// A species on a site.
-#[pyclass(module = "cifmi._core", frozen, get_all, skip_from_py_object)]
+#[pyclass(module = "cifmi._core", frozen, get_all)]
 #[derive(Clone)]
 pub struct Species {
     /// Label of the file's row this species comes from; of the first, when
@@ -74,7 +74,7 @@ pub struct Species {
 }
 
 /// A site of the asymmetric unit.
-#[pyclass(module = "cifmi._core", frozen, get_all, skip_from_py_object)]
+#[pyclass(module = "cifmi._core", frozen, get_all)]
 #[derive(Clone)]
 pub struct Site {
     /// Label of the first row on the site.
@@ -85,7 +85,7 @@ pub struct Site {
 }
 
 /// x' = R x + t on fractional coordinates.
-#[pyclass(module = "cifmi._core", frozen, get_all, skip_from_py_object)]
+#[pyclass(module = "cifmi._core", frozen, get_all)]
 #[derive(Clone)]
 pub struct Operation {
     rotation: [[i32; 3]; 3],
@@ -93,7 +93,7 @@ pub struct Operation {
 }
 
 /// An atom of the unit cell: an image of a site.
-#[pyclass(module = "cifmi._core", frozen, get_all, skip_from_py_object)]
+#[pyclass(module = "cifmi._core", frozen, get_all)]
 #[derive(Clone)]
 pub struct Atom {
     /// Index of its site in `sites`.
@@ -103,7 +103,7 @@ pub struct Atom {
 }
 
 /// Something the file left open or got wrong, reported rather than fixed.
-#[pyclass(module = "cifmi._core", frozen, get_all, skip_from_py_object)]
+#[pyclass(module = "cifmi._core", frozen, get_all)]
 #[derive(Clone)]
 pub struct Diagnostic {
     /// A stable name, such as "setting-chosen".

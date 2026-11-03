@@ -1460,7 +1460,7 @@ fn settle(
     if scored.is_empty() {
         return Err(first_error.expect("every candidate failed with an error"));
     }
-    scored.sort_by(|a, b| a.0.cmp(&b.0));
+    scored.sort_by_key(|(score, ..)| *score);
     let mut scored = scored.into_iter();
     let (best, candidate, assembly) = scored.next().expect("one candidate");
     let reason = match scored.next() {
