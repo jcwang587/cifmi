@@ -8,6 +8,7 @@ description = "Reads CIF 1.1 and 2.0 files into crystal structures"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 keywords = ["cif", "crystallography", "crystal structure", "parser", "rust"]
 classifiers = [
   "Programming Language :: Python :: 3",

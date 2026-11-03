@@ -13,6 +13,11 @@ Hall symbol and symmetry operations of each of its 564 settings. gemmi
 Public License 2.0 (<https://www.mozilla.org/MPL/2.0/>). The generator runs
 against an installed gemmi and is not part of the published packages.
 
+The generated table and its generator are available in the
+[cifmi release tags](https://github.com/jcwang587/cifmi/tags). Select the tag
+`v<package version>` and see `src/spacegroups.rs` and
+`tools/generate_spacegroups.py` for the source corresponding to a release.
+
 ## Crystallography Open Database
 
 The CIF files under `tests/data/cif/` are entries of the Crystallography Open

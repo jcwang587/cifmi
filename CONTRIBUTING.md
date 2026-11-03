@@ -94,3 +94,48 @@ Node manifests are synced from it.
    (`gh workflow run release.yml -f version=X.Y.Z`). It checks every package
    again, tags `vX.Y.Z`, and the tag publishes the crate to crates.io, the
    wheels to PyPI and the Node packages to npm.
+
+### Registry setup and the first release
+
+Before running the release workflow:
+
+- Add `CARGO_REGISTRY_TOKEN` and `RELEASE_TRIGGER_TOKEN` as **repository
+  secrets** in GitHub Actions settings. The crates.io token must allow the
+  first publication of `cifmi`; the release token must be able to push tags
+  and trigger workflows. These workflows do not use an environment, so
+  secrets stored only in the `pypi` environment are unavailable to them.
+- Create the GitHub environment `pypi`. On PyPI, add a pending trusted
+  publisher for project `cifmi`, owner `jcwang587`, repository `cifmi`,
+  workflow `publish-pypi.yml`, and environment `pypi`.
+- Wait for the complete `Check packages` run on the release commit to pass.
+
+npm trusted publishing requires the six packages to exist first. The
+initial tag-triggered `publish npm` run builds and tests all six tarballs,
+then its publish step refuses to continue while registry entries are
+missing. Bootstrap from that run's `node-packages` artifact:
+
+1. Download the artifact from the **tag-triggered `publish npm` run** whose
+   package checks all passed. Keep its run ID and original tarballs.
+2. Log in to npm locally and publish the five native tarballs in the order
+   listed in `packages.json`, then the `cifmi` wrapper last. For each tarball,
+   run `npm publish PATH_TO_TARBALL --ignore-scripts --access public`.
+3. For every package name in `packages.json`, configure its trusted
+   publisher:
+
+   ```sh
+   npm trust github PACKAGE_NAME --repo jcwang587/cifmi --file publish-npm.yml --allow-publish
+   ```
+
+4. Verify the original artifacts through the recovery workflow:
+
+   ```sh
+   gh workflow run publish-npm.yml --ref v0.1.0 -f publishToNPM=yes -f sourceRunId=RUN_ID
+   ```
+
+Recovery validates the source run and downloads its original tested
+tarballs. It skips a published version only when its integrity and npm tag
+match exactly. Do not substitute tarballs from an earlier `Check packages`
+run or rebuild them locally: a different binary or archive can have a
+different integrity even at the same version. Use this same recovery path
+after a partial npm publication. Subsequent releases publish automatically
+through the configured trusted publishers.

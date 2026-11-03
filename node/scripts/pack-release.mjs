@@ -16,15 +16,19 @@ const pkg = JSON.parse(readFileSync(join(nodeDir, 'package.json'), 'utf8'))
 const targets = localTarget ? [localTarget] : pkg.napi.targets
 assert(targets.every(target => pkg.napi.targets.includes(target)), 'Unknown native target')
 const staging = mkdtempSync(join(tmpdir(), 'cifmi-pack-'))
+const notices = ['LICENSE', 'THIRD_PARTY_NOTICES.md']
 mkdirSync(outputDir, { recursive: true })
 
 try {
   pkg.optionalDependencies = Object.fromEntries(pkg.napi.targets.map(target => [
     `${pkg.name}-${parseTriple(target).platformArchABI}`, pkg.version,
   ]))
+  pkg.files = [...new Set([...pkg.files, ...notices])]
   writeFileSync(join(staging, 'package.json'), JSON.stringify(pkg, null, 2) + '\n')
   copyFileSync(join(nodeDir, '..', 'README.md'), join(staging, 'README.md'))
-  copyFileSync(join(nodeDir, '..', 'LICENSE'), join(staging, 'LICENSE'))
+  for (const notice of notices) {
+    copyFileSync(join(nodeDir, '..', notice), join(staging, notice))
+  }
   await new NapiCli().createNpmDirs({ cwd: staging })
 
   const packages = []
@@ -34,7 +38,9 @@ try {
     const result = JSON.parse(execFileSync(process.execPath, [process.env.npm_execpath,
       'pack', '--json', '--ignore-scripts', '--pack-destination', outputDir,
     ], { cwd: directory, encoding: 'utf8' }))[0]
-    assert(result.files.some(file => file.path === 'LICENSE'), 'Package is missing LICENSE')
+    for (const notice of notices) {
+      assert(result.files.some(file => file.path === notice), `Package is missing ${notice}`)
+    }
     packages.push({ target, name: result.name, version: result.version, filename: result.filename })
   }
 
@@ -52,7 +58,13 @@ try {
     const nativeDir = join(staging, 'npm', abi)
     const binary = `${pkg.napi.binaryName}.${abi}.node`
     copyFileSync(join(built, binary), join(nativeDir, binary))
-    copyFileSync(join(staging, 'LICENSE'), join(nativeDir, 'LICENSE'))
+    const nativeManifestPath = join(nativeDir, 'package.json')
+    const nativeManifest = JSON.parse(readFileSync(nativeManifestPath, 'utf8'))
+    nativeManifest.files = [...new Set([...nativeManifest.files, ...notices])]
+    writeFileSync(nativeManifestPath, JSON.stringify(nativeManifest, null, 2) + '\n')
+    for (const notice of notices) {
+      copyFileSync(join(staging, notice), join(nativeDir, notice))
+    }
     pack(nativeDir, target)
   }
 

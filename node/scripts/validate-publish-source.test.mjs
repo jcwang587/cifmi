@@ -1,6 +1,35 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import { expectedSourceChecks, validatePublishSource } from './validate-publish-source.mjs'
+
+test('recovery install checks match the workflow matrix, including exclusions and additions', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/check-node.yml', import.meta.url), 'utf8').replace(/\r\n/g, '\n')
+  const matrix = workflow.split('\n  install-test:\n')[1]?.split('\n    steps:\n')[0]
+  assert(matrix, 'Expected the install-test workflow job')
+  // Read the simple inline lists and host/version entries used by this workflow.
+  // Fail if their syntax changes rather than silently ignoring matrix entries.
+  function values(key) {
+    const match = matrix.match(new RegExp(`^        ${key}: \\[([^\\]]+)\\]$`, 'm'))
+    assert(match, `Expected an inline ${key} matrix`)
+    return match[1].split(',').map(value => value.trim().replace(/^"|"$/g, ''))
+  }
+  function entries(key) {
+    const section = matrix.match(new RegExp(`^        ${key}:\\n([\\s\\S]*?)(?=^        \\w|$(?![\\s\\S]))`, 'm'))?.[1]
+    assert(section, `Expected matrix ${key}`)
+    const pairs = [...section.matchAll(/^          - host: ([^\n]+)\n            node-version: "([^"]+)"$/gm)]
+      .map(([, host, version]) => [host, version])
+    assert.equal(pairs.length, (section.match(/^          - /gm) ?? []).length,
+      `Unsupported ${key} entry syntax`)
+    return pairs
+  }
+  const excluded = entries('exclude')
+  const jobs = values('host').flatMap(host => values('node-version').map(version => [host, version]))
+    .filter(([host, version]) => !excluded.some(([otherHost, otherVersion]) => host === otherHost && version === otherVersion))
+  jobs.push(...entries('include'))
+  const expected = jobs.map(([host, version]) => `check / install-test (${host}, ${version})`)
+  assert.deepEqual(expectedSourceChecks.filter(name => name.startsWith('check / install-test ')).sort(), expected.sort())
+})
 
 function source() {
   return {

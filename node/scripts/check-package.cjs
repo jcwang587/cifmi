@@ -32,8 +32,11 @@ try {
   assert.equal(installedManifest.version, main.version)
   assert.equal(installedManifest.optionalDependencies[native.name], native.version)
   assert(fs.existsSync(path.join(installed, installedManifest.types)), 'Missing TypeScript declarations')
-  assert(fs.existsSync(path.join(installed, 'LICENSE')), 'Missing main package license')
-  assert(fs.existsSync(path.join(installedNative, 'LICENSE')), 'Missing native package license')
+  for (const directory of [installed, installedNative]) {
+    for (const notice of ['LICENSE', 'THIRD_PARTY_NOTICES.md']) {
+      assert(fs.existsSync(path.join(directory, notice)), `Missing ${notice} in ${directory}`)
+    }
+  }
   assert(!fs.readdirSync(installed).some(file => file.endsWith('.node')),
     'Test must load the installed platform package through the JS loader')
 

@@ -76,6 +76,11 @@ def main():
                 "prefix = pathlib.Path(sys.prefix).resolve()",
                 "assert module.is_relative_to(prefix), (module, prefix)",
                 "assert cifmi.__version__ == importlib.metadata.version('cifmi')",
+                "distribution = importlib.metadata.distribution('cifmi')",
+                "license_files = distribution.metadata.get_all('License-File', [])",
+                "for filename in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):",
+                "    assert filename in license_files, (filename, license_files)",
+                "    assert any(str(path).endswith('/licenses/' + filename) and distribution.locate_file(path).is_file() for path in distribution.files), filename",
                 "print(json.dumps({'python': sys.version, 'module': str(module), 'version': cifmi.__version__}, indent=2))",
             ]
         )
