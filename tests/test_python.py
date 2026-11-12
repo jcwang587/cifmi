@@ -1,4 +1,5 @@
-"""Python API tests: the fixtures, the reading's fields and diagnostics, errors.
+"""Python API tests: the fixtures, the reading's fields and diagnostics, errors,
+and the writing, byte for byte as the Rust and Node.js tests compare it.
 
 From the repository root, ``python -m pip install -e ".[test]"`` builds the
 extension; then run ``python -m pytest tests``.
@@ -11,6 +12,8 @@ import cifmi
 import pytest
 
 DATA = Path(__file__).parent / "data" / "cif"
+# Each fixture cifmi reads, as it writes it.
+WRITTEN = sorted((Path(__file__).parent / "data" / "written").glob("*.cif"))
 
 
 def atoms_by_species(structure: cifmi.Structure) -> Counter:
@@ -94,3 +97,108 @@ def test_errors_are_raised_not_papered_over(tmp_path):
     # A modulated structure is refused rather than read as its average.
     with pytest.raises(ValueError, match="modulated"):
         cifmi.read_cif(DATA / "cod__2100690.cif")
+
+
+def plain(structure: cifmi.Structure) -> cifmi.Structure:
+    """``structure`` built again from plain numbers, strings and lists."""
+    cell = structure.cell
+    return cifmi.Structure(
+        structure.name,
+        cifmi.Cell(cell.a, cell.b, cell.c, cell.alpha, cell.beta, cell.gamma),
+        [
+            cifmi.Operation([list(row) for row in op.rotation], list(op.translation))
+            for op in structure.operations
+        ],
+        [
+            cifmi.Site(
+                site.label,
+                list(site.fractional),
+                [
+                    cifmi.Species(s.label, s.element, s.occupancy, s.oxidation, s.b_iso)
+                    for s in site.species
+                ],
+            )
+            for site in structure.sites
+        ],
+    )
+
+
+@pytest.mark.parametrize("expected", WRITTEN, ids=lambda p: p.name)
+def test_every_fixture_is_written_byte_for_byte_and_reads_back(expected):
+    text = cifmi.write_cif_str(cifmi.read_cif(DATA / expected.name))
+    assert text == expected.read_bytes().decode("ascii")
+    assert cifmi.write_cif_str(cifmi.read_cif_str(text)) == text
+    # Built again from plain data, the structure is written the same.
+    built = plain(cifmi.read_cif(DATA / expected.name))
+    assert built.symmetry_source.kind == "given"
+    assert cifmi.write_cif_str(built) == text
+
+
+def test_written_files_read_back(tmp_path):
+    structure = cifmi.read_cif(DATA / "cod__7046814.cif")
+    path = tmp_path / "written.cif"
+    assert cifmi.write_cif(path, structure) is None
+    assert path.read_bytes().decode("ascii") == cifmi.write_cif_str(structure)
+    assert len(cifmi.read_cif(path).atoms) == len(structure.atoms)
+
+
+IDENTITY = cifmi.Operation([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [0, 0, 0])
+INVERSION = cifmi.Operation([[-1, 0, 0], [0, -1, 0], [0, 0, -1]], [0, 0, 0])
+
+
+def test_a_structure_built_from_its_parts():
+    built = cifmi.Structure(
+        "mixed",
+        cifmi.Cell(5, 6, 7, 90, 100, 90),
+        [IDENTITY, INVERSION],
+        [
+            cifmi.Site(
+                "M1",
+                (0, 0, 0),
+                [
+                    cifmi.Species("M1", "Fe", 0.5, oxidation=3),
+                    cifmi.Species("Mn1", "Mn", 0.5),
+                ],
+            ),
+            cifmi.Site(
+                "O1", (0.25, 0.1, 0.3), [cifmi.Species("O1", "O", 1, b_iso=1.2)]
+            ),
+        ],
+    )
+    # The site at the inversion centre is one atom, the other two.
+    assert [atom.site for atom in built.atoms] == [0, 1, 1]
+    assert built.space_group.number is None
+    assert (built.symmetry_source.kind, built.diagnostics) == ("given", [])
+    text = cifmi.write_cif_str(built)
+    assert "_space_group_name_H-M_alt   'P -1'\n" in text
+    assert "  M1  Fe3+  1  0.00000000  0.00000000  0.00000000  0.50000000  ?\n" in text
+    read = cifmi.read_cif_str(text)
+    assert [
+        (s.label, s.element, s.occupancy, s.oxidation) for s in read.sites[0].species
+    ] == [
+        ("M1", "Fe", 0.5, 3.0),
+        ("Mn1", "Mn", 0.5, 0.0),
+    ]
+    assert read.sites[1].species[0].b_iso == 1.2
+
+
+def test_structures_that_cannot_be_written_are_refused_with_the_reason():
+    with pytest.raises(ValueError, match="unknown element symbol"):
+        cifmi.Species("X1", "Xx", 1)
+    full = [cifmi.Species("Na1", "Na", 0.6), cifmi.Species("K1", "K", 0.6)]
+    with pytest.raises(
+        ValueError, match="site Na1: occupancies add up to 1.2, more than 1"
+    ):
+        cifmi.Structure(
+            "over",
+            cifmi.Cell(5, 5, 5, 90, 90, 90),
+            [IDENTITY],
+            [cifmi.Site("Na1", (0, 0, 0), full)],
+        )
+    with pytest.raises(ValueError, match="cannot be a data block code"):
+        cifmi.Structure(
+            "two words",
+            cifmi.Cell(5, 5, 5, 90, 90, 90),
+            [IDENTITY],
+            [cifmi.Site("Na1", (0, 0, 0), full[:1])],
+        )

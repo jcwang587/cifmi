@@ -1,8 +1,10 @@
 //! Python bindings (`cifmi._core`): structures as read-only objects with
-//! the fields of the Node addon's. The package in `python/cifmi` re-exports
-//! them.
+//! the fields of the Node addon's, read from CIF or built from their parts,
+//! and written as CIF. The package in `python/cifmi` re-exports them.
 
-use crate::{CifOptions, Error, SymmetrySource as Source};
+use crate::{
+    CellParameters, CifOptions, Element, Error, Occupant, SymOp, SymmetrySource as Source,
+};
 use pyo3::exceptions::{PyIOError, PyValueError};
 use pyo3::prelude::*;
 use std::path::PathBuf;
@@ -22,7 +24,7 @@ fn cif_options(block: Option<String>) -> CifOptions {
 }
 
 /// Cell edge lengths in Å and angles in degrees, as the file gives them.
-#[pyclass(module = "cifmi._core", frozen, get_all)]
+#[pyclass(module = "cifmi._core", frozen, get_all, from_py_object)]
 #[derive(Clone)]
 pub struct Cell {
     a: f64,
@@ -47,7 +49,8 @@ pub struct SpaceGroup {
 
 /// Where the operations came from: "listed" in the file under `tag`,
 /// looked up in a "table" from the name or number `value` given under `tag`,
-/// or "p1" when nothing usable was given.
+/// "p1" when nothing usable was given, or "given" with a structure built from
+/// its parts.
 #[pyclass(module = "cifmi._core", frozen, get_all)]
 #[derive(Clone)]
 pub struct SymmetrySource {
@@ -57,7 +60,7 @@ pub struct SymmetrySource {
 }
 
 /// A species on a site.
-#[pyclass(module = "cifmi._core", frozen, get_all)]
+#[pyclass(module = "cifmi._core", frozen, get_all, from_py_object)]
 #[derive(Clone)]
 pub struct Species {
     /// Label of the file's row this species comes from; of the first, when
@@ -74,10 +77,10 @@ pub struct Species {
 }
 
 /// A site of the asymmetric unit.
-#[pyclass(module = "cifmi._core", frozen, get_all)]
+#[pyclass(module = "cifmi._core", frozen, get_all, from_py_object)]
 #[derive(Clone)]
 pub struct Site {
-    /// Label of the first row on the site.
+    /// Label of the first row on the site, its first species' label.
     label: String,
     /// Fractional coordinates the site's atoms are generated from.
     fractional: [f64; 3],
@@ -85,7 +88,7 @@ pub struct Site {
 }
 
 /// x' = R x + t on fractional coordinates.
-#[pyclass(module = "cifmi._core", frozen, get_all)]
+#[pyclass(module = "cifmi._core", frozen, get_all, from_py_object)]
 #[derive(Clone)]
 pub struct Operation {
     rotation: [[i32; 3]; 3],
@@ -111,7 +114,11 @@ pub struct Diagnostic {
     message: String,
 }
 
-/// A crystal structure read from one CIF data block.
+/// A crystal structure read from one CIF data block, or built from its parts
+/// as they are by `Structure(name, cell, operations, sites)`: the vectors set
+/// from the cell and the atoms as the sites' orbits, with no space-group
+/// names, the symmetry source "given" and no diagnostics. Parts that cannot
+/// be written as a CIF that cifmi reads raise ValueError with the reason.
 #[pyclass(module = "cifmi._core", frozen, get_all)]
 pub struct Structure {
     /// Name of the data block, without `data_`.
@@ -133,7 +140,79 @@ pub struct Structure {
 }
 
 #[pymethods]
+impl Cell {
+    #[new]
+    fn new(a: f64, b: f64, c: f64, alpha: f64, beta: f64, gamma: f64) -> Self {
+        Cell {
+            a,
+            b,
+            c,
+            alpha,
+            beta,
+            gamma,
+        }
+    }
+}
+
+#[pymethods]
+impl Species {
+    /// `element` is a symbol such as "Fe", or "D" for deuterium.
+    #[new]
+    #[pyo3(signature = (label, element, occupancy, oxidation=0.0, b_iso=0.0))]
+    fn new(
+        label: String,
+        element: &str,
+        occupancy: f64,
+        oxidation: f64,
+        b_iso: f64,
+    ) -> PyResult<Self> {
+        Ok(Species {
+            label,
+            element: Element::from_symbol(element).map_err(to_py_err)?.symbol(),
+            occupancy,
+            oxidation,
+            b_iso,
+        })
+    }
+}
+
+#[pymethods]
+impl Site {
+    #[new]
+    fn new(label: String, fractional: [f64; 3], species: Vec<Species>) -> Self {
+        Site {
+            label,
+            fractional,
+            species,
+        }
+    }
+}
+
+#[pymethods]
+impl Operation {
+    #[new]
+    fn new(rotation: [[i32; 3]; 3], translation: [f64; 3]) -> Self {
+        Operation {
+            rotation,
+            translation,
+        }
+    }
+}
+
+#[pymethods]
 impl Structure {
+    #[new]
+    fn new(
+        name: String,
+        cell: Cell,
+        operations: Vec<Operation>,
+        sites: Vec<Site>,
+    ) -> PyResult<Self> {
+        core_structure(name, &cell, &operations, &sites)
+            .map(Structure::from)
+            .map_err(to_py_err)
+    }
+
     fn __repr__(&self) -> String {
         format!(
             "<cifmi.Structure {:?}: {} sites, {} atoms, {} operations>",
@@ -145,12 +224,65 @@ impl Structure {
     }
 }
 
+/// The core structure of a Python one's parts, checked as
+/// `crate::Structure::new` checks them.
+fn core_structure(
+    name: String,
+    cell: &Cell,
+    operations: &[Operation],
+    sites: &[Site],
+) -> Result<crate::Structure, Error> {
+    let sites = sites
+        .iter()
+        .map(|site| {
+            let occupants = site
+                .species
+                .iter()
+                .map(|s| {
+                    Ok(Occupant {
+                        label: s.label.clone(),
+                        element: Element::from_symbol(s.element)?,
+                        oxidation: s.oxidation,
+                        occupancy: s.occupancy,
+                        b_iso: s.b_iso,
+                    })
+                })
+                .collect::<Result<_, Error>>()?;
+            Ok(crate::Site {
+                label: site.label.clone(),
+                position: site.fractional,
+                occupants,
+            })
+        })
+        .collect::<Result<_, Error>>()?;
+    crate::Structure::new(
+        name,
+        CellParameters {
+            a: cell.a,
+            b: cell.b,
+            c: cell.c,
+            alpha: cell.alpha,
+            beta: cell.beta,
+            gamma: cell.gamma,
+        },
+        operations
+            .iter()
+            .map(|op| SymOp {
+                rotation: op.rotation,
+                translation: op.translation,
+            })
+            .collect(),
+        sites,
+    )
+}
+
 impl From<crate::Structure> for Structure {
     fn from(s: crate::Structure) -> Self {
         let (kind, tag, value) = match s.symmetry_source {
             Source::Listed { tag } => ("listed", Some(tag), None),
             Source::Table { tag, value } => ("table", Some(tag), Some(value)),
             Source::P1 => ("p1", None, None),
+            Source::Given => ("given", None, None),
         };
         Structure {
             name: s.name,
@@ -238,6 +370,33 @@ fn read_cif_str(text: &str, block: Option<String>) -> PyResult<Structure> {
         .map_err(to_py_err)
 }
 
+/// The core structure of `structure`, to write.
+fn to_write(structure: &Structure) -> PyResult<crate::Structure> {
+    core_structure(
+        structure.name.clone(),
+        &structure.cell,
+        &structure.operations,
+        &structure.sites,
+    )
+    .map_err(to_py_err)
+}
+
+/// Write a structure to a CIF file, as `write_cif_str` writes it.
+#[pyfunction]
+fn write_cif(path: PathBuf, structure: PyRef<'_, Structure>) -> PyResult<()> {
+    crate::write_cif(&path, &to_write(&structure)?).map_err(to_py_err)
+}
+
+/// A structure, read or built, as CIF 1.1 text: one data block in the core
+/// dictionary's names, in the structure's own setting, which `read_cif_str`
+/// reads back as the same structure for one cifmi read. A structure that
+/// cannot be written as a CIF that cifmi reads raises ValueError with the
+/// reason.
+#[pyfunction]
+fn write_cif_str(structure: PyRef<'_, Structure>) -> PyResult<String> {
+    crate::write_cif_str(&to_write(&structure)?).map_err(to_py_err)
+}
+
 #[pymodule]
 fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
@@ -252,5 +411,7 @@ fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Diagnostic>()?;
     m.add_function(wrap_pyfunction!(read_cif, m)?)?;
     m.add_function(wrap_pyfunction!(read_cif_str, m)?)?;
+    m.add_function(wrap_pyfunction!(write_cif, m)?)?;
+    m.add_function(wrap_pyfunction!(write_cif_str, m)?)?;
     Ok(())
 }

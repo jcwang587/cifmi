@@ -837,3 +837,5 @@ module.exports.__napiBindingTarget = __napiStampBindingTarget(nativeBinding, __n
 module.exports = nativeBinding
 module.exports.readCifFile = nativeBinding.readCifFile
 module.exports.readCifStr = nativeBinding.readCifStr
+module.exports.writeCifFile = nativeBinding.writeCifFile
+module.exports.writeCifStr = nativeBinding.writeCifStr

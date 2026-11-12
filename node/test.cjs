@@ -1,9 +1,14 @@
 const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const os = require('node:os')
 const path = require('node:path')
 // CIFMI_BINDING can point to an installed package entry point or a compiled .node file.
 const cifmi = require(process.env.CIFMI_BINDING || './index.js')
 
 const fixtures = path.resolve(__dirname, '../tests/data/cif')
+// Each fixture cifmi reads, as it writes it: the Rust and Python tests compare
+// their writing with the same bytes.
+const written = path.resolve(__dirname, '../tests/data/written')
 
 const cscl = `data_CsCl
 _cell_length_a 4.123
@@ -50,6 +55,31 @@ assert.deepEqual(structuredClone(s), s, 'survives structured cloning')
 assert.throws(() => cifmi.readCifStr('data_x\n_cell_length_a 1\n'), /CIF error/)
 assert.throws(() => cifmi.readCifStr(cscl, { block: 'other' }), /no data block named "other"/)
 
+// The writing: every fixture byte for byte as the other runtimes write it,
+// from the reading or from a plain object of its shape, and read back.
+for (const file of fs.readdirSync(written).sort()) {
+  const expected = fs.readFileSync(path.join(written, file), 'latin1')
+  const structure = cifmi.readCifStr(fs.readFileSync(path.join(fixtures, file), 'utf8'))
+  assert.equal(cifmi.writeCifStr(structure), expected, file)
+  const { name, cell, operations, sites } = JSON.parse(JSON.stringify(structure))
+  assert.equal(cifmi.writeCifStr({ name, cell, operations, sites }), expected, file)
+  assert.equal(cifmi.writeCifStr(cifmi.readCifStr(expected)), expected, file)
+}
+const csclText = cifmi.writeCifStr(s)
+assert.match(csclText, /^_space_group_name_H-M_alt {3}'P m -3 m'$/m)
+assert.match(csclText, /^ {2}Cs1 {2}Cs {2}1 {2}0\.00000000 {2}0\.00000000 {2}0\.00000000 {2}1\.00000000 {2}1\.57913670$/m)
+// What cannot be written is an error with the reason.
+const changed = (change) => {
+  const copy = structuredClone(s)
+  change(copy)
+  return () => cifmi.writeCifStr(copy)
+}
+assert.throws(changed((c) => { c.sites[0].species[0].element = 'Xx' }), /unknown element symbol "Xx"/)
+assert.throws(changed((c) => { c.sites[0].species[0].occupancy = 1.5 }), /Cs1: occupancy 1.5 is not above 0 and at most 1/)
+assert.throws(changed((c) => { c.operations[1].rotation[0] = 0.5 }), /rotation .* is not 9 integers/)
+assert.throws(changed((c) => { c.sites[1].fractional.pop() }), /site Cl1's fractional coordinates has 2 numbers, not 3/)
+assert.throws(changed((c) => { c.name = 'Cs Cl' }), /cannot be a data block code/)
+
 ;(async () => {
   // A file named in origin choice 1 with origin choice 2's coordinates:
   // the atoms settle it, and the reading says so.
@@ -59,7 +89,20 @@ assert.throws(() => cifmi.readCifStr(cscl, { block: 'other' }), /no data block n
   assert.deepEqual(y2ru2o7.diagnostics.map((d) => d.kind), ['setting-chosen'])
   assert.match(y2ru2o7.diagnostics[0].message, /F d -3 m:2 is read/)
   await assert.rejects(cifmi.readCifFile(path.join(fixtures, 'missing.cif')), /IO error/)
-  console.log('node: cifmi reads, reports and errs as expected')
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cifmi-'))
+  try {
+    const target = path.join(directory, 'written.cif')
+    assert.equal(await cifmi.writeCifFile(target, y2ru2o7), undefined)
+    assert.equal(fs.readFileSync(target, 'latin1'), cifmi.writeCifStr(y2ru2o7))
+    assert.equal((await cifmi.readCifFile(target)).atoms.length, 88)
+    await assert.rejects(cifmi.writeCifFile(path.join(directory, 'missing', 'x.cif'), y2ru2o7), /IO error/)
+    // What cannot be written rejects the promise, as a file that cannot be read does.
+    const unnamed = { ...y2ru2o7, name: '' }
+    await assert.rejects(cifmi.writeCifFile(target, unnamed), /cannot be a data block code: it is empty/)
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true })
+  }
+  console.log('node: cifmi reads, writes, reports and errs as expected')
 })().catch((err) => {
   console.error(err)
   process.exit(1)

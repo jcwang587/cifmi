@@ -119,6 +119,19 @@ export interface Structure {
 }
 
 /**
+ * The parts of a structure the writer reads: any object of the shape
+ * `readCifStr` returns, whose other fields are not read.
+ */
+export interface StructureParts {
+  /** Name of the data block, without `data_`. */
+  name: string
+  cell: Cell
+  operations: Array<Operation>
+  /** Each site's label is its first species' label. */
+  sites: Array<Site>
+}
+
+/**
  * Where the operations came from: "listed" in the file under `tag`,
  * looked up in a "table" from the name or number `value` given under `tag`,
  * or "p1" when nothing usable was given.
@@ -128,3 +141,17 @@ export interface SymmetrySource {
   tag?: string
   value?: string
 }
+
+/**
+ * Write a structure to a CIF file off the main thread, as `writeCifStr`
+ * writes it; a structure that cannot be written rejects the promise.
+ */
+export declare function writeCifFile(path: string, structure: StructureParts): Promise<void>
+
+/**
+ * A structure as CIF 1.1 text (synchronous): one data block in the core
+ * dictionary's names, in the structure's own setting, which `readCifStr`
+ * reads back as the same structure. A structure that cannot be written so
+ * is an error with the reason.
+ */
+export declare function writeCifStr(structure: StructureParts): string

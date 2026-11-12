@@ -1,12 +1,14 @@
 //! Symmetry: the operations a file lists, checked to form a group, or the
-//! settings its space-group name admits in gemmi's table of settings.
+//! settings its space-group name admits in gemmi's table of settings; and
+//! the setting a structure's operations are in.
 
 use crate::document::Block;
-use crate::spacegroups::{Setting, SETTINGS, SETTINGS_BY_HALL, SETTINGS_BY_SYMBOL};
+use crate::spacegroups::{Setting, OPS, SETTINGS, SETTINGS_BY_HALL, SETTINGS_BY_SYMBOL};
 use crate::structure::{Diagnostic, DiagnosticKind, SpaceGroupNames};
 use crate::symop::{table_operations, SymOp};
 use crate::Error;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
+use std::fmt::Write;
 
 /// Data names of listed operations, in the order they are looked for.
 const OPERATION_TAGS: [&str; 2] = [
@@ -507,18 +509,20 @@ pub(crate) fn same_group(a: &[SymOp], b: &[SymOp]) -> bool {
     a.len() == b.len() && a.iter().all(|x| b.iter().any(|y| same_op(x, y)))
 }
 
-/// `a` after `b`: x ↦ a(b(x)).
-fn compose(a: &SymOp, b: &SymOp) -> SymOp {
+/// `a` after `b`: x ↦ a(b(x)); `None` where a rotation entry overflows.
+fn compose(a: &SymOp, b: &SymOp) -> Option<SymOp> {
     let mut rotation = [[0; 3]; 3];
     for (i, row) in rotation.iter_mut().enumerate() {
         for (j, value) in row.iter_mut().enumerate() {
-            *value = (0..3).map(|k| a.rotation[i][k] * b.rotation[k][j]).sum();
+            *value = (0..3).try_fold(0i32, |sum, k| {
+                sum.checked_add(a.rotation[i][k].checked_mul(b.rotation[k][j])?)
+            })?;
         }
     }
-    SymOp {
+    Some(SymOp {
         rotation,
         translation: a.apply(b.translation),
-    }
+    })
 }
 
 /// Listed operations with near-1/24 translations made exact and repeats
@@ -543,74 +547,140 @@ fn checked_group(
             format!("{tag} lists {repeats} operation(s) more than once; each is read once"),
         ));
     }
+    check_group(&unique).map_err(|why| Error::cif(format!("{tag}: {why}")))?;
+    Ok(unique)
+}
+
+/// Whether `operations` hold each operation once and form a group, up to
+/// lattice translations: a repeated operation, or a product of two that is
+/// not among them, is the reason they do not.
+pub(crate) fn check_group(operations: &[SymOp]) -> Result<(), String> {
+    for (i, op) in operations.iter().enumerate() {
+        if operations[..i].iter().any(|other| same_op(other, op)) {
+            return Err(format!("the operations give {} twice", xyz(op, ",")));
+        }
+    }
     let mut by_rotation: FxHashMap<[[i32; 3]; 3], Vec<&SymOp>> = FxHashMap::default();
-    for op in &unique {
+    for op in operations {
         by_rotation.entry(op.rotation).or_default().push(op);
     }
-    for a in &unique {
-        for b in &unique {
-            let c = compose(a, b);
+    for a in operations {
+        for b in operations {
+            let Some(c) = compose(a, b) else {
+                return Err(format!(
+                    "the operations do not form a group: {} after {} overflows a rotation entry",
+                    xyz(a, ","),
+                    xyz(b, ",")
+                ));
+            };
             let listed = by_rotation
                 .get(&c.rotation)
                 .is_some_and(|ops| ops.iter().any(|op| same_op(op, &c)));
             if !listed {
-                return Err(Error::cif(format!(
-                    "{tag}: the operations do not form a group: {} after {} gives {}, which is not listed",
-                    xyz(a),
-                    xyz(b),
-                    xyz(&c)
-                )));
+                return Err(format!(
+                    "the operations do not form a group: {} after {} gives {}, which is not listed",
+                    xyz(a, ","),
+                    xyz(b, ","),
+                    xyz(&c, ",")
+                ));
             }
         }
     }
-    Ok(unique)
+    Ok(())
 }
 
-/// An operation as CIF writes it, such as `-x+1/2,y,-z`.
-pub(crate) fn xyz(op: &SymOp) -> String {
-    (0..3)
-        .map(|i| {
-            let mut part = String::new();
-            for (j, axis) in ["x", "y", "z"].iter().enumerate() {
-                match op.rotation[i][j] {
-                    0 => {}
-                    1 => part += &format!("{}{axis}", if part.is_empty() { "" } else { "+" }),
-                    -1 => part += &format!("-{axis}"),
-                    c => part += &format!("{c:+}{axis}"),
-                }
-            }
-            let t = op.translation[i];
-            if t != 0.0 {
-                let k = t * 24.0;
-                let text = if (k - k.round()).abs() < 1e-9 {
-                    let (mut n, mut d) = (k.round() as i64, 24i64);
-                    let g = gcd(n.abs(), d);
-                    n /= g;
-                    d /= g;
-                    if d == 1 {
-                        format!("{n}")
-                    } else {
-                        format!("{n}/{d}")
-                    }
-                } else {
-                    format!("{t}")
-                };
-                if text.starts_with('-') || part.is_empty() {
-                    part += &text;
-                } else {
-                    part += &format!("+{text}");
-                }
-            }
-            if part.is_empty() {
-                part.push('0');
-            }
-            part
-        })
-        .collect::<Vec<_>>()
-        .join(",")
+/// An operation as the table stores it: its rotation entries and its
+/// translation in 1/24ths, from 0 to 23. `None` for a translation farther
+/// than the tolerance from a multiple of 1/24, which no setting has.
+fn table_key(op: &SymOp) -> Option<([i32; 9], [i32; 3])> {
+    let mut translation = [0; 3];
+    for (k, t) in translation.iter_mut().zip(op.translation) {
+        let multiple = (t * 24.0).round();
+        if !((t * 24.0 - multiple).abs() <= 24.0 * TRANSLATION_TOLERANCE) {
+            return None;
+        }
+        *k = (multiple as i64).rem_euclid(24) as i32;
+    }
+    let r = op.rotation;
+    let rotation = [
+        r[0][0], r[0][1], r[0][2], r[1][0], r[1][1], r[1][2], r[2][0], r[2][1], r[2][2],
+    ];
+    Some((rotation, translation))
 }
 
-fn gcd(a: i64, b: i64) -> i64 {
+/// The setting `operations` are in: the first setting of the table with
+/// these operations, each once, up to lattice translations. `None` where no
+/// setting has them, as for a primitive cell of a centred group, a supercell
+/// or an origin no setting uses.
+pub(crate) fn setting_of(operations: &[SymOp]) -> Option<&'static Setting> {
+    let keys = operations
+        .iter()
+        .map(table_key)
+        .collect::<Option<FxHashSet<_>>>()?;
+    if keys.len() != operations.len() {
+        return None;
+    }
+    SETTINGS.iter().find(|setting| {
+        setting.operations.len() == keys.len()
+            && setting.operations.iter().all(|&i| {
+                let (rotation, translation) = OPS[i as usize];
+                keys.contains(&(rotation.map(i32::from), translation.map(i32::from)))
+            })
+    })
+}
+
+/// An operation as CIF writes it, its three parts joined by `separator`:
+/// `-x+1/2,y,-z` with `","`. Translations that are multiples of 1/24 are
+/// fractions, others decimals.
+pub(crate) fn xyz(op: &SymOp, separator: &str) -> String {
+    let mut out = String::new();
+    for i in 0..3 {
+        if i > 0 {
+            out.push_str(separator);
+        }
+        let start = out.len();
+        // A term's sign: `-`, or `+` after an earlier term.
+        let sign = |out: &mut String, negative: bool| {
+            if negative {
+                out.push('-');
+            } else if out.len() > start {
+                out.push('+');
+            }
+        };
+        for (j, axis) in ['x', 'y', 'z'].into_iter().enumerate() {
+            let c = op.rotation[i][j];
+            if c == 0 {
+                continue;
+            }
+            sign(&mut out, c < 0);
+            if c.abs() != 1 {
+                let _ = write!(out, "{}", c.abs());
+            }
+            out.push(axis);
+        }
+        let t = op.translation[i];
+        let k = t * 24.0;
+        if !k.is_finite() || (k - k.round()).abs() >= 1e-9 {
+            sign(&mut out, t < 0.0);
+            let _ = write!(out, "{}", t.abs());
+        } else if k.round() != 0.0 {
+            let n = k.round() as i64;
+            let g = gcd(n.abs(), 24);
+            sign(&mut out, n < 0);
+            let _ = write!(out, "{}", n.abs() / g);
+            if g != 24 {
+                let _ = write!(out, "/{}", 24 / g);
+            }
+        }
+        if out.len() == start {
+            out.push('0');
+        }
+    }
+    out
+}
+
+/// The greatest common divisor; 1 for two zeros.
+pub(crate) fn gcd(a: i64, b: i64) -> i64 {
     if b == 0 {
         a.max(1)
     } else {
@@ -784,7 +854,80 @@ mod tests {
 
     #[test]
     fn operations_print_as_cif_writes_them() {
-        assert_eq!(xyz(&SymOp::parse("-x+1/2, y, -z").unwrap()), "-x+1/2,y,-z");
-        assert_eq!(xyz(&SymOp::parse("x-y, x, z+5/6").unwrap()), "x-y,x,z+5/6");
+        let print = |text: &str| xyz(&SymOp::parse(text).unwrap(), ", ");
+        assert_eq!(print("-x+1/2,y,-z"), "-x+1/2, y, -z");
+        assert_eq!(print("x-y, x, z+5/6"), "x-y, x, z+5/6");
+        assert_eq!(print("2x-y, x-1/2, z+0.1"), "2x-y, x-1/2, z+0.1");
+        assert_eq!(
+            xyz(&SymOp::parse("-x+1/2, y, -z").unwrap(), ","),
+            "-x+1/2,y,-z"
+        );
+    }
+
+    #[test]
+    fn operations_name_their_setting() {
+        let setting = |names: &str| {
+            let Source::Named { candidates, .. } =
+                resolve(&block(&format!("data_x\n{names}")), &mut Vec::new()).unwrap()
+            else {
+                panic!("a named group")
+            };
+            setting_of(&candidates[0].operations).map(|s| (s.name, s.hall))
+        };
+        assert_eq!(
+            setting("_space_group_name_Hall '-P 2yn'"),
+            Some(("P 1 21/n 1", "-P 2yn"))
+        );
+        assert_eq!(
+            setting("_space_group_name_H-M_alt 'F d -3 m:2'"),
+            Some(("F d -3 m:2", "-F 4vw 2vw 3"))
+        );
+        assert_eq!(
+            setting("_space_group_name_H-M_alt 'R -3 m:R'"),
+            Some(("R -3 m:R", "-P 3* 2"))
+        );
+        // Operations equal up to lattice translations and order, and
+        // translations rounded within the tolerance, are the setting's.
+        let shifted: Vec<SymOp> = [
+            "-x+1/2,-y,z+1/2",
+            "x,y,z",
+            "x+0.4999,-y+1/2,-z",
+            "-x,y+1/2,-z-1/2",
+        ]
+        .iter()
+        .map(|text| SymOp::parse(text).unwrap())
+        .collect();
+        assert_eq!(setting_of(&shifted).map(|s| s.name), Some("P 21 21 21"));
+        // A setting holds each operation once; no setting has an origin off
+        // the 1/24 grid or a pure translation that is no centring.
+        let twice = [SymOp::IDENTITY, SymOp::IDENTITY];
+        assert!(setting_of(&twice).is_none());
+        let supercell = ["x,y,z", "x+1/2,y,z"].map(|text| SymOp::parse(text).unwrap());
+        assert!(setting_of(&supercell).is_none());
+        let off_grid = ["x,y,z", "-x+0.1,-y,-z"].map(|text| SymOp::parse(text).unwrap());
+        assert!(setting_of(&off_grid).is_none());
+    }
+
+    #[test]
+    fn a_group_holds_each_operation_once_and_every_product() {
+        let ops = |texts: &[&str]| -> Vec<SymOp> {
+            texts.iter().map(|t| SymOp::parse(t).unwrap()).collect()
+        };
+        assert_eq!(check_group(&ops(&["x,y,z", "-x,-y,-z"])), Ok(()));
+        assert_eq!(
+            check_group(&ops(&["x,y,z", "-x,-y,-z", "-x+1,-y,-z"])),
+            Err("the operations give -x+1,-y,-z twice".to_string())
+        );
+        assert_eq!(
+            check_group(&ops(&["x,y,z", "x+1/3,y,z"])),
+            Err("the operations do not form a group: x+1/3,y,z after x+1/3,y,z gives x+2/3,y,z, which is not listed".to_string())
+        );
+        // Entries too large to compose are no group, not an overflow.
+        let mut huge = SymOp::IDENTITY;
+        huge.rotation[0][0] = 50000;
+        assert_eq!(
+            check_group(&[SymOp::IDENTITY, huge]),
+            Err("the operations do not form a group: 50000x,y,z after 50000x,y,z overflows a rotation entry".to_string())
+        );
     }
 }
