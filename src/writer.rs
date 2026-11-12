@@ -236,9 +236,9 @@ pub(crate) fn write(structure: &Structure) -> Result<String, Error> {
     let mut out = String::from("#\\#CIF_1.1\n");
     let _ = writeln!(out, "data_{}", structure.name);
     if let Some(setting) = setting {
-        let symbol = match setting.name.split_once(':') {
+        let symbol = match setting.symbol.split_once(':') {
             Some((base, choice)) => Cow::Owned(format!("{base} :{choice}")),
-            None => Cow::Borrowed(setting.name),
+            None => Cow::Borrowed(setting.symbol),
         };
         item(
             &mut out,

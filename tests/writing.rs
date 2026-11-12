@@ -284,6 +284,43 @@ fn names_are_the_table_names_of_the_setting_the_operations_are_in() {
 }
 
 #[test]
+fn double_glide_groups_are_written_with_the_e_glide() {
+    let read = |symbol: &str| {
+        read_text(&format!("data_x\n_cell_length_a 5\n_cell_length_b 6\n_cell_length_c 7\n_cell_angle_alpha 90\n_cell_angle_beta 90\n_cell_angle_gamma 90\n_space_group_name_H-M_alt '{symbol}'\nloop_\n_atom_site_label\n_atom_site_fract_x\n_atom_site_fract_y\n_atom_site_fract_z\nNa1 0.1 0.2 0.3\n"))
+    };
+    let written = |symbol: &str| {
+        let names = read_text(&round_trip(&read(symbol))).space_group;
+        (names.hermann_mauguin.unwrap(), names.hall.unwrap())
+    };
+    let names = |symbol: &str, hall: &str| (symbol.to_string(), hall.to_string());
+    // Whichever spelling the file uses, the current one is written.
+    assert_eq!(written("C m c a"), names("C m c e", "-C 2ac 2"));
+    assert_eq!(written("B m a b"), names("B m e b", "-B 2ab 2"));
+    assert_eq!(written("B m e b"), names("B m e b", "-B 2ab 2"));
+    assert_eq!(written("C m m b"), names("C m m e", "-C 2a 2a"));
+    assert_eq!(written("C c c a :2"), names("C c c e :2", "-C 2a 2ac"));
+    // Both spellings name one setting.
+    for (old, current) in [
+        ("A b m 2", "A e m 2"),
+        ("C 2 m b", "C 2 m e"),
+        ("A c 2 a", "A e 2 a"),
+        ("A b m a", "A e m a"),
+    ] {
+        assert_eq!(read(old).operations, read(current).operations, "{old}");
+    }
+    // C m m e is the symbol of both C m m a and C m m b: the atoms settle it,
+    // and the reading says so.
+    let both = read("C m m e");
+    assert!(
+        both.diagnostics[0]
+            .message
+            .contains("admits the settings C m m a, C m m b; C m m a is read"),
+        "{:?}",
+        both.diagnostics
+    );
+}
+
+#[test]
 fn operations_in_no_setting_are_written_without_names() {
     // A doubled P 1 cell: its translation (1/2, 0, 0) is no centring.
     let text = "data_double\n_cell_length_a 10\n_cell_length_b 6\n_cell_length_c 7\n_cell_angle_alpha 90\n_cell_angle_beta 90\n_cell_angle_gamma 90\nloop_\n_symmetry_equiv_pos_as_xyz\nx,y,z\nx+1/2,y,z\nloop_\n_atom_site_label\n_atom_site_fract_x\n_atom_site_fract_y\n_atom_site_fract_z\nNa1 0.1 0.2 0.3\n";

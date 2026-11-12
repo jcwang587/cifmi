@@ -230,7 +230,7 @@ is an error with the reason.
 | Rule | What cifmi writes |
 | --- | --- |
 | Block | `#\#CIF_1.1`, then `data_` and the structure's name, which must be a block code: printable ASCII without spaces, at most 75 characters |
-| Space group | `_space_group_IT_number`, `_space_group_name_H-M_alt` and `_space_group_name_Hall` of the setting the operations are in, the first in the table of settings with the same operations up to lattice translations, whatever the file called it: the setting's symbol with its origin choice or axes where the group has a choice (`P 1 21/n 1`, `F d -3 m :2`, `R -3 m :H`), and its Hall symbol (`-P 2yn`). Operations in no setting of the table (a primitive cell of a centred group, a supercell, an origin no setting uses) are written without names |
+| Space group | `_space_group_IT_number`, `_space_group_name_H-M_alt` and `_space_group_name_Hall` of the setting the operations are in, the first in the table of settings with the same operations up to lattice translations, whatever the file called it: the setting's symbol as the International Tables now write it, with its origin choice or axes where the group has a choice (`P 1 21/n 1`, `F d -3 m :2`, `R -3 m :H`, `C c c e :2`), and its Hall symbol (`-P 2yn`). Operations in no setting of the table (a primitive cell of a centred group, a supercell, an origin no setting uses) are written without names |
 | Cell | `_cell_length_a` to `_cell_angle_gamma`, as the structure has them |
 | Contents | `_chemical_formula_sum` in Hill order (C, H, then the other elements alphabetically; without carbon, all alphabetically) and `_cell_formula_units_Z`, from the multiplicities and the occupancies as written: Z is the greatest common divisor of the amounts where all are whole to the written precision, else 1 |
 | Operations | `_space_group_symop_id` and `_space_group_symop_operation_xyz`: every operation, centring included, in the structure's order, as `-x+1/2, y, -z+3/4`; translations that are multiples of 1/24 as fractions, others as decimals |
@@ -415,10 +415,13 @@ Settled:
   finds no mismatch. Operations in no setting of the table are written
   without names: the operations define the space group, any name would
   disagree with them on reading, and finding another setting for them is a
-  symmetry library's work (the tables decision above). gemmi's symbols are
-  written as they are: `C m c a` where the International Tables now write
-  `C m c e`, and the settings that close its table outside the
-  International Tables' list (`C -1`, `I -1`, `F 1 2/m 1`).
+  symmetry library's work (the tables decision above). The symbols are the
+  International Tables' current ones: the generator gives the five groups
+  with a double glide plane their e glide (`A e m 2`, `C m c e`, `B b e b`)
+  in every setting, where gemmi writes the older glide, and reading takes
+  either spelling. The settings that close gemmi's table outside the
+  International Tables' list (`C -1`, `I -1`, `F 1 2/m 1`) are written by
+  its names.
 - **8 decimals.** Enough for a site on a special position to read back onto
   it, the reader snapping what rounding leaves (§6). The contents and Z are
   computed from the occupancies as written, so writing again gives the same

@@ -901,6 +901,10 @@ pub(crate) struct Setting {
     /// Hermann-Mauguin symbol with its origin choice (`:1`, `:2`) or axes
     /// (`:H`, `:R`) where the group has a choice, as gemmi writes it.
     pub(crate) name: &'static str,
+    /// `name` as the International Tables now write it, the symbol cifmi
+    /// writes: with the e glide of the five groups that have one (`C m c e`
+    /// where gemmi writes `C m c a`).
+    pub(crate) symbol: &'static str,
     /// Hall symbol, as gemmi writes it, with single spaces.
     pub(crate) hall: &'static str,
     /// gemmi's reference setting of the number: the first in the
@@ -915,6 +919,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 1,
         name: "P 1",
+        symbol: "P 1",
         hall: "P 1",
         reference: true,
         operations: &[0],
@@ -922,6 +927,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 2,
         name: "P -1",
+        symbol: "P -1",
         hall: "-P 1",
         reference: true,
         operations: &[0, 1],
@@ -929,6 +935,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 3,
         name: "P 1 2 1",
+        symbol: "P 1 2 1",
         hall: "P 2y",
         reference: true,
         operations: &[0, 2],
@@ -936,6 +943,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 3,
         name: "P 1 1 2",
+        symbol: "P 1 1 2",
         hall: "P 2",
         reference: false,
         operations: &[0, 3],
@@ -943,6 +951,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 3,
         name: "P 2 1 1",
+        symbol: "P 2 1 1",
         hall: "P 2x",
         reference: false,
         operations: &[0, 4],
@@ -950,6 +959,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 4,
         name: "P 1 21 1",
+        symbol: "P 1 21 1",
         hall: "P 2yb",
         reference: true,
         operations: &[0, 5],
@@ -957,6 +967,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 4,
         name: "P 1 1 21",
+        symbol: "P 1 1 21",
         hall: "P 2c",
         reference: false,
         operations: &[0, 6],
@@ -964,6 +975,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 4,
         name: "P 21 1 1",
+        symbol: "P 21 1 1",
         hall: "P 2xa",
         reference: false,
         operations: &[0, 7],
@@ -971,6 +983,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "C 1 2 1",
+        symbol: "C 1 2 1",
         hall: "C 2y",
         reference: true,
         operations: &[0, 2, 8, 9],
@@ -978,6 +991,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "A 1 2 1",
+        symbol: "A 1 2 1",
         hall: "A 2y",
         reference: false,
         operations: &[0, 2, 10, 11],
@@ -985,6 +999,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "I 1 2 1",
+        symbol: "I 1 2 1",
         hall: "I 2y",
         reference: false,
         operations: &[0, 2, 12, 13],
@@ -992,6 +1007,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "A 1 1 2",
+        symbol: "A 1 1 2",
         hall: "A 2",
         reference: false,
         operations: &[0, 3, 10, 14],
@@ -999,6 +1015,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "B 1 1 2",
+        symbol: "B 1 1 2",
         hall: "B 2",
         reference: false,
         operations: &[0, 3, 15, 16],
@@ -1006,6 +1023,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "I 1 1 2",
+        symbol: "I 1 1 2",
         hall: "I 2",
         reference: false,
         operations: &[0, 3, 12, 17],
@@ -1013,6 +1031,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "B 2 1 1",
+        symbol: "B 2 1 1",
         hall: "B 2x",
         reference: false,
         operations: &[0, 4, 15, 18],
@@ -1020,6 +1039,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "C 2 1 1",
+        symbol: "C 2 1 1",
         hall: "C 2x",
         reference: false,
         operations: &[0, 4, 8, 19],
@@ -1027,6 +1047,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "I 2 1 1",
+        symbol: "I 2 1 1",
         hall: "I 2x",
         reference: false,
         operations: &[0, 4, 12, 20],
@@ -1034,6 +1055,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 6,
         name: "P 1 m 1",
+        symbol: "P 1 m 1",
         hall: "P -2y",
         reference: true,
         operations: &[0, 21],
@@ -1041,6 +1063,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 6,
         name: "P 1 1 m",
+        symbol: "P 1 1 m",
         hall: "P -2",
         reference: false,
         operations: &[0, 22],
@@ -1048,6 +1071,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 6,
         name: "P m 1 1",
+        symbol: "P m 1 1",
         hall: "P -2x",
         reference: false,
         operations: &[0, 23],
@@ -1055,6 +1079,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 7,
         name: "P 1 c 1",
+        symbol: "P 1 c 1",
         hall: "P -2yc",
         reference: true,
         operations: &[0, 24],
@@ -1062,6 +1087,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 7,
         name: "P 1 n 1",
+        symbol: "P 1 n 1",
         hall: "P -2yac",
         reference: false,
         operations: &[0, 25],
@@ -1069,6 +1095,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 7,
         name: "P 1 a 1",
+        symbol: "P 1 a 1",
         hall: "P -2ya",
         reference: false,
         operations: &[0, 26],
@@ -1076,6 +1103,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 7,
         name: "P 1 1 a",
+        symbol: "P 1 1 a",
         hall: "P -2a",
         reference: false,
         operations: &[0, 27],
@@ -1083,6 +1111,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 7,
         name: "P 1 1 n",
+        symbol: "P 1 1 n",
         hall: "P -2ab",
         reference: false,
         operations: &[0, 28],
@@ -1090,6 +1119,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 7,
         name: "P 1 1 b",
+        symbol: "P 1 1 b",
         hall: "P -2b",
         reference: false,
         operations: &[0, 29],
@@ -1097,6 +1127,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 7,
         name: "P b 1 1",
+        symbol: "P b 1 1",
         hall: "P -2xb",
         reference: false,
         operations: &[0, 30],
@@ -1104,6 +1135,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 7,
         name: "P n 1 1",
+        symbol: "P n 1 1",
         hall: "P -2xbc",
         reference: false,
         operations: &[0, 31],
@@ -1111,6 +1143,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 7,
         name: "P c 1 1",
+        symbol: "P c 1 1",
         hall: "P -2xc",
         reference: false,
         operations: &[0, 32],
@@ -1118,6 +1151,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "C 1 m 1",
+        symbol: "C 1 m 1",
         hall: "C -2y",
         reference: true,
         operations: &[0, 21, 8, 33],
@@ -1125,6 +1159,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "A 1 m 1",
+        symbol: "A 1 m 1",
         hall: "A -2y",
         reference: false,
         operations: &[0, 21, 10, 34],
@@ -1132,6 +1167,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "I 1 m 1",
+        symbol: "I 1 m 1",
         hall: "I -2y",
         reference: false,
         operations: &[0, 21, 12, 35],
@@ -1139,6 +1175,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "A 1 1 m",
+        symbol: "A 1 1 m",
         hall: "A -2",
         reference: false,
         operations: &[0, 22, 10, 36],
@@ -1146,6 +1183,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "B 1 1 m",
+        symbol: "B 1 1 m",
         hall: "B -2",
         reference: false,
         operations: &[0, 22, 15, 37],
@@ -1153,6 +1191,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "I 1 1 m",
+        symbol: "I 1 1 m",
         hall: "I -2",
         reference: false,
         operations: &[0, 22, 12, 38],
@@ -1160,6 +1199,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "B m 1 1",
+        symbol: "B m 1 1",
         hall: "B -2x",
         reference: false,
         operations: &[0, 23, 15, 39],
@@ -1167,6 +1207,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "C m 1 1",
+        symbol: "C m 1 1",
         hall: "C -2x",
         reference: false,
         operations: &[0, 23, 8, 40],
@@ -1174,6 +1215,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "I m 1 1",
+        symbol: "I m 1 1",
         hall: "I -2x",
         reference: false,
         operations: &[0, 23, 12, 41],
@@ -1181,6 +1223,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "C 1 c 1",
+        symbol: "C 1 c 1",
         hall: "C -2yc",
         reference: true,
         operations: &[0, 24, 8, 35],
@@ -1188,6 +1231,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "A 1 n 1",
+        symbol: "A 1 n 1",
         hall: "A -2yab",
         reference: false,
         operations: &[0, 33, 10, 25],
@@ -1195,6 +1239,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "I 1 a 1",
+        symbol: "I 1 a 1",
         hall: "I -2ya",
         reference: false,
         operations: &[0, 26, 12, 34],
@@ -1202,6 +1247,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "A 1 a 1",
+        symbol: "A 1 a 1",
         hall: "A -2ya",
         reference: false,
         operations: &[0, 26, 10, 35],
@@ -1209,6 +1255,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "C 1 n 1",
+        symbol: "C 1 n 1",
         hall: "C -2yac",
         reference: false,
         operations: &[0, 25, 8, 34],
@@ -1216,6 +1263,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "I 1 c 1",
+        symbol: "I 1 c 1",
         hall: "I -2yc",
         reference: false,
         operations: &[0, 24, 12, 33],
@@ -1223,6 +1271,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "A 1 1 a",
+        symbol: "A 1 1 a",
         hall: "A -2a",
         reference: false,
         operations: &[0, 27, 10, 38],
@@ -1230,6 +1279,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "B 1 1 n",
+        symbol: "B 1 1 n",
         hall: "B -2ab",
         reference: false,
         operations: &[0, 28, 15, 36],
@@ -1237,6 +1287,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "I 1 1 b",
+        symbol: "I 1 1 b",
         hall: "I -2b",
         reference: false,
         operations: &[0, 29, 12, 37],
@@ -1244,6 +1295,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "B 1 1 b",
+        symbol: "B 1 1 b",
         hall: "B -2b",
         reference: false,
         operations: &[0, 29, 15, 38],
@@ -1251,6 +1303,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "A 1 1 n",
+        symbol: "A 1 1 n",
         hall: "A -2ab",
         reference: false,
         operations: &[0, 28, 10, 37],
@@ -1258,6 +1311,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "I 1 1 a",
+        symbol: "I 1 1 a",
         hall: "I -2a",
         reference: false,
         operations: &[0, 27, 12, 36],
@@ -1265,6 +1319,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "B b 1 1",
+        symbol: "B b 1 1",
         hall: "B -2xb",
         reference: false,
         operations: &[0, 30, 15, 41],
@@ -1272,6 +1327,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "C n 1 1",
+        symbol: "C n 1 1",
         hall: "C -2xac",
         reference: false,
         operations: &[0, 39, 8, 31],
@@ -1279,6 +1335,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "I c 1 1",
+        symbol: "I c 1 1",
         hall: "I -2xc",
         reference: false,
         operations: &[0, 32, 12, 40],
@@ -1286,6 +1343,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "C c 1 1",
+        symbol: "C c 1 1",
         hall: "C -2xc",
         reference: false,
         operations: &[0, 32, 8, 41],
@@ -1293,6 +1351,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "B n 1 1",
+        symbol: "B n 1 1",
         hall: "B -2xab",
         reference: false,
         operations: &[0, 40, 15, 31],
@@ -1300,6 +1359,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "I b 1 1",
+        symbol: "I b 1 1",
         hall: "I -2xb",
         reference: false,
         operations: &[0, 30, 12, 39],
@@ -1307,6 +1367,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 10,
         name: "P 1 2/m 1",
+        symbol: "P 1 2/m 1",
         hall: "-P 2y",
         reference: true,
         operations: &[0, 2, 1, 21],
@@ -1314,6 +1375,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 10,
         name: "P 1 1 2/m",
+        symbol: "P 1 1 2/m",
         hall: "-P 2",
         reference: false,
         operations: &[0, 3, 1, 22],
@@ -1321,6 +1383,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 10,
         name: "P 2/m 1 1",
+        symbol: "P 2/m 1 1",
         hall: "-P 2x",
         reference: false,
         operations: &[0, 4, 1, 23],
@@ -1328,6 +1391,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 11,
         name: "P 1 21/m 1",
+        symbol: "P 1 21/m 1",
         hall: "-P 2yb",
         reference: true,
         operations: &[0, 5, 1, 42],
@@ -1335,6 +1399,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 11,
         name: "P 1 1 21/m",
+        symbol: "P 1 1 21/m",
         hall: "-P 2c",
         reference: false,
         operations: &[0, 6, 1, 43],
@@ -1342,6 +1407,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 11,
         name: "P 21/m 1 1",
+        symbol: "P 21/m 1 1",
         hall: "-P 2xa",
         reference: false,
         operations: &[0, 7, 1, 44],
@@ -1349,6 +1415,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "C 1 2/m 1",
+        symbol: "C 1 2/m 1",
         hall: "-C 2y",
         reference: true,
         operations: &[0, 2, 1, 21, 8, 9, 45, 33],
@@ -1356,6 +1423,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "A 1 2/m 1",
+        symbol: "A 1 2/m 1",
         hall: "-A 2y",
         reference: false,
         operations: &[0, 2, 1, 21, 10, 11, 46, 34],
@@ -1363,6 +1431,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "I 1 2/m 1",
+        symbol: "I 1 2/m 1",
         hall: "-I 2y",
         reference: false,
         operations: &[0, 2, 1, 21, 12, 13, 47, 35],
@@ -1370,6 +1439,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "A 1 1 2/m",
+        symbol: "A 1 1 2/m",
         hall: "-A 2",
         reference: false,
         operations: &[0, 3, 1, 22, 10, 14, 46, 36],
@@ -1377,6 +1447,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "B 1 1 2/m",
+        symbol: "B 1 1 2/m",
         hall: "-B 2",
         reference: false,
         operations: &[0, 3, 1, 22, 15, 16, 48, 37],
@@ -1384,6 +1455,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "I 1 1 2/m",
+        symbol: "I 1 1 2/m",
         hall: "-I 2",
         reference: false,
         operations: &[0, 3, 1, 22, 12, 17, 47, 38],
@@ -1391,6 +1463,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "B 2/m 1 1",
+        symbol: "B 2/m 1 1",
         hall: "-B 2x",
         reference: false,
         operations: &[0, 4, 1, 23, 15, 18, 48, 39],
@@ -1398,6 +1471,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "C 2/m 1 1",
+        symbol: "C 2/m 1 1",
         hall: "-C 2x",
         reference: false,
         operations: &[0, 4, 1, 23, 8, 19, 45, 40],
@@ -1405,6 +1479,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "I 2/m 1 1",
+        symbol: "I 2/m 1 1",
         hall: "-I 2x",
         reference: false,
         operations: &[0, 4, 1, 23, 12, 20, 47, 41],
@@ -1412,6 +1487,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 13,
         name: "P 1 2/c 1",
+        symbol: "P 1 2/c 1",
         hall: "-P 2yc",
         reference: true,
         operations: &[0, 49, 1, 24],
@@ -1419,6 +1495,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 13,
         name: "P 1 2/n 1",
+        symbol: "P 1 2/n 1",
         hall: "-P 2yac",
         reference: false,
         operations: &[0, 50, 1, 25],
@@ -1426,6 +1503,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 13,
         name: "P 1 2/a 1",
+        symbol: "P 1 2/a 1",
         hall: "-P 2ya",
         reference: false,
         operations: &[0, 51, 1, 26],
@@ -1433,6 +1511,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 13,
         name: "P 1 1 2/a",
+        symbol: "P 1 1 2/a",
         hall: "-P 2a",
         reference: false,
         operations: &[0, 52, 1, 27],
@@ -1440,6 +1519,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 13,
         name: "P 1 1 2/n",
+        symbol: "P 1 1 2/n",
         hall: "-P 2ab",
         reference: false,
         operations: &[0, 53, 1, 28],
@@ -1447,6 +1527,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 13,
         name: "P 1 1 2/b",
+        symbol: "P 1 1 2/b",
         hall: "-P 2b",
         reference: false,
         operations: &[0, 54, 1, 29],
@@ -1454,6 +1535,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 13,
         name: "P 2/b 1 1",
+        symbol: "P 2/b 1 1",
         hall: "-P 2xb",
         reference: false,
         operations: &[0, 55, 1, 30],
@@ -1461,6 +1543,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 13,
         name: "P 2/n 1 1",
+        symbol: "P 2/n 1 1",
         hall: "-P 2xbc",
         reference: false,
         operations: &[0, 56, 1, 31],
@@ -1468,6 +1551,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 13,
         name: "P 2/c 1 1",
+        symbol: "P 2/c 1 1",
         hall: "-P 2xc",
         reference: false,
         operations: &[0, 57, 1, 32],
@@ -1475,6 +1559,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 14,
         name: "P 1 21/c 1",
+        symbol: "P 1 21/c 1",
         hall: "-P 2ybc",
         reference: true,
         operations: &[0, 11, 1, 34],
@@ -1482,6 +1567,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 14,
         name: "P 1 21/n 1",
+        symbol: "P 1 21/n 1",
         hall: "-P 2yn",
         reference: false,
         operations: &[0, 13, 1, 35],
@@ -1489,6 +1575,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 14,
         name: "P 1 21/a 1",
+        symbol: "P 1 21/a 1",
         hall: "-P 2yab",
         reference: false,
         operations: &[0, 9, 1, 33],
@@ -1496,6 +1583,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 14,
         name: "P 1 1 21/a",
+        symbol: "P 1 1 21/a",
         hall: "-P 2ac",
         reference: false,
         operations: &[0, 16, 1, 37],
@@ -1503,6 +1591,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 14,
         name: "P 1 1 21/n",
+        symbol: "P 1 1 21/n",
         hall: "-P 2n",
         reference: false,
         operations: &[0, 17, 1, 38],
@@ -1510,6 +1599,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 14,
         name: "P 1 1 21/b",
+        symbol: "P 1 1 21/b",
         hall: "-P 2bc",
         reference: false,
         operations: &[0, 14, 1, 36],
@@ -1517,6 +1607,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 14,
         name: "P 21/b 1 1",
+        symbol: "P 21/b 1 1",
         hall: "-P 2xab",
         reference: false,
         operations: &[0, 19, 1, 40],
@@ -1524,6 +1615,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 14,
         name: "P 21/n 1 1",
+        symbol: "P 21/n 1 1",
         hall: "-P 2xn",
         reference: false,
         operations: &[0, 20, 1, 41],
@@ -1531,6 +1623,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 14,
         name: "P 21/c 1 1",
+        symbol: "P 21/c 1 1",
         hall: "-P 2xac",
         reference: false,
         operations: &[0, 18, 1, 39],
@@ -1538,6 +1631,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "C 1 2/c 1",
+        symbol: "C 1 2/c 1",
         hall: "-C 2yc",
         reference: true,
         operations: &[0, 49, 1, 24, 8, 13, 45, 35],
@@ -1545,6 +1639,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "A 1 2/n 1",
+        symbol: "A 1 2/n 1",
         hall: "-A 2yab",
         reference: false,
         operations: &[0, 9, 1, 33, 10, 50, 46, 25],
@@ -1552,6 +1647,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "I 1 2/a 1",
+        symbol: "I 1 2/a 1",
         hall: "-I 2ya",
         reference: false,
         operations: &[0, 51, 1, 26, 12, 11, 47, 34],
@@ -1559,6 +1655,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "A 1 2/a 1",
+        symbol: "A 1 2/a 1",
         hall: "-A 2ya",
         reference: false,
         operations: &[0, 51, 1, 26, 10, 13, 46, 35],
@@ -1566,6 +1663,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "C 1 2/n 1",
+        symbol: "C 1 2/n 1",
         hall: "-C 2yac",
         reference: false,
         operations: &[0, 50, 1, 25, 8, 11, 45, 34],
@@ -1573,6 +1671,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "I 1 2/c 1",
+        symbol: "I 1 2/c 1",
         hall: "-I 2yc",
         reference: false,
         operations: &[0, 49, 1, 24, 12, 9, 47, 33],
@@ -1580,6 +1679,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "A 1 1 2/a",
+        symbol: "A 1 1 2/a",
         hall: "-A 2a",
         reference: false,
         operations: &[0, 52, 1, 27, 10, 17, 46, 38],
@@ -1587,6 +1687,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "B 1 1 2/n",
+        symbol: "B 1 1 2/n",
         hall: "-B 2ab",
         reference: false,
         operations: &[0, 53, 1, 28, 15, 14, 48, 36],
@@ -1594,6 +1695,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "I 1 1 2/b",
+        symbol: "I 1 1 2/b",
         hall: "-I 2b",
         reference: false,
         operations: &[0, 54, 1, 29, 12, 16, 47, 37],
@@ -1601,6 +1703,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "B 1 1 2/b",
+        symbol: "B 1 1 2/b",
         hall: "-B 2b",
         reference: false,
         operations: &[0, 54, 1, 29, 15, 17, 48, 38],
@@ -1608,6 +1711,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "A 1 1 2/n",
+        symbol: "A 1 1 2/n",
         hall: "-A 2ab",
         reference: false,
         operations: &[0, 53, 1, 28, 10, 16, 46, 37],
@@ -1615,6 +1719,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "I 1 1 2/a",
+        symbol: "I 1 1 2/a",
         hall: "-I 2a",
         reference: false,
         operations: &[0, 52, 1, 27, 12, 14, 47, 36],
@@ -1622,6 +1727,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "B 2/b 1 1",
+        symbol: "B 2/b 1 1",
         hall: "-B 2xb",
         reference: false,
         operations: &[0, 55, 1, 30, 15, 20, 48, 41],
@@ -1629,6 +1735,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "C 2/n 1 1",
+        symbol: "C 2/n 1 1",
         hall: "-C 2xac",
         reference: false,
         operations: &[0, 18, 1, 39, 8, 56, 45, 31],
@@ -1636,6 +1743,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "I 2/c 1 1",
+        symbol: "I 2/c 1 1",
         hall: "-I 2xc",
         reference: false,
         operations: &[0, 57, 1, 32, 12, 19, 47, 40],
@@ -1643,6 +1751,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "C 2/c 1 1",
+        symbol: "C 2/c 1 1",
         hall: "-C 2xc",
         reference: false,
         operations: &[0, 57, 1, 32, 8, 20, 45, 41],
@@ -1650,6 +1759,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "B 2/n 1 1",
+        symbol: "B 2/n 1 1",
         hall: "-B 2xab",
         reference: false,
         operations: &[0, 19, 1, 40, 15, 56, 48, 31],
@@ -1657,6 +1767,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 15,
         name: "I 2/b 1 1",
+        symbol: "I 2/b 1 1",
         hall: "-I 2xb",
         reference: false,
         operations: &[0, 55, 1, 30, 12, 18, 47, 39],
@@ -1664,6 +1775,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 16,
         name: "P 2 2 2",
+        symbol: "P 2 2 2",
         hall: "P 2 2",
         reference: true,
         operations: &[0, 3, 4, 2],
@@ -1671,6 +1783,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 17,
         name: "P 2 2 21",
+        symbol: "P 2 2 21",
         hall: "P 2c 2",
         reference: true,
         operations: &[0, 6, 4, 49],
@@ -1678,6 +1791,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 17,
         name: "P 21 2 2",
+        symbol: "P 21 2 2",
         hall: "P 2a 2a",
         reference: false,
         operations: &[0, 52, 7, 2],
@@ -1685,6 +1799,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 17,
         name: "P 2 21 2",
+        symbol: "P 2 21 2",
         hall: "P 2 2b",
         reference: false,
         operations: &[0, 3, 55, 5],
@@ -1692,6 +1807,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 18,
         name: "P 21 21 2",
+        symbol: "P 21 21 2",
         hall: "P 2 2ab",
         reference: true,
         operations: &[0, 3, 19, 9],
@@ -1699,6 +1815,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 18,
         name: "P 2 21 21",
+        symbol: "P 2 21 21",
         hall: "P 2bc 2",
         reference: false,
         operations: &[0, 14, 4, 11],
@@ -1706,6 +1823,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 18,
         name: "P 21 2 21",
+        symbol: "P 21 2 21",
         hall: "P 2ac 2ac",
         reference: false,
         operations: &[0, 16, 18, 2],
@@ -1713,6 +1831,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 19,
         name: "P 21 21 21",
+        symbol: "P 21 21 21",
         hall: "P 2ac 2ab",
         reference: true,
         operations: &[0, 16, 19, 11],
@@ -1720,6 +1839,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 20,
         name: "C 2 2 21",
+        symbol: "C 2 2 21",
         hall: "C 2c 2",
         reference: true,
         operations: &[0, 6, 4, 49, 8, 17, 19, 13],
@@ -1727,6 +1847,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 20,
         name: "A 21 2 2",
+        symbol: "A 21 2 2",
         hall: "A 2a 2a",
         reference: false,
         operations: &[0, 52, 7, 2, 10, 17, 20, 11],
@@ -1734,6 +1855,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 20,
         name: "B 2 21 2",
+        symbol: "B 2 21 2",
         hall: "B 2 2b",
         reference: false,
         operations: &[0, 3, 55, 5, 15, 16, 20, 13],
@@ -1741,6 +1863,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 21,
         name: "C 2 2 2",
+        symbol: "C 2 2 2",
         hall: "C 2 2",
         reference: true,
         operations: &[0, 3, 4, 2, 8, 53, 19, 9],
@@ -1748,6 +1871,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 21,
         name: "A 2 2 2",
+        symbol: "A 2 2 2",
         hall: "A 2 2",
         reference: false,
         operations: &[0, 3, 4, 2, 10, 14, 56, 11],
@@ -1755,6 +1879,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 21,
         name: "B 2 2 2",
+        symbol: "B 2 2 2",
         hall: "B 2 2",
         reference: false,
         operations: &[0, 3, 4, 2, 15, 16, 18, 50],
@@ -1762,6 +1887,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 22,
         name: "F 2 2 2",
+        symbol: "F 2 2 2",
         hall: "F 2 2",
         reference: true,
         operations: &[0, 3, 4, 2, 10, 14, 56, 11, 15, 16, 18, 50, 8, 53, 19, 9],
@@ -1769,6 +1895,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 23,
         name: "I 2 2 2",
+        symbol: "I 2 2 2",
         hall: "I 2 2",
         reference: true,
         operations: &[0, 3, 4, 2, 12, 17, 20, 13],
@@ -1776,6 +1903,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 24,
         name: "I 21 21 21",
+        symbol: "I 21 21 21",
         hall: "I 2b 2c",
         reference: true,
         operations: &[0, 54, 57, 11, 12, 16, 19, 51],
@@ -1783,6 +1911,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 25,
         name: "P m m 2",
+        symbol: "P m m 2",
         hall: "P 2 -2",
         reference: true,
         operations: &[0, 3, 23, 21],
@@ -1790,6 +1919,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 25,
         name: "P 2 m m",
+        symbol: "P 2 m m",
         hall: "P -2 2",
         reference: false,
         operations: &[0, 22, 4, 21],
@@ -1797,6 +1927,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 25,
         name: "P m 2 m",
+        symbol: "P m 2 m",
         hall: "P -2 -2",
         reference: false,
         operations: &[0, 22, 23, 2],
@@ -1804,6 +1935,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 26,
         name: "P m c 21",
+        symbol: "P m c 21",
         hall: "P 2c -2",
         reference: true,
         operations: &[0, 6, 23, 24],
@@ -1811,6 +1943,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 26,
         name: "P c m 21",
+        symbol: "P c m 21",
         hall: "P 2c -2c",
         reference: false,
         operations: &[0, 6, 32, 21],
@@ -1818,6 +1951,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 26,
         name: "P 21 m a",
+        symbol: "P 21 m a",
         hall: "P -2a 2a",
         reference: false,
         operations: &[0, 27, 7, 21],
@@ -1825,6 +1959,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 26,
         name: "P 21 a m",
+        symbol: "P 21 a m",
         hall: "P -2 2a",
         reference: false,
         operations: &[0, 22, 7, 26],
@@ -1832,6 +1967,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 26,
         name: "P b 21 m",
+        symbol: "P b 21 m",
         hall: "P -2 -2b",
         reference: false,
         operations: &[0, 22, 30, 5],
@@ -1839,6 +1975,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 26,
         name: "P m 21 b",
+        symbol: "P m 21 b",
         hall: "P -2b -2",
         reference: false,
         operations: &[0, 29, 23, 5],
@@ -1846,6 +1983,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 27,
         name: "P c c 2",
+        symbol: "P c c 2",
         hall: "P 2 -2c",
         reference: true,
         operations: &[0, 3, 32, 24],
@@ -1853,6 +1991,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 27,
         name: "P 2 a a",
+        symbol: "P 2 a a",
         hall: "P -2a 2",
         reference: false,
         operations: &[0, 27, 4, 26],
@@ -1860,6 +1999,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 27,
         name: "P b 2 b",
+        symbol: "P b 2 b",
         hall: "P -2b -2b",
         reference: false,
         operations: &[0, 29, 30, 2],
@@ -1867,6 +2007,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 28,
         name: "P m a 2",
+        symbol: "P m a 2",
         hall: "P 2 -2a",
         reference: true,
         operations: &[0, 3, 44, 26],
@@ -1874,6 +2015,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 28,
         name: "P b m 2",
+        symbol: "P b m 2",
         hall: "P 2 -2b",
         reference: false,
         operations: &[0, 3, 30, 42],
@@ -1881,6 +2023,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 28,
         name: "P 2 m b",
+        symbol: "P 2 m b",
         hall: "P -2b 2",
         reference: false,
         operations: &[0, 29, 4, 42],
@@ -1888,6 +2031,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 28,
         name: "P 2 c m",
+        symbol: "P 2 c m",
         hall: "P -2c 2",
         reference: false,
         operations: &[0, 43, 4, 24],
@@ -1895,6 +2039,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 28,
         name: "P c 2 m",
+        symbol: "P c 2 m",
         hall: "P -2c -2c",
         reference: false,
         operations: &[0, 43, 32, 2],
@@ -1902,6 +2047,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 28,
         name: "P m 2 a",
+        symbol: "P m 2 a",
         hall: "P -2a -2a",
         reference: false,
         operations: &[0, 27, 44, 2],
@@ -1909,6 +2055,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 29,
         name: "P c a 21",
+        symbol: "P c a 21",
         hall: "P 2c -2ac",
         reference: true,
         operations: &[0, 6, 39, 26],
@@ -1916,6 +2063,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 29,
         name: "P b c 21",
+        symbol: "P b c 21",
         hall: "P 2c -2b",
         reference: false,
         operations: &[0, 6, 30, 34],
@@ -1923,6 +2071,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 29,
         name: "P 21 a b",
+        symbol: "P 21 a b",
         hall: "P -2b 2a",
         reference: false,
         operations: &[0, 29, 7, 33],
@@ -1930,6 +2079,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 29,
         name: "P 21 c a",
+        symbol: "P 21 c a",
         hall: "P -2ac 2a",
         reference: false,
         operations: &[0, 37, 7, 24],
@@ -1937,6 +2087,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 29,
         name: "P c 21 b",
+        symbol: "P c 21 b",
         hall: "P -2bc -2c",
         reference: false,
         operations: &[0, 36, 32, 5],
@@ -1944,6 +2095,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 29,
         name: "P b 21 a",
+        symbol: "P b 21 a",
         hall: "P -2a -2ab",
         reference: false,
         operations: &[0, 27, 40, 5],
@@ -1951,6 +2103,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 30,
         name: "P n c 2",
+        symbol: "P n c 2",
         hall: "P 2 -2bc",
         reference: true,
         operations: &[0, 3, 31, 34],
@@ -1958,6 +2111,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 30,
         name: "P c n 2",
+        symbol: "P c n 2",
         hall: "P 2 -2ac",
         reference: false,
         operations: &[0, 3, 39, 25],
@@ -1965,6 +2119,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 30,
         name: "P 2 n a",
+        symbol: "P 2 n a",
         hall: "P -2ac 2",
         reference: false,
         operations: &[0, 37, 4, 25],
@@ -1972,6 +2127,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 30,
         name: "P 2 a n",
+        symbol: "P 2 a n",
         hall: "P -2ab 2",
         reference: false,
         operations: &[0, 28, 4, 33],
@@ -1979,6 +2135,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 30,
         name: "P b 2 n",
+        symbol: "P b 2 n",
         hall: "P -2ab -2ab",
         reference: false,
         operations: &[0, 28, 40, 2],
@@ -1986,6 +2143,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 30,
         name: "P n 2 b",
+        symbol: "P n 2 b",
         hall: "P -2bc -2bc",
         reference: false,
         operations: &[0, 36, 31, 2],
@@ -1993,6 +2151,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 31,
         name: "P m n 21",
+        symbol: "P m n 21",
         hall: "P 2ac -2",
         reference: true,
         operations: &[0, 16, 23, 25],
@@ -2000,6 +2159,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 31,
         name: "P n m 21",
+        symbol: "P n m 21",
         hall: "P 2bc -2bc",
         reference: false,
         operations: &[0, 14, 31, 21],
@@ -2007,6 +2167,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 31,
         name: "P 21 m n",
+        symbol: "P 21 m n",
         hall: "P -2ab 2ab",
         reference: false,
         operations: &[0, 28, 19, 21],
@@ -2014,6 +2175,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 31,
         name: "P 21 n m",
+        symbol: "P 21 n m",
         hall: "P -2 2ac",
         reference: false,
         operations: &[0, 22, 18, 25],
@@ -2021,6 +2183,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 31,
         name: "P n 21 m",
+        symbol: "P n 21 m",
         hall: "P -2 -2bc",
         reference: false,
         operations: &[0, 22, 31, 11],
@@ -2028,6 +2191,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 31,
         name: "P m 21 n",
+        symbol: "P m 21 n",
         hall: "P -2ab -2",
         reference: false,
         operations: &[0, 28, 23, 9],
@@ -2035,6 +2199,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 32,
         name: "P b a 2",
+        symbol: "P b a 2",
         hall: "P 2 -2ab",
         reference: true,
         operations: &[0, 3, 40, 33],
@@ -2042,6 +2207,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 32,
         name: "P 2 c b",
+        symbol: "P 2 c b",
         hall: "P -2bc 2",
         reference: false,
         operations: &[0, 36, 4, 34],
@@ -2049,6 +2215,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 32,
         name: "P c 2 a",
+        symbol: "P c 2 a",
         hall: "P -2ac -2ac",
         reference: false,
         operations: &[0, 37, 39, 2],
@@ -2056,6 +2223,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 33,
         name: "P n a 21",
+        symbol: "P n a 21",
         hall: "P 2c -2n",
         reference: true,
         operations: &[0, 6, 41, 33],
@@ -2063,6 +2231,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 33,
         name: "P b n 21",
+        symbol: "P b n 21",
         hall: "P 2c -2ab",
         reference: false,
         operations: &[0, 6, 40, 35],
@@ -2070,6 +2239,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 33,
         name: "P 21 n b",
+        symbol: "P 21 n b",
         hall: "P -2bc 2a",
         reference: false,
         operations: &[0, 36, 7, 35],
@@ -2077,6 +2247,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 33,
         name: "P 21 c n",
+        symbol: "P 21 c n",
         hall: "P -2n 2a",
         reference: false,
         operations: &[0, 38, 7, 34],
@@ -2084,6 +2255,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 33,
         name: "P c 21 n",
+        symbol: "P c 21 n",
         hall: "P -2n -2ac",
         reference: false,
         operations: &[0, 38, 39, 5],
@@ -2091,6 +2263,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 33,
         name: "P n 21 a",
+        symbol: "P n 21 a",
         hall: "P -2ac -2n",
         reference: false,
         operations: &[0, 37, 41, 5],
@@ -2098,6 +2271,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 34,
         name: "P n n 2",
+        symbol: "P n n 2",
         hall: "P 2 -2n",
         reference: true,
         operations: &[0, 3, 41, 35],
@@ -2105,6 +2279,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 34,
         name: "P 2 n n",
+        symbol: "P 2 n n",
         hall: "P -2n 2",
         reference: false,
         operations: &[0, 38, 4, 35],
@@ -2112,6 +2287,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 34,
         name: "P n 2 n",
+        symbol: "P n 2 n",
         hall: "P -2n -2n",
         reference: false,
         operations: &[0, 38, 41, 2],
@@ -2119,6 +2295,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 35,
         name: "C m m 2",
+        symbol: "C m m 2",
         hall: "C 2 -2",
         reference: true,
         operations: &[0, 3, 23, 21, 8, 53, 40, 33],
@@ -2126,6 +2303,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 35,
         name: "A 2 m m",
+        symbol: "A 2 m m",
         hall: "A -2 2",
         reference: false,
         operations: &[0, 22, 4, 21, 10, 36, 56, 34],
@@ -2133,6 +2311,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 35,
         name: "B m 2 m",
+        symbol: "B m 2 m",
         hall: "B -2 -2",
         reference: false,
         operations: &[0, 22, 23, 2, 15, 37, 39, 50],
@@ -2140,6 +2319,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 36,
         name: "C m c 21",
+        symbol: "C m c 21",
         hall: "C 2c -2",
         reference: true,
         operations: &[0, 6, 23, 24, 8, 17, 40, 35],
@@ -2147,6 +2327,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 36,
         name: "C c m 21",
+        symbol: "C c m 21",
         hall: "C 2c -2c",
         reference: false,
         operations: &[0, 6, 32, 21, 8, 17, 41, 33],
@@ -2154,6 +2335,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 36,
         name: "A 21 m a",
+        symbol: "A 21 m a",
         hall: "A -2a 2a",
         reference: false,
         operations: &[0, 27, 7, 21, 10, 38, 20, 34],
@@ -2161,6 +2343,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 36,
         name: "A 21 a m",
+        symbol: "A 21 a m",
         hall: "A -2 2a",
         reference: false,
         operations: &[0, 22, 7, 26, 10, 36, 20, 35],
@@ -2168,6 +2351,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 36,
         name: "B b 21 m",
+        symbol: "B b 21 m",
         hall: "B -2 -2b",
         reference: false,
         operations: &[0, 22, 30, 5, 15, 37, 41, 13],
@@ -2175,6 +2359,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 36,
         name: "B m 21 b",
+        symbol: "B m 21 b",
         hall: "B -2b -2",
         reference: false,
         operations: &[0, 29, 23, 5, 15, 38, 39, 13],
@@ -2182,6 +2367,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 37,
         name: "C c c 2",
+        symbol: "C c c 2",
         hall: "C 2 -2c",
         reference: true,
         operations: &[0, 3, 32, 24, 8, 53, 41, 35],
@@ -2189,6 +2375,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 37,
         name: "A 2 a a",
+        symbol: "A 2 a a",
         hall: "A -2a 2",
         reference: false,
         operations: &[0, 27, 4, 26, 10, 38, 56, 35],
@@ -2196,6 +2383,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 37,
         name: "B b 2 b",
+        symbol: "B b 2 b",
         hall: "B -2b -2b",
         reference: false,
         operations: &[0, 29, 30, 2, 15, 38, 41, 50],
@@ -2203,6 +2391,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 38,
         name: "A m m 2",
+        symbol: "A m m 2",
         hall: "A 2 -2",
         reference: true,
         operations: &[0, 3, 23, 21, 10, 14, 31, 34],
@@ -2210,6 +2399,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 38,
         name: "B m m 2",
+        symbol: "B m m 2",
         hall: "B 2 -2",
         reference: false,
         operations: &[0, 3, 23, 21, 15, 16, 39, 25],
@@ -2217,6 +2407,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 38,
         name: "B 2 m m",
+        symbol: "B 2 m m",
         hall: "B -2 2",
         reference: false,
         operations: &[0, 22, 4, 21, 15, 37, 18, 25],
@@ -2224,6 +2415,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 38,
         name: "C 2 m m",
+        symbol: "C 2 m m",
         hall: "C -2 2",
         reference: false,
         operations: &[0, 22, 4, 21, 8, 28, 19, 33],
@@ -2231,6 +2423,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 38,
         name: "C m 2 m",
+        symbol: "C m 2 m",
         hall: "C -2 -2",
         reference: false,
         operations: &[0, 22, 23, 2, 8, 28, 40, 9],
@@ -2238,6 +2431,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 38,
         name: "A m 2 m",
+        symbol: "A m 2 m",
         hall: "A -2 -2",
         reference: false,
         operations: &[0, 22, 23, 2, 10, 36, 31, 11],
@@ -2245,6 +2439,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 39,
         name: "A b m 2",
+        symbol: "A e m 2",
         hall: "A 2 -2b",
         reference: true,
         operations: &[0, 3, 30, 42, 10, 14, 32, 24],
@@ -2252,6 +2447,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 39,
         name: "B m a 2",
+        symbol: "B m e 2",
         hall: "B 2 -2a",
         reference: false,
         operations: &[0, 3, 44, 26, 15, 16, 32, 24],
@@ -2259,6 +2455,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 39,
         name: "B 2 c m",
+        symbol: "B 2 e m",
         hall: "B -2a 2",
         reference: false,
         operations: &[0, 27, 4, 26, 15, 43, 18, 24],
@@ -2266,6 +2463,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 39,
         name: "C 2 m b",
+        symbol: "C 2 m e",
         hall: "C -2a 2",
         reference: false,
         operations: &[0, 27, 4, 26, 8, 29, 19, 42],
@@ -2273,6 +2471,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 39,
         name: "C m 2 a",
+        symbol: "C m 2 e",
         hall: "C -2a -2a",
         reference: false,
         operations: &[0, 27, 44, 2, 8, 29, 30, 9],
@@ -2280,6 +2479,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 39,
         name: "A c 2 m",
+        symbol: "A e 2 m",
         hall: "A -2b -2b",
         reference: false,
         operations: &[0, 29, 30, 2, 10, 43, 32, 11],
@@ -2287,6 +2487,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 40,
         name: "A m a 2",
+        symbol: "A m a 2",
         hall: "A 2 -2a",
         reference: true,
         operations: &[0, 3, 44, 26, 10, 14, 41, 35],
@@ -2294,6 +2495,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 40,
         name: "B b m 2",
+        symbol: "B b m 2",
         hall: "B 2 -2b",
         reference: false,
         operations: &[0, 3, 30, 42, 15, 16, 41, 35],
@@ -2301,6 +2503,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 40,
         name: "B 2 m b",
+        symbol: "B 2 m b",
         hall: "B -2b 2",
         reference: false,
         operations: &[0, 29, 4, 42, 15, 38, 18, 35],
@@ -2308,6 +2511,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 40,
         name: "C 2 c m",
+        symbol: "C 2 c m",
         hall: "C -2c 2",
         reference: false,
         operations: &[0, 43, 4, 24, 8, 38, 19, 35],
@@ -2315,6 +2519,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 40,
         name: "C c 2 m",
+        symbol: "C c 2 m",
         hall: "C -2c -2c",
         reference: false,
         operations: &[0, 43, 32, 2, 8, 38, 41, 9],
@@ -2322,6 +2527,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 40,
         name: "A m 2 a",
+        symbol: "A m 2 a",
         hall: "A -2a -2a",
         reference: false,
         operations: &[0, 27, 44, 2, 10, 38, 41, 11],
@@ -2329,6 +2535,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 41,
         name: "A b a 2",
+        symbol: "A e a 2",
         hall: "A 2 -2ab",
         reference: true,
         operations: &[0, 3, 40, 33, 10, 14, 39, 25],
@@ -2336,6 +2543,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 41,
         name: "B b a 2",
+        symbol: "B b e 2",
         hall: "B 2 -2ab",
         reference: false,
         operations: &[0, 3, 40, 33, 15, 16, 31, 34],
@@ -2343,6 +2551,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 41,
         name: "B 2 c b",
+        symbol: "B 2 e b",
         hall: "B -2ab 2",
         reference: false,
         operations: &[0, 28, 4, 33, 15, 36, 18, 34],
@@ -2350,6 +2559,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 41,
         name: "C 2 c b",
+        symbol: "C 2 c e",
         hall: "C -2ac 2",
         reference: false,
         operations: &[0, 37, 4, 25, 8, 36, 19, 34],
@@ -2357,6 +2567,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 41,
         name: "C c 2 a",
+        symbol: "C c 2 e",
         hall: "C -2ac -2ac",
         reference: false,
         operations: &[0, 37, 39, 2, 8, 36, 31, 9],
@@ -2364,6 +2575,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 41,
         name: "A c 2 a",
+        symbol: "A e 2 a",
         hall: "A -2ab -2ab",
         reference: false,
         operations: &[0, 28, 40, 2, 10, 37, 39, 11],
@@ -2371,6 +2583,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 42,
         name: "F m m 2",
+        symbol: "F m m 2",
         hall: "F 2 -2",
         reference: true,
         operations: &[0, 3, 23, 21, 10, 14, 31, 34, 15, 16, 39, 25, 8, 53, 40, 33],
@@ -2378,6 +2591,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 42,
         name: "F 2 m m",
+        symbol: "F 2 m m",
         hall: "F -2 2",
         reference: false,
         operations: &[0, 22, 4, 21, 10, 36, 56, 34, 15, 37, 18, 25, 8, 28, 19, 33],
@@ -2385,6 +2599,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 42,
         name: "F m 2 m",
+        symbol: "F m 2 m",
         hall: "F -2 -2",
         reference: false,
         operations: &[0, 22, 23, 2, 10, 36, 31, 11, 15, 37, 39, 50, 8, 28, 40, 9],
@@ -2392,6 +2607,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 43,
         name: "F d d 2",
+        symbol: "F d d 2",
         hall: "F 2 -2d",
         reference: true,
         operations: &[0, 3, 58, 59, 10, 14, 60, 61, 15, 16, 62, 63, 8, 53, 64, 65],
@@ -2399,6 +2615,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 43,
         name: "F 2 d d",
+        symbol: "F 2 d d",
         hall: "F -2d 2",
         reference: false,
         operations: &[0, 66, 4, 61, 10, 67, 56, 59, 15, 68, 18, 65, 8, 69, 19, 63],
@@ -2406,6 +2623,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 43,
         name: "F d 2 d",
+        symbol: "F d 2 d",
         hall: "F -2d -2d",
         reference: false,
         operations: &[0, 66, 58, 11, 10, 67, 60, 2, 15, 68, 62, 9, 8, 69, 64, 50],
@@ -2413,6 +2631,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 44,
         name: "I m m 2",
+        symbol: "I m m 2",
         hall: "I 2 -2",
         reference: true,
         operations: &[0, 3, 23, 21, 12, 17, 41, 35],
@@ -2420,6 +2639,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 44,
         name: "I 2 m m",
+        symbol: "I 2 m m",
         hall: "I -2 2",
         reference: false,
         operations: &[0, 22, 4, 21, 12, 38, 20, 35],
@@ -2427,6 +2647,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 44,
         name: "I m 2 m",
+        symbol: "I m 2 m",
         hall: "I -2 -2",
         reference: false,
         operations: &[0, 22, 23, 2, 12, 38, 41, 13],
@@ -2434,6 +2655,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 45,
         name: "I b a 2",
+        symbol: "I b a 2",
         hall: "I 2 -2c",
         reference: true,
         operations: &[0, 3, 32, 24, 12, 17, 40, 33],
@@ -2441,6 +2663,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 45,
         name: "I 2 c b",
+        symbol: "I 2 c b",
         hall: "I -2a 2",
         reference: false,
         operations: &[0, 27, 4, 26, 12, 36, 20, 34],
@@ -2448,6 +2671,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 45,
         name: "I c 2 a",
+        symbol: "I c 2 a",
         hall: "I -2b -2b",
         reference: false,
         operations: &[0, 29, 30, 2, 12, 37, 39, 13],
@@ -2455,6 +2679,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 46,
         name: "I m a 2",
+        symbol: "I m a 2",
         hall: "I 2 -2a",
         reference: true,
         operations: &[0, 3, 44, 26, 12, 17, 31, 34],
@@ -2462,6 +2687,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 46,
         name: "I b m 2",
+        symbol: "I b m 2",
         hall: "I 2 -2b",
         reference: false,
         operations: &[0, 3, 30, 42, 12, 17, 39, 25],
@@ -2469,6 +2695,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 46,
         name: "I 2 m b",
+        symbol: "I 2 m b",
         hall: "I -2b 2",
         reference: false,
         operations: &[0, 29, 4, 42, 12, 37, 20, 25],
@@ -2476,6 +2703,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 46,
         name: "I 2 c m",
+        symbol: "I 2 c m",
         hall: "I -2c 2",
         reference: false,
         operations: &[0, 43, 4, 24, 12, 28, 20, 33],
@@ -2483,6 +2711,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 46,
         name: "I c 2 m",
+        symbol: "I c 2 m",
         hall: "I -2c -2c",
         reference: false,
         operations: &[0, 43, 32, 2, 12, 28, 40, 13],
@@ -2490,6 +2719,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 46,
         name: "I m 2 a",
+        symbol: "I m 2 a",
         hall: "I -2a -2a",
         reference: false,
         operations: &[0, 27, 44, 2, 12, 36, 31, 13],
@@ -2497,6 +2727,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 47,
         name: "P m m m",
+        symbol: "P m m m",
         hall: "-P 2 2",
         reference: true,
         operations: &[0, 3, 4, 2, 1, 22, 23, 21],
@@ -2504,6 +2735,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 48,
         name: "P n n n:1",
+        symbol: "P n n n:1",
         hall: "P 2 2 -1n",
         reference: false,
         operations: &[0, 3, 4, 2, 47, 38, 41, 35],
@@ -2511,6 +2743,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 48,
         name: "P n n n:2",
+        symbol: "P n n n:2",
         hall: "-P 2ab 2bc",
         reference: true,
         operations: &[0, 53, 56, 50, 1, 28, 31, 25],
@@ -2518,6 +2751,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 49,
         name: "P c c m",
+        symbol: "P c c m",
         hall: "-P 2 2c",
         reference: true,
         operations: &[0, 3, 57, 49, 1, 22, 32, 24],
@@ -2525,6 +2759,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 49,
         name: "P m a a",
+        symbol: "P m a a",
         hall: "-P 2a 2",
         reference: false,
         operations: &[0, 52, 4, 51, 1, 27, 23, 26],
@@ -2532,6 +2767,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 49,
         name: "P b m b",
+        symbol: "P b m b",
         hall: "-P 2b 2b",
         reference: false,
         operations: &[0, 54, 55, 2, 1, 29, 30, 21],
@@ -2539,6 +2775,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 50,
         name: "P b a n:1",
+        symbol: "P b a n:1",
         hall: "P 2 2 -1ab",
         reference: false,
         operations: &[0, 3, 4, 2, 45, 28, 40, 33],
@@ -2546,6 +2783,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 50,
         name: "P b a n:2",
+        symbol: "P b a n:2",
         hall: "-P 2ab 2b",
         reference: true,
         operations: &[0, 53, 55, 51, 1, 28, 30, 26],
@@ -2553,6 +2791,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 50,
         name: "P n c b:1",
+        symbol: "P n c b:1",
         hall: "P 2 2 -1bc",
         reference: false,
         operations: &[0, 3, 4, 2, 46, 36, 31, 34],
@@ -2560,6 +2799,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 50,
         name: "P n c b:2",
+        symbol: "P n c b:2",
         hall: "-P 2b 2bc",
         reference: false,
         operations: &[0, 54, 56, 49, 1, 29, 31, 24],
@@ -2567,6 +2807,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 50,
         name: "P c n a:1",
+        symbol: "P c n a:1",
         hall: "P 2 2 -1ac",
         reference: false,
         operations: &[0, 3, 4, 2, 48, 37, 39, 25],
@@ -2574,6 +2815,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 50,
         name: "P c n a:2",
+        symbol: "P c n a:2",
         hall: "-P 2a 2c",
         reference: false,
         operations: &[0, 52, 57, 50, 1, 27, 32, 25],
@@ -2581,6 +2823,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 51,
         name: "P m m a",
+        symbol: "P m m a",
         hall: "-P 2a 2a",
         reference: true,
         operations: &[0, 52, 7, 2, 1, 27, 44, 21],
@@ -2588,6 +2831,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 51,
         name: "P m m b",
+        symbol: "P m m b",
         hall: "-P 2b 2",
         reference: false,
         operations: &[0, 54, 4, 5, 1, 29, 23, 42],
@@ -2595,6 +2839,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 51,
         name: "P b m m",
+        symbol: "P b m m",
         hall: "-P 2 2b",
         reference: false,
         operations: &[0, 3, 55, 5, 1, 22, 30, 42],
@@ -2602,6 +2847,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 51,
         name: "P c m m",
+        symbol: "P c m m",
         hall: "-P 2c 2c",
         reference: false,
         operations: &[0, 6, 57, 2, 1, 43, 32, 21],
@@ -2609,6 +2855,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 51,
         name: "P m c m",
+        symbol: "P m c m",
         hall: "-P 2c 2",
         reference: false,
         operations: &[0, 6, 4, 49, 1, 43, 23, 24],
@@ -2616,6 +2863,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 51,
         name: "P m a m",
+        symbol: "P m a m",
         hall: "-P 2 2a",
         reference: false,
         operations: &[0, 3, 7, 51, 1, 22, 44, 26],
@@ -2623,6 +2871,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 52,
         name: "P n n a",
+        symbol: "P n n a",
         hall: "-P 2a 2bc",
         reference: true,
         operations: &[0, 52, 56, 13, 1, 27, 31, 35],
@@ -2630,6 +2879,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 52,
         name: "P n n b",
+        symbol: "P n n b",
         hall: "-P 2b 2n",
         reference: false,
         operations: &[0, 54, 20, 50, 1, 29, 41, 25],
@@ -2637,6 +2887,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 52,
         name: "P b n n",
+        symbol: "P b n n",
         hall: "-P 2n 2b",
         reference: false,
         operations: &[0, 17, 55, 50, 1, 38, 30, 25],
@@ -2644,6 +2895,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 52,
         name: "P c n n",
+        symbol: "P c n n",
         hall: "-P 2ab 2c",
         reference: false,
         operations: &[0, 53, 57, 13, 1, 28, 32, 35],
@@ -2651,6 +2903,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 52,
         name: "P n c n",
+        symbol: "P n c n",
         hall: "-P 2ab 2n",
         reference: false,
         operations: &[0, 53, 20, 49, 1, 28, 41, 24],
@@ -2658,6 +2911,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 52,
         name: "P n a n",
+        symbol: "P n a n",
         hall: "-P 2n 2bc",
         reference: false,
         operations: &[0, 17, 56, 51, 1, 38, 31, 26],
@@ -2665,6 +2919,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 53,
         name: "P m n a",
+        symbol: "P m n a",
         hall: "-P 2ac 2",
         reference: true,
         operations: &[0, 16, 4, 50, 1, 37, 23, 25],
@@ -2672,6 +2927,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 53,
         name: "P n m b",
+        symbol: "P n m b",
         hall: "-P 2bc 2bc",
         reference: false,
         operations: &[0, 14, 56, 2, 1, 36, 31, 21],
@@ -2679,6 +2935,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 53,
         name: "P b m n",
+        symbol: "P b m n",
         hall: "-P 2ab 2ab",
         reference: false,
         operations: &[0, 53, 19, 2, 1, 28, 40, 21],
@@ -2686,6 +2943,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 53,
         name: "P c n m",
+        symbol: "P c n m",
         hall: "-P 2 2ac",
         reference: false,
         operations: &[0, 3, 18, 50, 1, 22, 39, 25],
@@ -2693,6 +2951,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 53,
         name: "P n c m",
+        symbol: "P n c m",
         hall: "-P 2 2bc",
         reference: false,
         operations: &[0, 3, 56, 11, 1, 22, 31, 34],
@@ -2700,6 +2959,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 53,
         name: "P m a n",
+        symbol: "P m a n",
         hall: "-P 2ab 2",
         reference: false,
         operations: &[0, 53, 4, 9, 1, 28, 23, 33],
@@ -2707,6 +2967,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 54,
         name: "P c c a",
+        symbol: "P c c a",
         hall: "-P 2a 2ac",
         reference: true,
         operations: &[0, 52, 18, 49, 1, 27, 39, 24],
@@ -2714,6 +2975,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 54,
         name: "P c c b",
+        symbol: "P c c b",
         hall: "-P 2b 2c",
         reference: false,
         operations: &[0, 54, 57, 11, 1, 29, 32, 34],
@@ -2721,6 +2983,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 54,
         name: "P b a a",
+        symbol: "P b a a",
         hall: "-P 2a 2b",
         reference: false,
         operations: &[0, 52, 55, 9, 1, 27, 30, 33],
@@ -2728,6 +2991,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 54,
         name: "P c a a",
+        symbol: "P c a a",
         hall: "-P 2ac 2c",
         reference: false,
         operations: &[0, 16, 57, 51, 1, 37, 32, 26],
@@ -2735,6 +2999,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 54,
         name: "P b c b",
+        symbol: "P b c b",
         hall: "-P 2bc 2b",
         reference: false,
         operations: &[0, 14, 55, 49, 1, 36, 30, 24],
@@ -2742,6 +3007,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 54,
         name: "P b a b",
+        symbol: "P b a b",
         hall: "-P 2b 2ab",
         reference: false,
         operations: &[0, 54, 19, 51, 1, 29, 40, 26],
@@ -2749,6 +3015,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 55,
         name: "P b a m",
+        symbol: "P b a m",
         hall: "-P 2 2ab",
         reference: true,
         operations: &[0, 3, 19, 9, 1, 22, 40, 33],
@@ -2756,6 +3023,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 55,
         name: "P m c b",
+        symbol: "P m c b",
         hall: "-P 2bc 2",
         reference: false,
         operations: &[0, 14, 4, 11, 1, 36, 23, 34],
@@ -2763,6 +3031,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 55,
         name: "P c m a",
+        symbol: "P c m a",
         hall: "-P 2ac 2ac",
         reference: false,
         operations: &[0, 16, 18, 2, 1, 37, 39, 21],
@@ -2770,6 +3039,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 56,
         name: "P c c n",
+        symbol: "P c c n",
         hall: "-P 2ab 2ac",
         reference: true,
         operations: &[0, 53, 18, 11, 1, 28, 39, 34],
@@ -2777,6 +3047,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 56,
         name: "P n a a",
+        symbol: "P n a a",
         hall: "-P 2ac 2bc",
         reference: false,
         operations: &[0, 16, 56, 9, 1, 37, 31, 33],
@@ -2784,6 +3055,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 56,
         name: "P b n b",
+        symbol: "P b n b",
         hall: "-P 2bc 2ab",
         reference: false,
         operations: &[0, 14, 19, 50, 1, 36, 40, 25],
@@ -2791,6 +3063,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 57,
         name: "P b c m",
+        symbol: "P b c m",
         hall: "-P 2c 2b",
         reference: true,
         operations: &[0, 6, 55, 11, 1, 43, 30, 34],
@@ -2798,6 +3071,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 57,
         name: "P c a m",
+        symbol: "P c a m",
         hall: "-P 2c 2ac",
         reference: false,
         operations: &[0, 6, 18, 51, 1, 43, 39, 26],
@@ -2805,6 +3079,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 57,
         name: "P m c a",
+        symbol: "P m c a",
         hall: "-P 2ac 2a",
         reference: false,
         operations: &[0, 16, 7, 49, 1, 37, 44, 24],
@@ -2812,6 +3087,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 57,
         name: "P m a b",
+        symbol: "P m a b",
         hall: "-P 2b 2a",
         reference: false,
         operations: &[0, 54, 7, 9, 1, 29, 44, 33],
@@ -2819,6 +3095,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 57,
         name: "P b m a",
+        symbol: "P b m a",
         hall: "-P 2a 2ab",
         reference: false,
         operations: &[0, 52, 19, 5, 1, 27, 40, 42],
@@ -2826,6 +3103,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 57,
         name: "P c m b",
+        symbol: "P c m b",
         hall: "-P 2bc 2c",
         reference: false,
         operations: &[0, 14, 57, 5, 1, 36, 32, 42],
@@ -2833,6 +3111,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 58,
         name: "P n n m",
+        symbol: "P n n m",
         hall: "-P 2 2n",
         reference: true,
         operations: &[0, 3, 20, 13, 1, 22, 41, 35],
@@ -2840,6 +3119,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 58,
         name: "P m n n",
+        symbol: "P m n n",
         hall: "-P 2n 2",
         reference: false,
         operations: &[0, 17, 4, 13, 1, 38, 23, 35],
@@ -2847,6 +3127,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 58,
         name: "P n m n",
+        symbol: "P n m n",
         hall: "-P 2n 2n",
         reference: false,
         operations: &[0, 17, 20, 2, 1, 38, 41, 21],
@@ -2854,6 +3135,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 59,
         name: "P m m n:1",
+        symbol: "P m m n:1",
         hall: "P 2 2ab -1ab",
         reference: false,
         operations: &[0, 3, 19, 9, 45, 28, 23, 21],
@@ -2861,6 +3143,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 59,
         name: "P m m n:2",
+        symbol: "P m m n:2",
         hall: "-P 2ab 2a",
         reference: true,
         operations: &[0, 53, 7, 5, 1, 28, 44, 42],
@@ -2868,6 +3151,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 59,
         name: "P n m m:1",
+        symbol: "P n m m:1",
         hall: "P 2bc 2 -1bc",
         reference: false,
         operations: &[0, 14, 4, 11, 46, 22, 31, 21],
@@ -2875,6 +3159,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 59,
         name: "P n m m:2",
+        symbol: "P n m m:2",
         hall: "-P 2c 2bc",
         reference: false,
         operations: &[0, 6, 56, 5, 1, 43, 31, 42],
@@ -2882,6 +3167,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 59,
         name: "P m n m:1",
+        symbol: "P m n m:1",
         hall: "P 2ac 2ac -1ac",
         reference: false,
         operations: &[0, 16, 18, 2, 48, 22, 23, 25],
@@ -2889,6 +3175,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 59,
         name: "P m n m:2",
+        symbol: "P m n m:2",
         hall: "-P 2c 2a",
         reference: false,
         operations: &[0, 6, 7, 50, 1, 43, 44, 25],
@@ -2896,6 +3183,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 60,
         name: "P b c n",
+        symbol: "P b c n",
         hall: "-P 2n 2ab",
         reference: true,
         operations: &[0, 17, 19, 49, 1, 38, 40, 24],
@@ -2903,6 +3191,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 60,
         name: "P c a n",
+        symbol: "P c a n",
         hall: "-P 2n 2c",
         reference: false,
         operations: &[0, 17, 57, 9, 1, 38, 32, 33],
@@ -2910,6 +3199,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 60,
         name: "P n c a",
+        symbol: "P n c a",
         hall: "-P 2a 2n",
         reference: false,
         operations: &[0, 52, 20, 11, 1, 27, 41, 34],
@@ -2917,6 +3207,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 60,
         name: "P n a b",
+        symbol: "P n a b",
         hall: "-P 2bc 2n",
         reference: false,
         operations: &[0, 14, 20, 51, 1, 36, 41, 26],
@@ -2924,6 +3215,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 60,
         name: "P b n a",
+        symbol: "P b n a",
         hall: "-P 2ac 2b",
         reference: false,
         operations: &[0, 16, 55, 13, 1, 37, 30, 35],
@@ -2931,6 +3223,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 60,
         name: "P c n b",
+        symbol: "P c n b",
         hall: "-P 2b 2ac",
         reference: false,
         operations: &[0, 54, 18, 13, 1, 29, 39, 35],
@@ -2938,6 +3231,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 61,
         name: "P b c a",
+        symbol: "P b c a",
         hall: "-P 2ac 2ab",
         reference: true,
         operations: &[0, 16, 19, 11, 1, 37, 40, 34],
@@ -2945,6 +3239,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 61,
         name: "P c a b",
+        symbol: "P c a b",
         hall: "-P 2bc 2ac",
         reference: false,
         operations: &[0, 14, 18, 9, 1, 36, 39, 33],
@@ -2952,6 +3247,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 62,
         name: "P n m a",
+        symbol: "P n m a",
         hall: "-P 2ac 2n",
         reference: true,
         operations: &[0, 16, 20, 5, 1, 37, 41, 42],
@@ -2959,6 +3255,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 62,
         name: "P m n b",
+        symbol: "P m n b",
         hall: "-P 2bc 2a",
         reference: false,
         operations: &[0, 14, 7, 13, 1, 36, 44, 35],
@@ -2966,6 +3263,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 62,
         name: "P b n m",
+        symbol: "P b n m",
         hall: "-P 2c 2ab",
         reference: false,
         operations: &[0, 6, 19, 13, 1, 43, 40, 35],
@@ -2973,6 +3271,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 62,
         name: "P c m n",
+        symbol: "P c m n",
         hall: "-P 2n 2ac",
         reference: false,
         operations: &[0, 17, 18, 5, 1, 38, 39, 42],
@@ -2980,6 +3279,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 62,
         name: "P m c n",
+        symbol: "P m c n",
         hall: "-P 2n 2a",
         reference: false,
         operations: &[0, 17, 7, 11, 1, 38, 44, 34],
@@ -2987,6 +3287,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 62,
         name: "P n a m",
+        symbol: "P n a m",
         hall: "-P 2c 2n",
         reference: false,
         operations: &[0, 6, 20, 9, 1, 43, 41, 33],
@@ -2994,6 +3295,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 63,
         name: "C m c m",
+        symbol: "C m c m",
         hall: "-C 2c 2",
         reference: true,
         operations: &[0, 6, 4, 49, 1, 43, 23, 24, 8, 17, 19, 13, 45, 38, 40, 35],
@@ -3001,6 +3303,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 63,
         name: "C c m m",
+        symbol: "C c m m",
         hall: "-C 2c 2c",
         reference: false,
         operations: &[0, 6, 57, 2, 1, 43, 32, 21, 8, 17, 20, 9, 45, 38, 41, 33],
@@ -3008,6 +3311,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 63,
         name: "A m m a",
+        symbol: "A m m a",
         hall: "-A 2a 2a",
         reference: false,
         operations: &[0, 52, 7, 2, 1, 27, 44, 21, 10, 17, 20, 11, 46, 38, 41, 34],
@@ -3015,6 +3319,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 63,
         name: "A m a m",
+        symbol: "A m a m",
         hall: "-A 2 2a",
         reference: false,
         operations: &[0, 3, 7, 51, 1, 22, 44, 26, 10, 14, 20, 13, 46, 36, 41, 35],
@@ -3022,6 +3327,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 63,
         name: "B b m m",
+        symbol: "B b m m",
         hall: "-B 2 2b",
         reference: false,
         operations: &[0, 3, 55, 5, 1, 22, 30, 42, 15, 16, 20, 13, 48, 37, 41, 35],
@@ -3029,6 +3335,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 63,
         name: "B m m b",
+        symbol: "B m m b",
         hall: "-B 2b 2",
         reference: false,
         operations: &[0, 54, 4, 5, 1, 29, 23, 42, 15, 17, 18, 13, 48, 38, 39, 35],
@@ -3036,6 +3343,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 64,
         name: "C m c a",
+        symbol: "C m c e",
         hall: "-C 2ac 2",
         reference: true,
         operations: &[0, 16, 4, 50, 1, 37, 23, 25, 8, 14, 19, 11, 45, 36, 40, 34],
@@ -3043,6 +3351,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 64,
         name: "C c m b",
+        symbol: "C c m e",
         hall: "-C 2ac 2ac",
         reference: false,
         operations: &[0, 16, 18, 2, 1, 37, 39, 21, 8, 14, 56, 9, 45, 36, 31, 33],
@@ -3050,6 +3359,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 64,
         name: "A b m a",
+        symbol: "A e m a",
         hall: "-A 2ab 2ab",
         reference: false,
         operations: &[0, 53, 19, 2, 1, 28, 40, 21, 10, 16, 18, 11, 46, 37, 39, 34],
@@ -3057,6 +3367,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 64,
         name: "A c a m",
+        symbol: "A e a m",
         hall: "-A 2 2ab",
         reference: false,
         operations: &[0, 3, 19, 9, 1, 22, 40, 33, 10, 14, 18, 50, 46, 36, 39, 25],
@@ -3064,6 +3375,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 64,
         name: "B b c m",
+        symbol: "B b e m",
         hall: "-B 2 2ab",
         reference: false,
         operations: &[0, 3, 19, 9, 1, 22, 40, 33, 15, 16, 56, 11, 48, 37, 31, 34],
@@ -3071,6 +3383,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 64,
         name: "B m a b",
+        symbol: "B m e b",
         hall: "-B 2ab 2",
         reference: false,
         operations: &[0, 53, 4, 9, 1, 28, 23, 33, 15, 14, 18, 11, 48, 36, 39, 34],
@@ -3078,6 +3391,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 65,
         name: "C m m m",
+        symbol: "C m m m",
         hall: "-C 2 2",
         reference: true,
         operations: &[0, 3, 4, 2, 1, 22, 23, 21, 8, 53, 19, 9, 45, 28, 40, 33],
@@ -3085,6 +3399,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 65,
         name: "A m m m",
+        symbol: "A m m m",
         hall: "-A 2 2",
         reference: false,
         operations: &[0, 3, 4, 2, 1, 22, 23, 21, 10, 14, 56, 11, 46, 36, 31, 34],
@@ -3092,6 +3407,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 65,
         name: "B m m m",
+        symbol: "B m m m",
         hall: "-B 2 2",
         reference: false,
         operations: &[0, 3, 4, 2, 1, 22, 23, 21, 15, 16, 18, 50, 48, 37, 39, 25],
@@ -3099,6 +3415,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 66,
         name: "C c c m",
+        symbol: "C c c m",
         hall: "-C 2 2c",
         reference: true,
         operations: &[0, 3, 57, 49, 1, 22, 32, 24, 8, 53, 20, 13, 45, 28, 41, 35],
@@ -3106,6 +3423,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 66,
         name: "A m a a",
+        symbol: "A m a a",
         hall: "-A 2a 2",
         reference: false,
         operations: &[0, 52, 4, 51, 1, 27, 23, 26, 10, 17, 56, 13, 46, 38, 31, 35],
@@ -3113,6 +3431,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 66,
         name: "B b m b",
+        symbol: "B b m b",
         hall: "-B 2b 2b",
         reference: false,
         operations: &[0, 54, 55, 2, 1, 29, 30, 21, 15, 17, 20, 50, 48, 38, 41, 25],
@@ -3120,6 +3439,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 67,
         name: "C m m a",
+        symbol: "C m m e",
         hall: "-C 2a 2",
         reference: true,
         operations: &[0, 52, 4, 51, 1, 27, 23, 26, 8, 54, 19, 5, 45, 29, 40, 42],
@@ -3127,6 +3447,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 67,
         name: "C m m b",
+        symbol: "C m m e",
         hall: "-C 2a 2a",
         reference: false,
         operations: &[0, 52, 7, 2, 1, 27, 44, 21, 8, 54, 55, 9, 45, 29, 30, 33],
@@ -3134,6 +3455,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 67,
         name: "A b m m",
+        symbol: "A e m m",
         hall: "-A 2b 2b",
         reference: false,
         operations: &[0, 54, 55, 2, 1, 29, 30, 21, 10, 6, 57, 11, 46, 43, 32, 34],
@@ -3141,6 +3463,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 67,
         name: "A c m m",
+        symbol: "A e m m",
         hall: "-A 2 2b",
         reference: false,
         operations: &[0, 3, 55, 5, 1, 22, 30, 42, 10, 14, 57, 49, 46, 36, 32, 24],
@@ -3148,6 +3471,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 67,
         name: "B m c m",
+        symbol: "B m e m",
         hall: "-B 2 2a",
         reference: false,
         operations: &[0, 3, 7, 51, 1, 22, 44, 26, 15, 16, 57, 49, 48, 37, 32, 24],
@@ -3155,6 +3479,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 67,
         name: "B m a m",
+        symbol: "B m e m",
         hall: "-B 2a 2",
         reference: false,
         operations: &[0, 52, 4, 51, 1, 27, 23, 26, 15, 6, 18, 49, 48, 43, 39, 24],
@@ -3162,6 +3487,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "C c c a:1",
+        symbol: "C c c e:1",
         hall: "C 2 2 -1ac",
         reference: false,
         operations: &[0, 3, 4, 2, 48, 37, 39, 25, 8, 53, 19, 9, 46, 36, 31, 34],
@@ -3169,6 +3495,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "C c c a:2",
+        symbol: "C c c e:2",
         hall: "-C 2a 2ac",
         reference: true,
         operations: &[0, 52, 18, 49, 1, 27, 39, 24, 8, 54, 56, 13, 45, 29, 31, 35],
@@ -3176,6 +3503,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "C c c b:1",
+        symbol: "C c c e:1",
         hall: "C 2 2 -1ac",
         reference: false,
         operations: &[0, 3, 4, 2, 48, 37, 39, 25, 8, 53, 19, 9, 46, 36, 31, 34],
@@ -3183,6 +3511,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "C c c b:2",
+        symbol: "C c c e:2",
         hall: "-C 2a 2c",
         reference: false,
         operations: &[0, 52, 57, 50, 1, 27, 32, 25, 8, 54, 20, 11, 45, 29, 41, 34],
@@ -3190,6 +3519,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "A b a a:1",
+        symbol: "A e a a:1",
         hall: "A 2 2 -1ab",
         reference: false,
         operations: &[0, 3, 4, 2, 45, 28, 40, 33, 10, 14, 56, 11, 48, 37, 39, 25],
@@ -3197,6 +3527,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "A b a a:2",
+        symbol: "A e a a:2",
         hall: "-A 2a 2b",
         reference: false,
         operations: &[0, 52, 55, 9, 1, 27, 30, 33, 10, 17, 57, 50, 46, 38, 32, 25],
@@ -3204,6 +3535,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "A c a a:1",
+        symbol: "A e a a:1",
         hall: "A 2 2 -1ab",
         reference: false,
         operations: &[0, 3, 4, 2, 45, 28, 40, 33, 10, 14, 56, 11, 48, 37, 39, 25],
@@ -3211,6 +3543,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "A c a a:2",
+        symbol: "A e a a:2",
         hall: "-A 2ab 2b",
         reference: false,
         operations: &[0, 53, 55, 51, 1, 28, 30, 26, 10, 16, 57, 13, 46, 37, 32, 35],
@@ -3218,6 +3551,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "B b c b:1",
+        symbol: "B b e b:1",
         hall: "B 2 2 -1ab",
         reference: false,
         operations: &[0, 3, 4, 2, 45, 28, 40, 33, 15, 16, 18, 50, 46, 36, 31, 34],
@@ -3225,6 +3559,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "B b c b:2",
+        symbol: "B b e b:2",
         hall: "-B 2ab 2b",
         reference: false,
         operations: &[0, 53, 55, 51, 1, 28, 30, 26, 15, 14, 20, 49, 48, 36, 41, 24],
@@ -3232,6 +3567,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "B b a b:1",
+        symbol: "B b e b:1",
         hall: "B 2 2 -1ab",
         reference: false,
         operations: &[0, 3, 4, 2, 45, 28, 40, 33, 15, 16, 18, 50, 46, 36, 31, 34],
@@ -3239,6 +3575,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 68,
         name: "B b a b:2",
+        symbol: "B b e b:2",
         hall: "-B 2b 2ab",
         reference: false,
         operations: &[0, 54, 19, 51, 1, 29, 40, 26, 15, 17, 56, 49, 48, 38, 31, 24],
@@ -3246,6 +3583,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 69,
         name: "F m m m",
+        symbol: "F m m m",
         hall: "-F 2 2",
         reference: true,
         operations: &[
@@ -3256,6 +3594,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 70,
         name: "F d d d:1",
+        symbol: "F d d d:1",
         hall: "F 2 2 -1d",
         reference: false,
         operations: &[
@@ -3266,6 +3605,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 70,
         name: "F d d d:2",
+        symbol: "F d d d:2",
         hall: "-F 2uv 2vw",
         reference: true,
         operations: &[
@@ -3276,6 +3616,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 71,
         name: "I m m m",
+        symbol: "I m m m",
         hall: "-I 2 2",
         reference: true,
         operations: &[0, 3, 4, 2, 1, 22, 23, 21, 12, 17, 20, 13, 47, 38, 41, 35],
@@ -3283,6 +3624,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 72,
         name: "I b a m",
+        symbol: "I b a m",
         hall: "-I 2 2c",
         reference: true,
         operations: &[0, 3, 57, 49, 1, 22, 32, 24, 12, 17, 19, 9, 47, 38, 40, 33],
@@ -3290,6 +3632,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 72,
         name: "I m c b",
+        symbol: "I m c b",
         hall: "-I 2a 2",
         reference: false,
         operations: &[0, 52, 4, 51, 1, 27, 23, 26, 12, 14, 20, 11, 47, 36, 41, 34],
@@ -3297,6 +3640,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 72,
         name: "I c m a",
+        symbol: "I c m a",
         hall: "-I 2b 2b",
         reference: false,
         operations: &[0, 54, 55, 2, 1, 29, 30, 21, 12, 16, 18, 13, 47, 37, 39, 35],
@@ -3304,6 +3648,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 73,
         name: "I b c a",
+        symbol: "I b c a",
         hall: "-I 2b 2c",
         reference: true,
         operations: &[0, 54, 57, 11, 1, 29, 32, 34, 12, 16, 19, 51, 47, 37, 40, 26],
@@ -3311,6 +3656,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 73,
         name: "I c a b",
+        symbol: "I c a b",
         hall: "-I 2a 2b",
         reference: false,
         operations: &[0, 52, 55, 9, 1, 27, 30, 33, 12, 14, 18, 49, 47, 36, 39, 24],
@@ -3318,6 +3664,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 74,
         name: "I m m a",
+        symbol: "I m m a",
         hall: "-I 2b 2",
         reference: true,
         operations: &[0, 54, 4, 5, 1, 29, 23, 42, 12, 16, 20, 50, 47, 37, 41, 25],
@@ -3325,6 +3672,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 74,
         name: "I m m b",
+        symbol: "I m m b",
         hall: "-I 2a 2a",
         reference: false,
         operations: &[0, 52, 7, 2, 1, 27, 44, 21, 12, 14, 56, 13, 47, 36, 31, 35],
@@ -3332,6 +3680,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 74,
         name: "I b m m",
+        symbol: "I b m m",
         hall: "-I 2c 2c",
         reference: false,
         operations: &[0, 6, 57, 2, 1, 43, 32, 21, 12, 53, 19, 13, 47, 28, 40, 35],
@@ -3339,6 +3688,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 74,
         name: "I c m m",
+        symbol: "I c m m",
         hall: "-I 2 2b",
         reference: false,
         operations: &[0, 3, 55, 5, 1, 22, 30, 42, 12, 17, 18, 50, 47, 38, 39, 25],
@@ -3346,6 +3696,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 74,
         name: "I m c m",
+        symbol: "I m c m",
         hall: "-I 2 2a",
         reference: false,
         operations: &[0, 3, 7, 51, 1, 22, 44, 26, 12, 17, 56, 11, 47, 38, 31, 34],
@@ -3353,6 +3704,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 74,
         name: "I m a m",
+        symbol: "I m a m",
         hall: "-I 2c 2",
         reference: false,
         operations: &[0, 6, 4, 49, 1, 43, 23, 24, 12, 53, 20, 9, 47, 28, 41, 33],
@@ -3360,6 +3712,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 75,
         name: "P 4",
+        symbol: "P 4",
         hall: "P 4",
         reference: true,
         operations: &[0, 98, 3, 99],
@@ -3367,6 +3720,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 76,
         name: "P 41",
+        symbol: "P 41",
         hall: "P 4w",
         reference: true,
         operations: &[0, 100, 6, 101],
@@ -3374,6 +3728,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 77,
         name: "P 42",
+        symbol: "P 42",
         hall: "P 4c",
         reference: true,
         operations: &[0, 102, 3, 103],
@@ -3381,6 +3736,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 78,
         name: "P 43",
+        symbol: "P 43",
         hall: "P 4cw",
         reference: true,
         operations: &[0, 104, 6, 105],
@@ -3388,6 +3744,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 79,
         name: "I 4",
+        symbol: "I 4",
         hall: "I 4",
         reference: true,
         operations: &[0, 98, 3, 99, 12, 106, 17, 107],
@@ -3395,6 +3752,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 80,
         name: "I 41",
+        symbol: "I 41",
         hall: "I 4bw",
         reference: true,
         operations: &[0, 108, 17, 109, 12, 110, 3, 111],
@@ -3402,6 +3760,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 81,
         name: "P -4",
+        symbol: "P -4",
         hall: "P -4",
         reference: true,
         operations: &[0, 112, 3, 113],
@@ -3409,6 +3768,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 82,
         name: "I -4",
+        symbol: "I -4",
         hall: "I -4",
         reference: true,
         operations: &[0, 112, 3, 113, 12, 114, 17, 115],
@@ -3416,6 +3776,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 83,
         name: "P 4/m",
+        symbol: "P 4/m",
         hall: "-P 4",
         reference: true,
         operations: &[0, 98, 3, 99, 1, 112, 22, 113],
@@ -3423,6 +3784,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 84,
         name: "P 42/m",
+        symbol: "P 42/m",
         hall: "-P 4c",
         reference: true,
         operations: &[0, 102, 3, 103, 1, 116, 22, 117],
@@ -3430,6 +3792,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 85,
         name: "P 4/n:1",
+        symbol: "P 4/n:1",
         hall: "P 4ab -1ab",
         reference: false,
         operations: &[0, 118, 3, 119, 45, 112, 28, 113],
@@ -3437,6 +3800,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 85,
         name: "P 4/n:2",
+        symbol: "P 4/n:2",
         hall: "-P 4a",
         reference: true,
         operations: &[0, 120, 53, 121, 1, 122, 28, 123],
@@ -3444,6 +3808,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 86,
         name: "P 42/n:1",
+        symbol: "P 42/n:1",
         hall: "P 4n -1n",
         reference: false,
         operations: &[0, 106, 3, 107, 47, 112, 38, 113],
@@ -3451,6 +3816,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 86,
         name: "P 42/n:2",
+        symbol: "P 42/n:2",
         hall: "-P 4bc",
         reference: true,
         operations: &[0, 124, 53, 125, 1, 126, 28, 127],
@@ -3458,6 +3824,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 87,
         name: "I 4/m",
+        symbol: "I 4/m",
         hall: "-I 4",
         reference: true,
         operations: &[
@@ -3467,6 +3834,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 88,
         name: "I 41/a:1",
+        symbol: "I 41/a:1",
         hall: "I 4bw -1bw",
         reference: false,
         operations: &[
@@ -3476,6 +3844,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 88,
         name: "I 41/a:2",
+        symbol: "I 41/a:2",
         hall: "-I 4ad",
         reference: true,
         operations: &[
@@ -3485,6 +3854,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 89,
         name: "P 4 2 2",
+        symbol: "P 4 2 2",
         hall: "P 4 2",
         reference: true,
         operations: &[0, 98, 3, 99, 4, 140, 2, 141],
@@ -3492,6 +3862,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 90,
         name: "P 4 21 2",
+        symbol: "P 4 21 2",
         hall: "P 4ab 2ab",
         reference: true,
         operations: &[0, 118, 3, 119, 19, 140, 9, 141],
@@ -3499,6 +3870,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 91,
         name: "P 41 2 2",
+        symbol: "P 41 2 2",
         hall: "P 4w 2c",
         reference: true,
         operations: &[0, 100, 6, 101, 57, 142, 2, 143],
@@ -3506,6 +3878,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 92,
         name: "P 41 21 2",
+        symbol: "P 41 21 2",
         hall: "P 4abw 2nw",
         reference: true,
         operations: &[0, 144, 6, 145, 146, 147, 148, 141],
@@ -3513,6 +3886,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 93,
         name: "P 42 2 2",
+        symbol: "P 42 2 2",
         hall: "P 4c 2",
         reference: true,
         operations: &[0, 102, 3, 103, 4, 147, 2, 149],
@@ -3520,6 +3894,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 94,
         name: "P 42 21 2",
+        symbol: "P 42 21 2",
         hall: "P 4n 2n",
         reference: true,
         operations: &[0, 106, 3, 107, 20, 140, 13, 141],
@@ -3527,6 +3902,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 95,
         name: "P 43 2 2",
+        symbol: "P 43 2 2",
         hall: "P 4cw 2c",
         reference: true,
         operations: &[0, 104, 6, 105, 57, 150, 2, 151],
@@ -3534,6 +3910,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 96,
         name: "P 43 21 2",
+        symbol: "P 43 21 2",
         hall: "P 4nw 2abw",
         reference: true,
         operations: &[0, 152, 6, 153, 154, 147, 155, 141],
@@ -3541,6 +3918,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 97,
         name: "I 4 2 2",
+        symbol: "I 4 2 2",
         hall: "I 4 2",
         reference: true,
         operations: &[
@@ -3550,6 +3928,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 98,
         name: "I 41 2 2",
+        symbol: "I 41 2 2",
         hall: "I 4bw 2bw",
         reference: true,
         operations: &[
@@ -3559,6 +3938,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 99,
         name: "P 4 m m",
+        symbol: "P 4 m m",
         hall: "P 4 -2",
         reference: true,
         operations: &[0, 98, 3, 99, 23, 162, 21, 163],
@@ -3566,6 +3946,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 100,
         name: "P 4 b m",
+        symbol: "P 4 b m",
         hall: "P 4 -2ab",
         reference: true,
         operations: &[0, 98, 3, 99, 40, 164, 33, 165],
@@ -3573,6 +3954,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 101,
         name: "P 42 c m",
+        symbol: "P 42 c m",
         hall: "P 4c -2c",
         reference: true,
         operations: &[0, 102, 3, 103, 32, 162, 24, 163],
@@ -3580,6 +3962,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 102,
         name: "P 42 n m",
+        symbol: "P 42 n m",
         hall: "P 4n -2n",
         reference: true,
         operations: &[0, 106, 3, 107, 41, 162, 35, 163],
@@ -3587,6 +3970,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 103,
         name: "P 4 c c",
+        symbol: "P 4 c c",
         hall: "P 4 -2c",
         reference: true,
         operations: &[0, 98, 3, 99, 32, 166, 24, 167],
@@ -3594,6 +3978,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 104,
         name: "P 4 n c",
+        symbol: "P 4 n c",
         hall: "P 4 -2n",
         reference: true,
         operations: &[0, 98, 3, 99, 41, 168, 35, 169],
@@ -3601,6 +3986,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 105,
         name: "P 42 m c",
+        symbol: "P 42 m c",
         hall: "P 4c -2",
         reference: true,
         operations: &[0, 102, 3, 103, 23, 166, 21, 167],
@@ -3608,6 +3994,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 106,
         name: "P 42 b c",
+        symbol: "P 42 b c",
         hall: "P 4c -2ab",
         reference: true,
         operations: &[0, 102, 3, 103, 40, 168, 33, 169],
@@ -3615,6 +4002,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 107,
         name: "I 4 m m",
+        symbol: "I 4 m m",
         hall: "I 4 -2",
         reference: true,
         operations: &[
@@ -3624,6 +4012,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 108,
         name: "I 4 c m",
+        symbol: "I 4 c m",
         hall: "I 4 -2c",
         reference: true,
         operations: &[
@@ -3633,6 +4022,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 109,
         name: "I 41 m d",
+        symbol: "I 41 m d",
         hall: "I 4bw -2",
         reference: true,
         operations: &[
@@ -3642,6 +4032,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 110,
         name: "I 41 c d",
+        symbol: "I 41 c d",
         hall: "I 4bw -2c",
         reference: true,
         operations: &[
@@ -3651,6 +4042,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 111,
         name: "P -4 2 m",
+        symbol: "P -4 2 m",
         hall: "P -4 2",
         reference: true,
         operations: &[0, 112, 3, 113, 4, 162, 2, 163],
@@ -3658,6 +4050,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 112,
         name: "P -4 2 c",
+        symbol: "P -4 2 c",
         hall: "P -4 2c",
         reference: true,
         operations: &[0, 112, 3, 113, 57, 166, 49, 167],
@@ -3665,6 +4058,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 113,
         name: "P -4 21 m",
+        symbol: "P -4 21 m",
         hall: "P -4 2ab",
         reference: true,
         operations: &[0, 112, 3, 113, 19, 164, 9, 165],
@@ -3672,6 +4066,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 114,
         name: "P -4 21 c",
+        symbol: "P -4 21 c",
         hall: "P -4 2n",
         reference: true,
         operations: &[0, 112, 3, 113, 20, 168, 13, 169],
@@ -3679,6 +4074,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 115,
         name: "P -4 m 2",
+        symbol: "P -4 m 2",
         hall: "P -4 -2",
         reference: true,
         operations: &[0, 112, 3, 113, 23, 140, 21, 141],
@@ -3686,6 +4082,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 116,
         name: "P -4 c 2",
+        symbol: "P -4 c 2",
         hall: "P -4 -2c",
         reference: true,
         operations: &[0, 112, 3, 113, 32, 147, 24, 149],
@@ -3693,6 +4090,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 117,
         name: "P -4 b 2",
+        symbol: "P -4 b 2",
         hall: "P -4 -2ab",
         reference: true,
         operations: &[0, 112, 3, 113, 40, 178, 33, 179],
@@ -3700,6 +4098,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 118,
         name: "P -4 n 2",
+        symbol: "P -4 n 2",
         hall: "P -4 -2n",
         reference: true,
         operations: &[0, 112, 3, 113, 41, 156, 35, 157],
@@ -3707,6 +4106,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 119,
         name: "I -4 m 2",
+        symbol: "I -4 m 2",
         hall: "I -4 -2",
         reference: true,
         operations: &[
@@ -3716,6 +4116,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 120,
         name: "I -4 c 2",
+        symbol: "I -4 c 2",
         hall: "I -4 -2c",
         reference: true,
         operations: &[
@@ -3725,6 +4126,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 121,
         name: "I -4 2 m",
+        symbol: "I -4 2 m",
         hall: "I -4 2",
         reference: true,
         operations: &[
@@ -3734,6 +4136,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 122,
         name: "I -4 2 d",
+        symbol: "I -4 2 d",
         hall: "I -4 2bw",
         reference: true,
         operations: &[
@@ -3743,6 +4146,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 123,
         name: "P 4/m m m",
+        symbol: "P 4/m m m",
         hall: "-P 4 2",
         reference: true,
         operations: &[
@@ -3752,6 +4156,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 124,
         name: "P 4/m c c",
+        symbol: "P 4/m c c",
         hall: "-P 4 2c",
         reference: true,
         operations: &[
@@ -3761,6 +4166,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 125,
         name: "P 4/n b m:1",
+        symbol: "P 4/n b m:1",
         hall: "P 4 2 -1ab",
         reference: false,
         operations: &[
@@ -3770,6 +4176,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 125,
         name: "P 4/n b m:2",
+        symbol: "P 4/n b m:2",
         hall: "-P 4a 2b",
         reference: true,
         operations: &[
@@ -3779,6 +4186,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 126,
         name: "P 4/n n c:1",
+        symbol: "P 4/n n c:1",
         hall: "P 4 2 -1n",
         reference: false,
         operations: &[
@@ -3788,6 +4196,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 126,
         name: "P 4/n n c:2",
+        symbol: "P 4/n n c:2",
         hall: "-P 4a 2bc",
         reference: true,
         operations: &[
@@ -3797,6 +4206,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 127,
         name: "P 4/m b m",
+        symbol: "P 4/m b m",
         hall: "-P 4 2ab",
         reference: true,
         operations: &[
@@ -3806,6 +4216,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 128,
         name: "P 4/m n c",
+        symbol: "P 4/m n c",
         hall: "-P 4 2n",
         reference: true,
         operations: &[
@@ -3815,6 +4226,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 129,
         name: "P 4/n m m:1",
+        symbol: "P 4/n m m:1",
         hall: "P 4ab 2ab -1ab",
         reference: false,
         operations: &[
@@ -3824,6 +4236,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 129,
         name: "P 4/n m m:2",
+        symbol: "P 4/n m m:2",
         hall: "-P 4a 2a",
         reference: true,
         operations: &[
@@ -3833,6 +4246,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 130,
         name: "P 4/n c c:1",
+        symbol: "P 4/n c c:1",
         hall: "P 4ab 2n -1ab",
         reference: false,
         operations: &[
@@ -3842,6 +4256,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 130,
         name: "P 4/n c c:2",
+        symbol: "P 4/n c c:2",
         hall: "-P 4a 2ac",
         reference: true,
         operations: &[
@@ -3851,6 +4266,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 131,
         name: "P 42/m m c",
+        symbol: "P 42/m m c",
         hall: "-P 4c 2",
         reference: true,
         operations: &[
@@ -3860,6 +4276,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 132,
         name: "P 42/m c m",
+        symbol: "P 42/m c m",
         hall: "-P 4c 2c",
         reference: true,
         operations: &[
@@ -3869,6 +4286,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 133,
         name: "P 42/n b c:1",
+        symbol: "P 42/n b c:1",
         hall: "P 4n 2c -1n",
         reference: false,
         operations: &[
@@ -3878,6 +4296,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 133,
         name: "P 42/n b c:2",
+        symbol: "P 42/n b c:2",
         hall: "-P 4ac 2b",
         reference: true,
         operations: &[
@@ -3887,6 +4306,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 134,
         name: "P 42/n n m:1",
+        symbol: "P 42/n n m:1",
         hall: "P 4n 2 -1n",
         reference: false,
         operations: &[
@@ -3896,6 +4316,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 134,
         name: "P 42/n n m:2",
+        symbol: "P 42/n n m:2",
         hall: "-P 4ac 2bc",
         reference: true,
         operations: &[
@@ -3905,6 +4326,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 135,
         name: "P 42/m b c",
+        symbol: "P 42/m b c",
         hall: "-P 4c 2ab",
         reference: true,
         operations: &[
@@ -3914,6 +4336,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 136,
         name: "P 42/m n m",
+        symbol: "P 42/m n m",
         hall: "-P 4n 2n",
         reference: true,
         operations: &[
@@ -3923,6 +4346,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 137,
         name: "P 42/n m c:1",
+        symbol: "P 42/n m c:1",
         hall: "P 4n 2n -1n",
         reference: false,
         operations: &[
@@ -3932,6 +4356,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 137,
         name: "P 42/n m c:2",
+        symbol: "P 42/n m c:2",
         hall: "-P 4ac 2a",
         reference: true,
         operations: &[
@@ -3941,6 +4366,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 138,
         name: "P 42/n c m:1",
+        symbol: "P 42/n c m:1",
         hall: "P 4n 2ab -1n",
         reference: false,
         operations: &[
@@ -3950,6 +4376,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 138,
         name: "P 42/n c m:2",
+        symbol: "P 42/n c m:2",
         hall: "-P 4ac 2ac",
         reference: true,
         operations: &[
@@ -3959,6 +4386,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 139,
         name: "I 4/m m m",
+        symbol: "I 4/m m m",
         hall: "-I 4 2",
         reference: true,
         operations: &[
@@ -3969,6 +4397,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 140,
         name: "I 4/m c m",
+        symbol: "I 4/m c m",
         hall: "-I 4 2c",
         reference: true,
         operations: &[
@@ -3979,6 +4408,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 141,
         name: "I 41/a m d:1",
+        symbol: "I 41/a m d:1",
         hall: "I 4bw 2bw -1bw",
         reference: false,
         operations: &[
@@ -3989,6 +4419,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 141,
         name: "I 41/a m d:2",
+        symbol: "I 41/a m d:2",
         hall: "-I 4bd 2",
         reference: true,
         operations: &[
@@ -3999,6 +4430,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 142,
         name: "I 41/a c d:1",
+        symbol: "I 41/a c d:1",
         hall: "I 4bw 2aw -1bw",
         reference: false,
         operations: &[
@@ -4009,6 +4441,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 142,
         name: "I 41/a c d:2",
+        symbol: "I 41/a c d:2",
         hall: "-I 4bd 2c",
         reference: true,
         operations: &[
@@ -4019,6 +4452,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 143,
         name: "P 3",
+        symbol: "P 3",
         hall: "P 3",
         reference: true,
         operations: &[0, 214, 215],
@@ -4026,6 +4460,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 144,
         name: "P 31",
+        symbol: "P 31",
         hall: "P 31",
         reference: true,
         operations: &[0, 216, 217],
@@ -4033,6 +4468,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 145,
         name: "P 32",
+        symbol: "P 32",
         hall: "P 32",
         reference: true,
         operations: &[0, 218, 219],
@@ -4040,6 +4476,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 146,
         name: "R 3:H",
+        symbol: "R 3:H",
         hall: "R 3",
         reference: true,
         operations: &[0, 214, 215, 220, 221, 222, 223, 224, 225],
@@ -4047,6 +4484,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 146,
         name: "R 3:R",
+        symbol: "R 3:R",
         hall: "P 3*",
         reference: false,
         operations: &[0, 226, 227],
@@ -4054,6 +4492,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 147,
         name: "P -3",
+        symbol: "P -3",
         hall: "-P 3",
         reference: true,
         operations: &[0, 214, 215, 1, 228, 229],
@@ -4061,6 +4500,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 148,
         name: "R -3:H",
+        symbol: "R -3:H",
         hall: "-R 3",
         reference: true,
         operations: &[
@@ -4070,6 +4510,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 148,
         name: "R -3:R",
+        symbol: "R -3:R",
         hall: "-P 3*",
         reference: false,
         operations: &[0, 226, 227, 1, 236, 237],
@@ -4077,6 +4518,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 149,
         name: "P 3 1 2",
+        symbol: "P 3 1 2",
         hall: "P 3 2",
         reference: true,
         operations: &[0, 214, 215, 140, 238, 239],
@@ -4084,6 +4526,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 150,
         name: "P 3 2 1",
+        symbol: "P 3 2 1",
         hall: "P 3 2\"",
         reference: true,
         operations: &[0, 214, 215, 141, 240, 241],
@@ -4091,6 +4534,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 151,
         name: "P 31 1 2",
+        symbol: "P 31 1 2",
         hall: "P 31 2 (0 0 4)",
         reference: true,
         operations: &[0, 216, 217, 242, 243, 239],
@@ -4098,6 +4542,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 152,
         name: "P 31 2 1",
+        symbol: "P 31 2 1",
         hall: "P 31 2\"",
         reference: true,
         operations: &[0, 216, 217, 141, 244, 245],
@@ -4105,6 +4550,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 153,
         name: "P 32 1 2",
+        symbol: "P 32 1 2",
         hall: "P 32 2 (0 0 2)",
         reference: true,
         operations: &[0, 218, 219, 246, 247, 239],
@@ -4112,6 +4558,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 154,
         name: "P 32 2 1",
+        symbol: "P 32 2 1",
         hall: "P 32 2\"",
         reference: true,
         operations: &[0, 218, 219, 141, 248, 249],
@@ -4119,6 +4566,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 155,
         name: "R 3 2:H",
+        symbol: "R 3 2:H",
         hall: "R 3 2\"",
         reference: true,
         operations: &[
@@ -4128,6 +4576,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 155,
         name: "R 3 2:R",
+        symbol: "R 3 2:R",
         hall: "P 3* 2",
         reference: false,
         operations: &[0, 226, 227, 140, 256, 257],
@@ -4135,6 +4584,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 156,
         name: "P 3 m 1",
+        symbol: "P 3 m 1",
         hall: "P 3 -2\"",
         reference: true,
         operations: &[0, 214, 215, 163, 258, 259],
@@ -4142,6 +4592,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 157,
         name: "P 3 1 m",
+        symbol: "P 3 1 m",
         hall: "P 3 -2",
         reference: true,
         operations: &[0, 214, 215, 162, 260, 261],
@@ -4149,6 +4600,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 158,
         name: "P 3 c 1",
+        symbol: "P 3 c 1",
         hall: "P 3 -2\"c",
         reference: true,
         operations: &[0, 214, 215, 167, 262, 263],
@@ -4156,6 +4608,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 159,
         name: "P 3 1 c",
+        symbol: "P 3 1 c",
         hall: "P 3 -2c",
         reference: true,
         operations: &[0, 214, 215, 166, 264, 265],
@@ -4163,6 +4616,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 160,
         name: "R 3 m:H",
+        symbol: "R 3 m:H",
         hall: "R 3 -2\"",
         reference: true,
         operations: &[
@@ -4172,6 +4626,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 160,
         name: "R 3 m:R",
+        symbol: "R 3 m:R",
         hall: "P 3* -2",
         reference: false,
         operations: &[0, 226, 227, 162, 272, 273],
@@ -4179,6 +4634,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 161,
         name: "R 3 c:H",
+        symbol: "R 3 c:H",
         hall: "R 3 -2\"c",
         reference: true,
         operations: &[
@@ -4188,6 +4644,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 161,
         name: "R 3 c:R",
+        symbol: "R 3 c:R",
         hall: "P 3* -2n",
         reference: false,
         operations: &[0, 226, 227, 168, 280, 281],
@@ -4195,6 +4652,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 162,
         name: "P -3 1 m",
+        symbol: "P -3 1 m",
         hall: "-P 3 2",
         reference: true,
         operations: &[0, 214, 215, 140, 238, 239, 1, 228, 229, 162, 260, 261],
@@ -4202,6 +4660,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 163,
         name: "P -3 1 c",
+        symbol: "P -3 1 c",
         hall: "-P 3 2c",
         reference: true,
         operations: &[0, 214, 215, 147, 282, 283, 1, 228, 229, 166, 264, 265],
@@ -4209,6 +4668,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 164,
         name: "P -3 m 1",
+        symbol: "P -3 m 1",
         hall: "-P 3 2\"",
         reference: true,
         operations: &[0, 214, 215, 141, 240, 241, 1, 228, 229, 163, 258, 259],
@@ -4216,6 +4676,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 165,
         name: "P -3 c 1",
+        symbol: "P -3 c 1",
         hall: "-P 3 2\"c",
         reference: true,
         operations: &[0, 214, 215, 149, 284, 285, 1, 228, 229, 167, 262, 263],
@@ -4223,6 +4684,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 166,
         name: "R -3 m:H",
+        symbol: "R -3 m:H",
         hall: "-R 3 2\"",
         reference: true,
         operations: &[
@@ -4234,6 +4696,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 166,
         name: "R -3 m:R",
+        symbol: "R -3 m:R",
         hall: "-P 3* 2",
         reference: false,
         operations: &[0, 226, 227, 140, 256, 257, 1, 236, 237, 162, 272, 273],
@@ -4241,6 +4704,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 167,
         name: "R -3 c:H",
+        symbol: "R -3 c:H",
         hall: "-R 3 2\"c",
         reference: true,
         operations: &[
@@ -4252,6 +4716,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 167,
         name: "R -3 c:R",
+        symbol: "R -3 c:R",
         hall: "-P 3* 2n",
         reference: false,
         operations: &[0, 226, 227, 156, 292, 293, 1, 236, 237, 168, 280, 281],
@@ -4259,6 +4724,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 168,
         name: "P 6",
+        symbol: "P 6",
         hall: "P 6",
         reference: true,
         operations: &[0, 294, 214, 3, 215, 295],
@@ -4266,6 +4732,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 169,
         name: "P 61",
+        symbol: "P 61",
         hall: "P 61",
         reference: true,
         operations: &[0, 296, 216, 6, 217, 297],
@@ -4273,6 +4740,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 170,
         name: "P 65",
+        symbol: "P 65",
         hall: "P 65",
         reference: true,
         operations: &[0, 298, 218, 6, 219, 299],
@@ -4280,6 +4748,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 171,
         name: "P 62",
+        symbol: "P 62",
         hall: "P 62",
         reference: true,
         operations: &[0, 300, 218, 3, 219, 301],
@@ -4287,6 +4756,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 172,
         name: "P 64",
+        symbol: "P 64",
         hall: "P 64",
         reference: true,
         operations: &[0, 302, 216, 3, 217, 303],
@@ -4294,6 +4764,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 173,
         name: "P 63",
+        symbol: "P 63",
         hall: "P 6c",
         reference: true,
         operations: &[0, 304, 214, 6, 215, 305],
@@ -4301,6 +4772,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 174,
         name: "P -6",
+        symbol: "P -6",
         hall: "P -6",
         reference: true,
         operations: &[0, 306, 214, 22, 215, 307],
@@ -4308,6 +4780,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 175,
         name: "P 6/m",
+        symbol: "P 6/m",
         hall: "-P 6",
         reference: true,
         operations: &[0, 294, 214, 3, 215, 295, 1, 306, 228, 22, 229, 307],
@@ -4315,6 +4788,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 176,
         name: "P 63/m",
+        symbol: "P 63/m",
         hall: "-P 6c",
         reference: true,
         operations: &[0, 304, 214, 6, 215, 305, 1, 308, 228, 43, 229, 309],
@@ -4322,6 +4796,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 177,
         name: "P 6 2 2",
+        symbol: "P 6 2 2",
         hall: "P 6 2",
         reference: true,
         operations: &[0, 294, 214, 3, 215, 295, 140, 241, 238, 141, 239, 240],
@@ -4329,6 +4804,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 178,
         name: "P 61 2 2",
+        symbol: "P 61 2 2",
         hall: "P 61 2 (0 0 5)",
         reference: true,
         operations: &[0, 296, 216, 6, 217, 297, 310, 249, 282, 311, 312, 240],
@@ -4336,6 +4812,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 179,
         name: "P 65 2 2",
+        symbol: "P 65 2 2",
         hall: "P 65 2 (0 0 1)",
         reference: true,
         operations: &[0, 298, 218, 6, 219, 299, 313, 245, 282, 314, 315, 240],
@@ -4343,6 +4820,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 180,
         name: "P 62 2 2",
+        symbol: "P 62 2 2",
         hall: "P 62 2 (0 0 4)",
         reference: true,
         operations: &[0, 300, 218, 3, 219, 301, 242, 245, 238, 314, 316, 240],
@@ -4350,6 +4828,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 181,
         name: "P 64 2 2",
+        symbol: "P 64 2 2",
         hall: "P 64 2 (0 0 2)",
         reference: true,
         operations: &[0, 302, 216, 3, 217, 303, 246, 249, 238, 311, 317, 240],
@@ -4357,6 +4836,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 182,
         name: "P 63 2 2",
+        symbol: "P 63 2 2",
         hall: "P 6c 2c",
         reference: true,
         operations: &[0, 304, 214, 6, 215, 305, 147, 241, 282, 141, 283, 240],
@@ -4364,6 +4844,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 183,
         name: "P 6 m m",
+        symbol: "P 6 m m",
         hall: "P 6 -2",
         reference: true,
         operations: &[0, 294, 214, 3, 215, 295, 162, 259, 260, 163, 261, 258],
@@ -4371,6 +4852,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 184,
         name: "P 6 c c",
+        symbol: "P 6 c c",
         hall: "P 6 -2c",
         reference: true,
         operations: &[0, 294, 214, 3, 215, 295, 166, 263, 264, 167, 265, 262],
@@ -4378,6 +4860,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 185,
         name: "P 63 c m",
+        symbol: "P 63 c m",
         hall: "P 6c -2",
         reference: true,
         operations: &[0, 304, 214, 6, 215, 305, 162, 263, 260, 167, 261, 262],
@@ -4385,6 +4868,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 186,
         name: "P 63 m c",
+        symbol: "P 63 m c",
         hall: "P 6c -2c",
         reference: true,
         operations: &[0, 304, 214, 6, 215, 305, 166, 259, 264, 163, 265, 258],
@@ -4392,6 +4876,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 187,
         name: "P -6 m 2",
+        symbol: "P -6 m 2",
         hall: "P -6 2",
         reference: true,
         operations: &[0, 306, 214, 22, 215, 307, 140, 259, 238, 163, 239, 258],
@@ -4399,6 +4884,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 188,
         name: "P -6 c 2",
+        symbol: "P -6 c 2",
         hall: "P -6c 2",
         reference: true,
         operations: &[0, 308, 214, 43, 215, 309, 140, 263, 238, 167, 239, 262],
@@ -4406,6 +4892,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 189,
         name: "P -6 2 m",
+        symbol: "P -6 2 m",
         hall: "P -6 -2",
         reference: true,
         operations: &[0, 306, 214, 22, 215, 307, 162, 241, 260, 141, 261, 240],
@@ -4413,6 +4900,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 190,
         name: "P -6 2 c",
+        symbol: "P -6 2 c",
         hall: "P -6c -2c",
         reference: true,
         operations: &[0, 308, 214, 43, 215, 309, 166, 241, 264, 141, 265, 240],
@@ -4420,6 +4908,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 191,
         name: "P 6/m m m",
+        symbol: "P 6/m m m",
         hall: "-P 6 2",
         reference: true,
         operations: &[
@@ -4430,6 +4919,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 192,
         name: "P 6/m c c",
+        symbol: "P 6/m c c",
         hall: "-P 6 2c",
         reference: true,
         operations: &[
@@ -4440,6 +4930,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 193,
         name: "P 63/m c m",
+        symbol: "P 63/m c m",
         hall: "-P 6c 2",
         reference: true,
         operations: &[
@@ -4450,6 +4941,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 194,
         name: "P 63/m m c",
+        symbol: "P 63/m m c",
         hall: "-P 6c 2c",
         reference: true,
         operations: &[
@@ -4460,6 +4952,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 195,
         name: "P 2 3",
+        symbol: "P 2 3",
         hall: "P 2 2 3",
         reference: true,
         operations: &[0, 3, 4, 2, 226, 318, 319, 320, 227, 321, 322, 323],
@@ -4467,6 +4960,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 196,
         name: "F 2 3",
+        symbol: "F 2 3",
         hall: "F 2 2 3",
         reference: true,
         operations: &[
@@ -4478,6 +4972,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 197,
         name: "I 2 3",
+        symbol: "I 2 3",
         hall: "I 2 2 3",
         reference: true,
         operations: &[
@@ -4488,6 +4983,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 198,
         name: "P 21 3",
+        symbol: "P 21 3",
         hall: "P 2ac 2ab 3",
         reference: true,
         operations: &[0, 16, 19, 11, 226, 341, 326, 335, 227, 329, 338, 347],
@@ -4495,6 +4991,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 199,
         name: "I 21 3",
+        symbol: "I 21 3",
         hall: "I 2b 2c 3",
         reference: true,
         operations: &[
@@ -4505,6 +5002,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 200,
         name: "P m -3",
+        symbol: "P m -3",
         hall: "-P 2 2 3",
         reference: true,
         operations: &[
@@ -4515,6 +5013,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 201,
         name: "P n -3:1",
+        symbol: "P n -3:1",
         hall: "P 2 2 3 -1n",
         reference: false,
         operations: &[
@@ -4525,6 +5024,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 201,
         name: "P n -3:2",
+        symbol: "P n -3:2",
         hall: "-P 2ab 2bc 3",
         reference: true,
         operations: &[
@@ -4535,6 +5035,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 202,
         name: "F m -3",
+        symbol: "F m -3",
         hall: "-F 2 2 3",
         reference: true,
         operations: &[
@@ -4549,6 +5050,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 203,
         name: "F d -3:1",
+        symbol: "F d -3:1",
         hall: "F 2 2 3 -1d",
         reference: false,
         operations: &[
@@ -4563,6 +5065,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 203,
         name: "F d -3:2",
+        symbol: "F d -3:2",
         hall: "-F 2uv 2vw 3",
         reference: true,
         operations: &[
@@ -4577,6 +5080,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 204,
         name: "I m -3",
+        symbol: "I m -3",
         hall: "-I 2 2 3",
         reference: true,
         operations: &[
@@ -4588,6 +5092,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 205,
         name: "P a -3",
+        symbol: "P a -3",
         hall: "-P 2ac 2ab 3",
         reference: true,
         operations: &[
@@ -4598,6 +5103,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 206,
         name: "I a -3",
+        symbol: "I a -3",
         hall: "-I 2b 2c 3",
         reference: true,
         operations: &[
@@ -4609,6 +5115,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 207,
         name: "P 4 3 2",
+        symbol: "P 4 3 2",
         hall: "P 4 2 3",
         reference: true,
         operations: &[
@@ -4619,6 +5126,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 208,
         name: "P 42 3 2",
+        symbol: "P 42 3 2",
         hall: "P 4n 2 3",
         reference: true,
         operations: &[
@@ -4629,6 +5137,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 209,
         name: "F 4 3 2",
+        symbol: "F 4 3 2",
         hall: "F 4 2 3",
         reference: true,
         operations: &[
@@ -4643,6 +5152,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 210,
         name: "F 41 3 2",
+        symbol: "F 41 3 2",
         hall: "F 4d 2 3",
         reference: true,
         operations: &[
@@ -4657,6 +5167,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 211,
         name: "I 4 3 2",
+        symbol: "I 4 3 2",
         hall: "I 4 2 3",
         reference: true,
         operations: &[
@@ -4668,6 +5179,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 212,
         name: "P 43 3 2",
+        symbol: "P 43 3 2",
         hall: "P 4acd 2ab 3",
         reference: true,
         operations: &[
@@ -4678,6 +5190,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 213,
         name: "P 41 3 2",
+        symbol: "P 41 3 2",
         hall: "P 4bd 2ab 3",
         reference: true,
         operations: &[
@@ -4688,6 +5201,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 214,
         name: "I 41 3 2",
+        symbol: "I 41 3 2",
         hall: "I 4bd 2c 3",
         reference: true,
         operations: &[
@@ -4699,6 +5213,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 215,
         name: "P -4 3 m",
+        symbol: "P -4 3 m",
         hall: "P -4 2 3",
         reference: true,
         operations: &[
@@ -4709,6 +5224,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 216,
         name: "F -4 3 m",
+        symbol: "F -4 3 m",
         hall: "F -4 2 3",
         reference: true,
         operations: &[
@@ -4723,6 +5239,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 217,
         name: "I -4 3 m",
+        symbol: "I -4 3 m",
         hall: "I -4 2 3",
         reference: true,
         operations: &[
@@ -4734,6 +5251,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 218,
         name: "P -4 3 n",
+        symbol: "P -4 3 n",
         hall: "P -4n 2 3",
         reference: true,
         operations: &[
@@ -4744,6 +5262,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 219,
         name: "F -4 3 c",
+        symbol: "F -4 3 c",
         hall: "F -4a 2 3",
         reference: true,
         operations: &[
@@ -4758,6 +5277,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 220,
         name: "I -4 3 d",
+        symbol: "I -4 3 d",
         hall: "I -4bd 2c 3",
         reference: true,
         operations: &[
@@ -4769,6 +5289,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 221,
         name: "P m -3 m",
+        symbol: "P m -3 m",
         hall: "-P 4 2 3",
         reference: true,
         operations: &[
@@ -4780,6 +5301,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 222,
         name: "P n -3 n:1",
+        symbol: "P n -3 n:1",
         hall: "P 4 2 3 -1n",
         reference: false,
         operations: &[
@@ -4791,6 +5313,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 222,
         name: "P n -3 n:2",
+        symbol: "P n -3 n:2",
         hall: "-P 4a 2bc 3",
         reference: true,
         operations: &[
@@ -4802,6 +5325,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 223,
         name: "P m -3 n",
+        symbol: "P m -3 n",
         hall: "-P 4n 2 3",
         reference: true,
         operations: &[
@@ -4813,6 +5337,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 224,
         name: "P n -3 m:1",
+        symbol: "P n -3 m:1",
         hall: "P 4n 2 3 -1n",
         reference: false,
         operations: &[
@@ -4824,6 +5349,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 224,
         name: "P n -3 m:2",
+        symbol: "P n -3 m:2",
         hall: "-P 4bc 2bc 3",
         reference: true,
         operations: &[
@@ -4835,6 +5361,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 225,
         name: "F m -3 m",
+        symbol: "F m -3 m",
         hall: "-F 4 2 3",
         reference: true,
         operations: &[
@@ -4854,6 +5381,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 226,
         name: "F m -3 c",
+        symbol: "F m -3 c",
         hall: "-F 4a 2 3",
         reference: true,
         operations: &[
@@ -4873,6 +5401,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 227,
         name: "F d -3 m:1",
+        symbol: "F d -3 m:1",
         hall: "F 4d 2 3 -1d",
         reference: false,
         operations: &[
@@ -4892,6 +5421,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 227,
         name: "F d -3 m:2",
+        symbol: "F d -3 m:2",
         hall: "-F 4vw 2vw 3",
         reference: true,
         operations: &[
@@ -4911,6 +5441,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 228,
         name: "F d -3 c:1",
+        symbol: "F d -3 c:1",
         hall: "F 4d 2 3 -1ad",
         reference: false,
         operations: &[
@@ -4930,6 +5461,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 228,
         name: "F d -3 c:2",
+        symbol: "F d -3 c:2",
         hall: "-F 4ud 2vw 3",
         reference: true,
         operations: &[
@@ -4949,6 +5481,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 229,
         name: "I m -3 m",
+        symbol: "I m -3 m",
         hall: "-I 4 2 3",
         reference: true,
         operations: &[
@@ -4963,6 +5496,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 230,
         name: "I a -3 d",
+        symbol: "I a -3 d",
         hall: "-I 4bd 2c 3",
         reference: true,
         operations: &[
@@ -4977,6 +5511,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "I 1 21 1",
+        symbol: "I 1 21 1",
         hall: "I 2yb",
         reference: false,
         operations: &[0, 5, 12, 50],
@@ -4984,6 +5519,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "C 1 21 1",
+        symbol: "C 1 21 1",
         hall: "C 2yb",
         reference: false,
         operations: &[0, 5, 8, 51],
@@ -4991,6 +5527,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 18,
         name: "P 21212(a)",
+        symbol: "P 21212(a)",
         hall: "P 2ab 2a",
         reference: false,
         operations: &[0, 53, 7, 5],
@@ -4998,6 +5535,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 20,
         name: "C 2 2 21a)",
+        symbol: "C 2 2 21a)",
         hall: "C 2ac 2",
         reference: false,
         operations: &[0, 16, 4, 50, 8, 14, 19, 11],
@@ -5005,6 +5543,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 21,
         name: "C 2 2 2a",
+        symbol: "C 2 2 2a",
         hall: "C 2ab 2b",
         reference: false,
         operations: &[0, 53, 55, 51, 8, 3, 7, 5],
@@ -5012,6 +5551,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 22,
         name: "F 2 2 2a",
+        symbol: "F 2 2 2a",
         hall: "F 2 2c",
         reference: false,
         operations: &[0, 3, 57, 49, 10, 14, 55, 5, 15, 16, 7, 51, 8, 53, 20, 13],
@@ -5019,6 +5559,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 23,
         name: "I 2 2 2a",
+        symbol: "I 2 2 2a",
         hall: "I 2ab 2bc",
         reference: false,
         operations: &[0, 53, 56, 50, 12, 6, 7, 5],
@@ -5026,6 +5567,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 94,
         name: "P 42 21 2a",
+        symbol: "P 42 21 2a",
         hall: "P 4bc 2a",
         reference: false,
         operations: &[0, 124, 53, 125, 7, 156, 5, 149],
@@ -5033,6 +5575,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 197,
         name: "I 2 3a",
+        symbol: "I 2 3a",
         hall: "I 2ab 2bc 3",
         reference: false,
         operations: &[
@@ -5043,6 +5586,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 1,
         name: "A 1",
+        symbol: "A 1",
         hall: "A 1",
         reference: false,
         operations: &[0, 10],
@@ -5050,6 +5594,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 1,
         name: "B 1",
+        symbol: "B 1",
         hall: "B 1",
         reference: false,
         operations: &[0, 15],
@@ -5057,6 +5602,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 1,
         name: "C 1",
+        symbol: "C 1",
         hall: "C 1",
         reference: false,
         operations: &[0, 8],
@@ -5064,6 +5610,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 1,
         name: "F 1",
+        symbol: "F 1",
         hall: "F 1",
         reference: false,
         operations: &[0, 10, 15, 8],
@@ -5071,6 +5618,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 1,
         name: "I 1",
+        symbol: "I 1",
         hall: "I 1",
         reference: false,
         operations: &[0, 12],
@@ -5078,6 +5626,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 2,
         name: "A -1",
+        symbol: "A -1",
         hall: "-A 1",
         reference: false,
         operations: &[0, 1, 10, 46],
@@ -5085,6 +5634,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 2,
         name: "B -1",
+        symbol: "B -1",
         hall: "-B 1",
         reference: false,
         operations: &[0, 1, 15, 48],
@@ -5092,6 +5642,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 2,
         name: "C -1",
+        symbol: "C -1",
         hall: "-C 1",
         reference: false,
         operations: &[0, 1, 8, 45],
@@ -5099,6 +5650,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 2,
         name: "F -1",
+        symbol: "F -1",
         hall: "-F 1",
         reference: false,
         operations: &[0, 1, 10, 46, 15, 48, 8, 45],
@@ -5106,6 +5658,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 2,
         name: "I -1",
+        symbol: "I -1",
         hall: "-I 1",
         reference: false,
         operations: &[0, 1, 12, 47],
@@ -5113,6 +5666,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 3,
         name: "B 1 2 1",
+        symbol: "B 1 2 1",
         hall: "B 2y",
         reference: false,
         operations: &[0, 2, 15, 50],
@@ -5120,6 +5674,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 3,
         name: "C 1 1 2",
+        symbol: "C 1 1 2",
         hall: "C 2",
         reference: false,
         operations: &[0, 3, 8, 53],
@@ -5127,6 +5682,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 4,
         name: "B 1 21 1",
+        symbol: "B 1 21 1",
         hall: "B 2yb",
         reference: false,
         operations: &[0, 5, 15, 13],
@@ -5134,6 +5690,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 4,
         name: "C 1 1 21",
+        symbol: "C 1 1 21",
         hall: "C 2c",
         reference: false,
         operations: &[0, 6, 8, 17],
@@ -5141,6 +5698,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 5,
         name: "F 1 2 1",
+        symbol: "F 1 2 1",
         hall: "F 2y",
         reference: false,
         operations: &[0, 2, 10, 11, 15, 50, 8, 9],
@@ -5148,6 +5706,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 8,
         name: "F 1 m 1",
+        symbol: "F 1 m 1",
         hall: "F -2y",
         reference: false,
         operations: &[0, 21, 10, 34, 15, 25, 8, 33],
@@ -5155,6 +5714,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 9,
         name: "F 1 d 1",
+        symbol: "F 1 d 1",
         hall: "F -2yuw",
         reference: false,
         operations: &[0, 91, 10, 97, 15, 79, 8, 85],
@@ -5162,6 +5722,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 12,
         name: "F 1 2/m 1",
+        symbol: "F 1 2/m 1",
         hall: "-F 2y",
         reference: false,
         operations: &[0, 2, 1, 21, 10, 11, 46, 34, 15, 50, 48, 25, 8, 9, 45, 33],
@@ -5169,6 +5730,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 64,
         name: "A b a m",
+        symbol: "A e a m",
         hall: "-A 2 2ab",
         reference: false,
         operations: &[0, 3, 19, 9, 1, 22, 40, 33, 10, 14, 18, 50, 46, 36, 39, 25],
@@ -5176,6 +5738,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 89,
         name: "C 4 2 2",
+        symbol: "C 4 2 2",
         hall: "C 4 2",
         reference: false,
         operations: &[
@@ -5185,6 +5748,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 90,
         name: "C 4 2 21",
+        symbol: "C 4 2 21",
         hall: "C 4a 2",
         reference: false,
         operations: &[
@@ -5194,6 +5758,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 97,
         name: "F 4 2 2",
+        symbol: "F 4 2 2",
         hall: "F 4 2",
         reference: false,
         operations: &[
@@ -5204,6 +5769,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 115,
         name: "C -4 2 m",
+        symbol: "C -4 2 m",
         hall: "C -4 2",
         reference: false,
         operations: &[
@@ -5213,6 +5779,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 117,
         name: "C -4 2 b",
+        symbol: "C -4 2 b",
         hall: "C -4 2ya",
         reference: false,
         operations: &[
@@ -5222,6 +5789,7 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     Setting {
         number: 139,
         name: "F 4/m m m",
+        symbol: "F 4/m m m",
         hall: "-F 4 2",
         reference: false,
         operations: &[
@@ -5233,8 +5801,8 @@ pub(crate) static SETTINGS: [Setting; 564] = [
     },
 ];
 
-/// Indices into `SETTINGS` by full or short Hermann-Mauguin symbol without its extension (`symbol_key`), sorted by key.
-pub(crate) static SETTINGS_BY_SYMBOL: [(&str, &[u16]); 579] = [
+/// Indices into `SETTINGS` by full or short Hermann-Mauguin symbol, gemmi's or the current one, without its extension (`symbol_key`), sorted by key.
+pub(crate) static SETTINGS_BY_SYMBOL: [(&str, &[u16]); 598] = [
     ("a-1", &[544]),
     ("a1", &[539]),
     ("a112", &[11]),
@@ -5273,8 +5841,14 @@ pub(crate) static SETTINGS_BY_SYMBOL: [(&str, &[u16]); 579] = [
     ("acaa", &[327, 328]),
     ("acam", &[306]),
     ("acmm", &[318]),
+    ("ae2a", &[207]),
+    ("ae2m", &[195]),
     ("aea2", &[202]),
+    ("aeaa", &[325, 326, 327, 328]),
+    ("aeam", &[306, 557]),
     ("aem2", &[190]),
+    ("aema", &[305]),
+    ("aemm", &[317, 318]),
     ("am", &[30]),
     ("am2a", &[201]),
     ("am2m", &[189]),
@@ -5306,6 +5880,8 @@ pub(crate) static SETTINGS_BY_SYMBOL: [(&str, &[u16]); 579] = [
     ("b222", &[120]),
     ("b2cb", &[204]),
     ("b2cm", &[192]),
+    ("b2eb", &[204]),
+    ("b2em", &[192]),
     ("b2mb", &[198]),
     ("b2mm", &[186]),
     ("bb11", &[50]),
@@ -5315,6 +5891,9 @@ pub(crate) static SETTINGS_BY_SYMBOL: [(&str, &[u16]); 579] = [
     ("bbab", &[331, 332]),
     ("bbcb", &[329, 330]),
     ("bbcm", &[307]),
+    ("bbe2", &[203]),
+    ("bbeb", &[329, 330, 331, 332]),
+    ("bbem", &[307]),
     ("bbm2", &[197]),
     ("bbmb", &[314]),
     ("bbmm", &[301]),
@@ -5325,6 +5904,9 @@ pub(crate) static SETTINGS_BY_SYMBOL: [(&str, &[u16]); 579] = [
     ("bmab", &[308]),
     ("bmam", &[320]),
     ("bmcm", &[319]),
+    ("bme2", &[191]),
+    ("bmeb", &[308]),
+    ("bmem", &[319, 320]),
     ("bmm2", &[185]),
     ("bmmb", &[302]),
     ("bmmm", &[311]),
@@ -5357,26 +5939,31 @@ pub(crate) static SETTINGS_BY_SYMBOL: [(&str, &[u16]); 579] = [
     ("c2221a)", &[533]),
     ("c222a", &[534]),
     ("c2cb", &[205]),
+    ("c2ce", &[205]),
     ("c2cm", &[199]),
     ("c2mb", &[193]),
+    ("c2me", &[193]),
     ("c2mm", &[187]),
     ("c422", &[558]),
     ("c4221", &[559]),
     ("cc", &[38]),
     ("cc11", &[53]),
     ("cc2a", &[206]),
+    ("cc2e", &[206]),
     ("cc2m", &[200]),
     ("ccc2", &[181]),
     ("ccca", &[321, 322]),
     ("cccb", &[323, 324]),
-    ("ccce", &[321, 322]),
+    ("ccce", &[321, 322, 323, 324]),
     ("cccm", &[312]),
     ("ccm21", &[176]),
     ("ccmb", &[304]),
+    ("ccme", &[304]),
     ("ccmm", &[298]),
     ("cm", &[29]),
     ("cm11", &[36]),
     ("cm2a", &[194]),
+    ("cm2e", &[194]),
     ("cm2m", &[188]),
     ("cmc21", &[175]),
     ("cmca", &[303]),
@@ -5385,7 +5972,7 @@ pub(crate) static SETTINGS_BY_SYMBOL: [(&str, &[u16]); 579] = [
     ("cmm2", &[172]),
     ("cmma", &[315]),
     ("cmmb", &[316]),
-    ("cmme", &[315]),
+    ("cmme", &[315, 316]),
     ("cmmm", &[309]),
     ("cn", &[42]),
     ("cn11", &[51]),
