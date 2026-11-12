@@ -1,0 +1,2 @@
+# Written CIFs the tests compare byte for byte: no line-ending conversion.
+tests/data/written/*.cif -text

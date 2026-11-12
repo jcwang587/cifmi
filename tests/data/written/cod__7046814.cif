@@ -1,0 +1,44 @@
+#\#CIF_1.1
+data_7046814
+_space_group_IT_number   58
+_space_group_name_H-M_alt   'P n n m'
+_space_group_name_Hall   '-P 2 2n'
+_cell_length_a   7.68700000
+_cell_length_b   18.84000000
+_cell_length_c   4.18900000
+_cell_angle_alpha   90.00000000
+_cell_angle_beta   90.00000000
+_cell_angle_gamma   90.00000000
+_chemical_formula_sum   'C8 H16 Br2 O2 Yb'
+_cell_formula_units_Z   2
+loop_
+ _space_group_symop_id
+ _space_group_symop_operation_xyz
+  1  'x, y, z'
+  2  '-x, -y, z'
+  3  'x+1/2, -y+1/2, -z+1/2'
+  4  '-x+1/2, y+1/2, -z+1/2'
+  5  '-x, -y, -z'
+  6  'x, y, -z'
+  7  '-x-1/2, y-1/2, z-1/2'
+  8  'x-1/2, -y-1/2, z-1/2'
+loop_
+ _atom_site_label
+ _atom_site_type_symbol
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+ _atom_site_B_iso_or_equiv
+  Yb1  Yb  2  0.50000000  0.00000000  0.00000000  1.00000000  2.35291369
+  Br1  Br  4  0.30111000  0.06742000  -0.50000000  1.00000000  2.95298564
+  O1  O  4  0.69380000  0.09840000  0.00000000  1.00000000  3.05562952
+  C1  C  4  0.88320000  0.09420000  0.00000000  1.00000000  3.71097125
+  H1A  H  8  0.92440000  0.06860000  -0.19180000  1.00000000  4.50053961
+  C2  C  4  0.95040000  0.16770000  0.00000000  1.00000000  3.94784176
+  H2A  H  8  1.02280000  0.17610000  -0.19180000  1.00000000  4.73741011
+  C3  C  4  0.79830000  0.21610000  0.00000000  1.00000000  4.42158277
+  H3A  H  8  0.80040000  0.24680000  0.19180000  1.00000000  5.29010796
+  C4  C  4  0.64290000  0.17240000  0.00000000  1.00000000  4.97428062
+  H4A  H  8  0.57200000  0.18290000  0.19160000  1.00000000  5.92176264

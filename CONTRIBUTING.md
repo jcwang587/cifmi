@@ -15,6 +15,10 @@ cargo clippy --all-targets --features python -- -D warnings
 The `python` feature turns on the PyO3 bindings, which only maturin can
 link, so use it for `clippy` and `check` but not for `cargo test`.
 
+The tests compare what cifmi writes with the texts in `tests/data/written`;
+[tests/README.md](tests/README.md) says how to write them anew after a
+change to the writing.
+
 ### Python
 
 Build the extension into an activated environment, then run the suite:

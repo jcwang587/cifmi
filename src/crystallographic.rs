@@ -7,7 +7,7 @@ use crate::element::Element;
 use crate::lattice::Lattice;
 use crate::lexer::Value;
 use crate::options::CifOptions;
-use crate::sites::{snap_thirds, snap_to_special_position, snap_within, Grid};
+use crate::sites::{moving, orbit, snap_thirds, snap_to_special_position, snap_within, Grid};
 use crate::structure::{
     Atom, CellParameters, Diagnostic, DiagnosticKind, Occupant, Site, Structure, SymmetrySource,
 };
@@ -27,9 +27,9 @@ const FRACT: [&str; 3] = [
 /// allow only one of them at a time.
 const COLLISION_DISTANCE: f64 = 0.5;
 
-/// Images closer than this (fractional, per axis) are one atom; snapped
-/// orbits coincide to rounding.
-const IMAGE_TOLERANCE: f64 = 1e-6;
+/// A site's occupancies may add up to this much above 1 from rounding; a
+/// site fuller than that is overfull.
+pub(crate) const OCCUPANCY_ROUNDING: f64 = 1e-6;
 
 /// A partly occupied site whose file says nothing of its site symmetry, and
 /// whose cell's declared contents do not settle it, is on a special position
@@ -84,13 +84,7 @@ fn structure(block: &Block<'_>, options: &CifOptions) -> Result<Structure, Error
     }
     let mut diagnostics = block.diagnostics.clone();
     let cell = cell(block, &mut diagnostics)?;
-    let lattice =
-        Lattice::from_parameters(cell.a, cell.b, cell.c, cell.alpha, cell.beta, cell.gamma)?;
-    for hkl in [[1, 0, 0], [0, 1, 0], [0, 0, 1]] {
-        if lattice.d_spacing(hkl) < 0.01 {
-            return Err(Error::cif("cell thinner than 0.01 Å"));
-        }
-    }
+    let lattice = cell_lattice(&cell)?;
     let space_group = symmetry::names(block);
     let rows = rows(block, &lattice, options, &mut diagnostics)?;
     if rows.is_empty() {
@@ -136,7 +130,7 @@ fn structure(block: &Block<'_>, options: &CifOptions) -> Result<Structure, Error
             (operations, SymmetrySource::P1, assembly)
         }
     };
-    cell_symmetry(&operations, &lattice, &mut diagnostics)?;
+    diagnostics.extend(cell_symmetry(&operations, &lattice)?);
     diagnostics.extend(assembly.diagnostics);
     Ok(Structure {
         name: block.name.to_string(),
@@ -151,6 +145,19 @@ fn structure(block: &Block<'_>, options: &CifOptions) -> Result<Structure, Error
     })
 }
 
+/// The lattice of a cell, which must be at least 0.01 Å thick between each
+/// pair of faces.
+pub(crate) fn cell_lattice(cell: &CellParameters) -> Result<Lattice, Error> {
+    let lattice =
+        Lattice::from_parameters(cell.a, cell.b, cell.c, cell.alpha, cell.beta, cell.gamma)?;
+    for hkl in [[1, 0, 0], [0, 1, 0], [0, 0, 1]] {
+        if lattice.d_spacing(hkl) < 0.01 {
+            return Err(Error::cif("cell thinner than 0.01 Å"));
+        }
+    }
+    Ok(lattice)
+}
+
 /// A departure of the cell from the symmetry of its operations above this,
 /// relative to the metric, is an error: about 1 % in a length or 0.6° in an
 /// angle.
@@ -163,12 +170,11 @@ const CELL_SYMMETRY_NOTE: f64 = 1e-5;
 /// entry, |(RᵀGR − G)ᵢⱼ| / √(Gᵢᵢ Gⱼⱼ), is an error above
 /// [`CELL_SYMMETRY_ERROR`] (a cubic name on an orthorhombic cell) and a
 /// diagnostic above [`CELL_SYMMETRY_NOTE`] (an angle of 90.06° under a
-/// two-fold axis); the cell is read as given.
-fn cell_symmetry(
+/// two-fold axis), returned to report; the cell is read as given.
+pub(crate) fn cell_symmetry(
     operations: &[SymOp],
     lattice: &Lattice,
-    diagnostics: &mut Vec<Diagnostic>,
-) -> Result<(), Error> {
+) -> Result<Option<Diagnostic>, Error> {
     let m = lattice.matrix();
     let dot = |u: &[f64; 3], v: &[f64; 3]| u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
     let mut g = [[0.0; 3]; 3];
@@ -196,10 +202,10 @@ fn cell_symmetry(
         }
     }
     let Some((departure, op, i, j, image)) = worst else {
-        return Ok(());
+        return Ok(None);
     };
     if departure <= CELL_SYMMETRY_NOTE {
-        return Ok(());
+        return Ok(None);
     }
     let axes = ["a", "b", "c"];
     let what = if i == j {
@@ -227,17 +233,16 @@ fn cell_symmetry(
     if departure > CELL_SYMMETRY_ERROR {
         return Err(Error::cif(format!(
             "the cell does not have the symmetry of its operations: {} {what}",
-            symmetry::xyz(op)
+            symmetry::xyz(op, ",")
         )));
     }
-    diagnostics.push(Diagnostic::new(
+    Ok(Some(Diagnostic::new(
         DiagnosticKind::CellSymmetryMismatch,
         format!(
             "the cell departs from the symmetry of its operations: {} {what}",
-            symmetry::xyz(op)
+            symmetry::xyz(op, ",")
         ),
-    ));
-    Ok(())
+    )))
 }
 
 // ---------------------------------------------------------------------------
@@ -451,9 +456,11 @@ fn together(a: &Column<'_, '_>, b: &Column<'_, '_>) -> bool {
 }
 
 /// The atom types' oxidation numbers, `_atom_type_oxidation_number` by
-/// `_atom_type_symbol`, also under the symbol with its charge removed. Each
-/// type keeps its own; a placeholder (`?`, `.`) leaves its type without one,
-/// and the types whose numbers cannot be read are returned to report.
+/// `_atom_type_symbol`, also under the symbol with its charge removed where
+/// no type is listed under that symbol (`Fe` keeps its own number beside
+/// `Fe3+`). Each type keeps its own; a placeholder (`?`, `.`) leaves its type
+/// without one, and the types whose numbers cannot be read are returned to
+/// report.
 fn oxidation_states(block: &Block<'_>) -> (FxHashMap<String, f64>, Vec<String>) {
     let mut out = FxHashMap::default();
     let mut unreadable = Vec::new();
@@ -475,9 +482,6 @@ fn oxidation_states(block: &Block<'_>) -> (FxHashMap<String, f64>, Vec<String>) 
         }
     }
     for (symbol, oxidation) in &read {
-        out.insert(symbol.clone(), *oxidation);
-    }
-    for (symbol, oxidation) in &read {
         let mut stripped = symbol.clone();
         if stripped.ends_with(['+', ',', '-']) {
             stripped.pop();
@@ -486,6 +490,9 @@ fn oxidation_states(block: &Block<'_>) -> (FxHashMap<String, f64>, Vec<String>) 
             stripped.pop();
         }
         out.insert(stripped, *oxidation);
+    }
+    for (symbol, oxidation) in &read {
+        out.insert(symbol.clone(), *oxidation);
     }
     (out, unreadable)
 }
@@ -737,18 +744,6 @@ struct Assembly {
     multiplicity_mismatches: usize,
 }
 
-/// Wrap a fractional position into the cell, a hair below 1 to 0.
-fn wrap(x: [f64; 3]) -> [f64; 3] {
-    x.map(|v| {
-        let w = v - v.floor();
-        if w >= 1.0 - 1e-12 {
-            0.0
-        } else {
-            w
-        }
-    })
-}
-
 /// Cartesian length of a fractional displacement, across cell boundaries.
 fn distance(lattice: &Lattice, a: [f64; 3], b: [f64; 3]) -> f64 {
     let m = lattice.matrix();
@@ -760,11 +755,6 @@ fn distance(lattice: &Lattice, a: [f64; 3], b: [f64; 3]) -> f64 {
     (cart[0] * cart[0] + cart[1] * cart[1] + cart[2] * cart[2]).sqrt()
 }
 
-fn is_identity(op: &SymOp) -> bool {
-    op.rotation == SymOp::IDENTITY.rotation
-        && op.translation.iter().all(|t| (t - t.round()).abs() < 1e-9)
-}
-
 /// Rows merged into sites and expanded into atoms with `operations`.
 fn assemble(
     rows: &[Row],
@@ -774,7 +764,7 @@ fn assemble(
     declared: Option<&[(Element, f64)]>,
 ) -> Result<Assembly, Error> {
     let mut diagnostics = Vec::new();
-    let images: Vec<&SymOp> = operations.iter().filter(|op| !is_identity(op)).collect();
+    let images = moving(operations);
 
     // Rows on one position, directly or through symmetry, make one site, and
     // rows of one species add their occupancies: a
@@ -799,16 +789,7 @@ fn assemble(
             occupancy: row.occupancy,
             b_iso: row.b_iso,
         };
-        let (j, image) = match grid.first_match(row.position) {
-            Some(j) => (Some(j), false),
-            None => (
-                images
-                    .iter()
-                    .find_map(|op| grid.first_match(op.apply(row.position))),
-                true,
-            ),
-        };
-        let Some(j) = j else {
+        let Some((j, image)) = grid.site_of(&images, row.position) else {
             grid.insert(row.position);
             drafts.push(Draft {
                 row,
@@ -928,16 +909,6 @@ fn assemble(
         listed: Option<usize>,
         reading: Reading,
     }
-    let orbit_of = |position: [f64; 3]| -> Vec<[f64; 3]> {
-        let mut orbit = Grid::new(IMAGE_TOLERANCE);
-        for op in operations {
-            let image = wrap(op.apply(position));
-            if orbit.first_match(image).is_none() {
-                orbit.insert(image);
-            }
-        }
-        orbit.points
-    };
     let mut prepared = Vec::with_capacity(drafts.len());
     let mut overfull = Vec::new();
     for (k, draft) in drafts.into_iter().enumerate() {
@@ -950,7 +921,7 @@ fn assemble(
                 options.occupancy_tolerance
             )));
         }
-        if total > 1.0 + 1e-6 {
+        if total > 1.0 + OCCUPANCY_ROUNDING {
             overfull.push(format!("{label} ({total:.4})"));
             for o in &mut occupants {
                 o.occupancy /= total;
@@ -978,7 +949,7 @@ fn assemble(
                 options.special_position_tolerance,
             );
             let (orbit_apart, orbit_snapped) = (operations.len() / same, operations.len() / near);
-            let on_special = if total * (near / same) as f64 > 1.0 + 1e-6 {
+            let on_special = if total * (near / same) as f64 > 1.0 + OCCUPANCY_ROUNDING {
                 Some(true)
             } else if let Some(order) = draft.row.site_symmetry_order {
                 Some(order > 1)
@@ -1021,7 +992,7 @@ fn assemble(
             let mut settled: FxHashMap<u8, f64> = FxHashMap::default();
             for p in &prepared {
                 if let Reading::Settled(position) = p.reading {
-                    let size = orbit_of(position).len() as f64;
+                    let size = orbit(operations, position).len() as f64;
                     for o in &p.occupants {
                         *settled.entry(o.element.z()).or_insert(0.0) += size * o.occupancy;
                     }
@@ -1039,7 +1010,7 @@ fn assemble(
                         unreachable!("open sites are open")
                     };
                     let contents = |position: [f64; 3]| -> Vec<(u8, f64)> {
-                        let size = orbit_of(position).len() as f64;
+                        let size = orbit(operations, position).len() as f64;
                         prepared[i]
                             .occupants
                             .iter()
@@ -1092,9 +1063,9 @@ fn assemble(
                 }
             }
         };
-        let orbit = orbit_of(position);
-        let size = orbit.len();
-        atoms.extend(orbit.into_iter().map(|image| Atom {
+        let images = orbit(operations, position);
+        let size = images.len();
+        atoms.extend(images.into_iter().map(|image| Atom {
             site: k,
             position: image,
         }));

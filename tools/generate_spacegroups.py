@@ -1,7 +1,8 @@
 """Generate src/spacegroups.rs: gemmi's table of space-group settings.
 
 A CIF that names its space group instead of listing operations is read with
-the settings the name admits: gemmi's table of all 564 settings
+the settings the name admits, and a structure is written with the names of
+the setting its operations are in: gemmi's table of all 564 settings
 (Hermann-Mauguin symbols with their origin choice or axes, and Hall symbols),
 ``SETTINGS``, indexed by symbol in ``SETTINGS_BY_SYMBOL`` and by Hall symbol
 in ``SETTINGS_BY_HALL``. Operations are stored once (rotation entries and
@@ -49,13 +50,15 @@ def symbol_key(name: str) -> str:
     return re.sub(r"[\s_]", "", name).lower()
 
 
-def hall_key(name: str) -> str:
-    """A Hall symbol as cifmi matches it.
+def hall_symbol(name: str) -> str:
+    """A Hall symbol as cifmi writes it: runs of whitespace become one
+    space, since spaces separate the generators (``P 32`` is not ``P 3 2``)."""
+    return " ".join(name.split())
 
-    Runs of whitespace become one space, since spaces separate the
-    generators (``P 32`` is not ``P 3 2``), and letters are lowercased.
-    """
-    return " ".join(name.split()).lower()
+
+def hall_key(name: str) -> str:
+    """A Hall symbol as cifmi matches it: as written, lowercased."""
+    return hall_symbol(name).lower()
 
 
 def rust_str(text: str) -> str:
@@ -68,7 +71,9 @@ def main() -> None:
     by_hall: dict[str, list[int]] = {}
     for index, sg in enumerate(gemmi.spacegroup_table()):
         ops = [encode(op) for op in sg.operations()]
-        settings.append((sg.number, sg.xhm(), sg.is_reference_setting(), ops))
+        settings.append(
+            (sg.number, sg.xhm(), hall_symbol(sg.hall), sg.is_reference_setting(), ops)
+        )
         names = {sg.hm, sg.short_name()}
         if sg.hm in E_GLIDE_NAMES:
             names.add(E_GLIDE_NAMES[sg.hm])
@@ -99,6 +104,8 @@ def main() -> None:
         "    /// Hermann-Mauguin symbol with its origin choice (`:1`, `:2`) or axes",
         "    /// (`:H`, `:R`) where the group has a choice, as gemmi writes it.",
         "    pub(crate) name: &'static str,",
+        "    /// Hall symbol, as gemmi writes it, with single spaces.",
+        "    pub(crate) hall: &'static str,",
         "    /// gemmi's reference setting of the number: the first in the",
         "    /// International Tables, but origin choice 2 and hexagonal axes.",
         "    pub(crate) reference: bool,",
@@ -109,9 +116,10 @@ def main() -> None:
         "/// gemmi's table of settings, in its order.",
         f"pub(crate) static SETTINGS: [Setting; {len(settings)}] = [",
     ]
-    for number, name, reference, idx in settings:
+    for number, name, hall, reference, idx in settings:
         lines.append(
             f"    Setting {{ number: {number}, name: {rust_str(name)}, "
+            f"hall: {rust_str(hall)}, "
             f"reference: {'true' if reference else 'false'}, "
             f"operations: &[{', '.join(map(str, idx))}] }},"
         )

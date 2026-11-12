@@ -1,12 +1,16 @@
-//! Crystal structures as read from a CIF data block.
+//! Crystal structures as read from a CIF data block, or built from their
+//! parts.
 
 use crate::element::Element;
 use crate::lattice::Lattice;
 use crate::symop::SymOp;
+use crate::writer;
+use crate::Error;
 
 /// A crystal structure read from one CIF data block: the sites the file
 /// lists, the symmetry operations, and every atom of the unit cell those
-/// operations generate from the sites.
+/// operations generate from the sites. [`Structure::new`] builds one from
+/// its parts.
 #[derive(Clone, Debug)]
 pub struct Structure {
     /// Name of the data block, without `data_`.
@@ -31,6 +35,54 @@ pub struct Structure {
     /// What the reader found that the file left open or got wrong, in the
     /// order found.
     pub diagnostics: Vec<Diagnostic>,
+}
+
+impl Structure {
+    /// A structure from the parts a crystal model holds: the cell, the
+    /// space-group operations and the asymmetric unit, as they are. Nothing
+    /// is merged or moved: the lattice is set from the cell and the atoms
+    /// are the sites' orbits. The structure names no space group, its
+    /// symmetry source is [`SymmetrySource::Given`] and it has no
+    /// diagnostics.
+    ///
+    /// The parts must be what a CIF can hold and cifmi reads back as them
+    /// (see [`write_cif_str`](crate::write_cif_str)): `name` a data block
+    /// code; the operations a group, each once, of which the cell has the
+    /// symmetry; each site labelled as its first species, on a position of
+    /// its own up to symmetry, at finite coordinates, holding each species
+    /// once, with occupancies above 0 adding up to at most 1, B at least 0
+    /// and finite oxidation states. Anything else is an error with the
+    /// reason.
+    pub fn new(
+        name: impl Into<String>,
+        cell: CellParameters,
+        operations: Vec<SymOp>,
+        sites: Vec<Site>,
+    ) -> Result<Self, Error> {
+        let name = name.into();
+        let parts = writer::check(&name, &cell, &operations, &sites)?;
+        let atoms = parts
+            .orbits
+            .into_iter()
+            .enumerate()
+            .flat_map(|(site, orbit)| {
+                orbit
+                    .into_iter()
+                    .map(move |position| Atom { site, position })
+            })
+            .collect();
+        Ok(Structure {
+            name,
+            cell,
+            lattice: parts.lattice,
+            space_group: SpaceGroupNames::default(),
+            symmetry_source: SymmetrySource::Given,
+            sites,
+            operations,
+            atoms,
+            diagnostics: Vec::new(),
+        })
+    }
 }
 
 /// Cell edge lengths in Å and angles in degrees.
@@ -66,6 +118,9 @@ pub enum SymmetrySource {
     /// Nothing the file gives: the identity alone (P1). A diagnostic says
     /// why.
     P1,
+    /// Given with the structure's other parts, to [`Structure::new`]; not
+    /// read from a file.
+    Given,
 }
 
 /// A site of the asymmetric unit.

@@ -1,0 +1,44 @@
+#\#CIF_1.1
+data_9005920
+_space_group_IT_number   62
+_space_group_name_H-M_alt   'P b n m'
+_space_group_name_Hall   '-P 2c 2ab'
+_cell_length_a   4.76200000
+_cell_length_b   10.22070000
+_cell_length_c   5.99070000
+_cell_angle_alpha   90.00000000
+_cell_angle_beta   90.00000000
+_cell_angle_gamma   90.00000000
+_chemical_formula_sum   'Ca0.02797204 Fe0.65568432 Mg7.26435564 Mn0.011988 Ni0.04 O16 Si4'
+_cell_formula_units_Z   1
+loop_
+ _space_group_symop_id
+ _space_group_symop_operation_xyz
+  1  'x, y, z'
+  2  'x, y, -z+1/2'
+  3  '-x, -y, z+1/2'
+  4  'x+1/2, -y+1/2, z+1/2'
+  5  '-x+1/2, y+1/2, -z+1/2'
+  6  '-x+1/2, y+1/2, z'
+  7  'x+1/2, -y+1/2, -z'
+  8  '-x, -y, -z'
+loop_
+ _atom_site_label
+ _atom_site_type_symbol
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+ _atom_site_B_iso_or_equiv
+  MgM1  Mg  4  0.00000000  0.00000000  0.00000000  0.90500000  0.39004677
+  FeM1  Fe  4  0.00000000  0.00000000  0.00000000  0.08500000  0.39004677
+  NiM1  Ni  4  0.00000000  0.00000000  0.00000000  0.01000000  0.39004677
+  MgM2  Mg  4  0.99030000  0.27760000  0.25000000  0.91108891  0.39004677
+  FeM2  Fe  4  0.99030000  0.27760000  0.25000000  0.07892108  0.39004677
+  MnM2  Mn  4  0.99030000  0.27760000  0.25000000  0.00299700  0.39004677
+  CaM2  Ca  4  0.99030000  0.27760000  0.25000000  0.00699301  0.39004677
+  SiT  Si  4  0.42670000  0.09430000  0.25000000  1.00000000  0.31977518
+  O1  O  4  0.76620000  0.09180000  0.25000000  1.00000000  0.43031475
+  O2  O  4  0.22000000  0.44790000  0.25000000  1.00000000  0.40978597
+  O3  O  8  0.27820000  0.16320000  0.03330000  1.00000000  0.46031835

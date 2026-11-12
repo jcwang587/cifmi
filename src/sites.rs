@@ -1,9 +1,13 @@
-//! Positions in the cell: a periodic index for tolerance lookups, snapping
-//! of thirds, and snapping onto special positions.
+//! Positions in the cell: a periodic index for tolerance lookups, orbits,
+//! snapping of thirds, and snapping onto special positions.
 
 use crate::lattice::Lattice;
 use crate::symop::SymOp;
 use rustc_hash::FxHashMap;
+
+/// Images closer than this (fractional, per axis) are one atom; snapped
+/// orbits coincide to rounding.
+const IMAGE_TOLERANCE: f64 = 1e-6;
 
 /// Periodic grid of fractional positions for tolerance lookups. Cells evenly
 /// partition [0, 1) and are at least 2.5 tolerances wide, so every point
@@ -54,6 +58,19 @@ impl Grid {
         })
     }
 
+    /// The site of `x` among the points, as rows on one position make one
+    /// site: the first point within the tolerance of `x`, else of an image of
+    /// `x` under `images`, with whether an image matched.
+    pub(crate) fn site_of(&self, images: &[&SymOp], x: [f64; 3]) -> Option<(usize, bool)> {
+        if let Some(j) = self.first_match(x) {
+            return Some((j, false));
+        }
+        images
+            .iter()
+            .find_map(|op| self.first_match(op.apply(x)))
+            .map(|j| (j, true))
+    }
+
     /// Lowest index within `tolerance` on every axis.
     pub(crate) fn first_match(&self, x: [f64; 3]) -> Option<usize> {
         if self.n < 3 {
@@ -80,6 +97,43 @@ impl Grid {
         }
         best
     }
+}
+
+/// The operations that move positions: all but the identity.
+pub(crate) fn moving(operations: &[SymOp]) -> Vec<&SymOp> {
+    operations
+        .iter()
+        .filter(|op| {
+            op.rotation != SymOp::IDENTITY.rotation
+                || op.translation.iter().any(|t| (t - t.round()).abs() >= 1e-9)
+        })
+        .collect()
+}
+
+/// The atoms of a site at `position`: its images under `operations`,
+/// wrapped into the cell, each once, in the order the operations first reach
+/// them.
+pub(crate) fn orbit(operations: &[SymOp], position: [f64; 3]) -> Vec<[f64; 3]> {
+    let mut orbit = Grid::new(IMAGE_TOLERANCE);
+    for op in operations {
+        let image = wrap(op.apply(position));
+        if orbit.first_match(image).is_none() {
+            orbit.insert(image);
+        }
+    }
+    orbit.points
+}
+
+/// Wrap a fractional position into the cell, a hair below 1 to 0.
+fn wrap(x: [f64; 3]) -> [f64; 3] {
+    x.map(|v| {
+        let w = v - v.floor();
+        if w >= 1.0 - 1e-12 {
+            0.0
+        } else {
+            w
+        }
+    })
 }
 
 const TWO_THIRDS: f64 = 2.0 / 3.0;

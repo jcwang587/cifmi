@@ -1,14 +1,17 @@
 use std::io;
 use thiserror::Error as ThisError;
 
-/// Errors raised while reading a structure or validating its parts.
+/// Errors raised while reading or writing a structure or validating its
+/// parts.
 #[derive(ThisError, Debug)]
 pub enum Error {
-    /// An input/output error occurred while reading a structure file.
+    /// An input/output error occurred while reading or writing a structure
+    /// file.
     #[error("IO error: {0}")]
     Io(#[from] io::Error),
 
-    /// A structure file could not be parsed.
+    /// A structure file could not be parsed, or a structure cannot be
+    /// written as one.
     #[error("CIF error: {0}")]
     Cif(String),
 
