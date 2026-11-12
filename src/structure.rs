@@ -215,6 +215,9 @@ pub enum DiagnosticKind {
     /// Rows repeating atoms at symmetry images of earlier rows (a listing
     /// already expanded), each atom read once.
     RepeatedAtom,
+    /// Sites the file lists apart that are on one position, up to symmetry,
+    /// on their special positions, read as one site.
+    MergedSites,
     /// Sites whose occupancies add up to more than 1, within the tolerance,
     /// scaled to a full site.
     OverfullSite,
@@ -252,6 +255,7 @@ impl DiagnosticKind {
             DiagnosticKind::PseudoAtom => "pseudo-atom",
             DiagnosticKind::ZeroOccupancy => "zero-occupancy",
             DiagnosticKind::RepeatedAtom => "repeated-atom",
+            DiagnosticKind::MergedSites => "merged-sites",
             DiagnosticKind::OverfullSite => "overfull-site",
             DiagnosticKind::AmbiguousSpecialPosition => "ambiguous-special-position",
             DiagnosticKind::IgnoredDisplacement => "ignored-displacement",

@@ -13,6 +13,7 @@ use crate::structure::{
 };
 use crate::symmetry::{self, Candidate, Source};
 use crate::symop::SymOp;
+use crate::writer::{read_back, written};
 use crate::Error;
 use rustc_hash::FxHashMap;
 use std::f64::consts::PI;
@@ -755,6 +756,48 @@ fn distance(lattice: &Lattice, a: [f64; 3], b: [f64; 3]) -> f64 {
     (cart[0] * cart[0] + cart[1] * cart[1] + cart[2] * cart[2]).sqrt()
 }
 
+/// A site in the making: its first row, and the species the rows on its
+/// position add up to.
+struct Draft<'r> {
+    row: &'r Row,
+    occupants: Vec<Occupant>,
+}
+
+/// Species joining a site by the rules for rows on one position: a species
+/// the site holds already adds its occupancy, except that a row repeats the
+/// site's atom when the listing is already expanded and the row lies at a
+/// symmetry image, or when adding it would fill the site past the occupancy
+/// tolerance with an equal occupancy. The rows read once are kept to report.
+struct Joining {
+    fully_expanded: bool,
+    occupancy_tolerance: f64,
+    listed_again: Vec<String>,
+    overfilling: Vec<String>,
+}
+
+impl Joining {
+    /// Add `occupant`, on the site through a symmetry image when `image`.
+    fn add(&mut self, occupants: &mut Vec<Occupant>, occupant: Occupant, image: bool) {
+        let total: f64 = occupants.iter().map(|o| o.occupancy).sum();
+        let Some(same) = occupants
+            .iter_mut()
+            .find(|o| o.element == occupant.element && o.oxidation == occupant.oxidation)
+        else {
+            occupants.push(occupant);
+            return;
+        };
+        if image && self.fully_expanded {
+            self.listed_again.push(occupant.label);
+        } else if total + occupant.occupancy > self.occupancy_tolerance + 1e-9
+            && (same.occupancy - occupant.occupancy).abs() <= 1e-3
+        {
+            self.overfilling.push(occupant.label);
+        } else {
+            same.occupancy += occupant.occupancy;
+        }
+    }
+}
+
 /// Rows merged into sites and expanded into atoms with `operations`.
 fn assemble(
     rows: &[Row],
@@ -772,15 +815,15 @@ fn assemble(
     // instead repeats its site's atom when the listing is already expanded,
     // or when adding it would fill the site past the tolerance with an equal
     // occupancy.
-    struct Draft<'r> {
-        row: &'r Row,
-        occupants: Vec<Occupant>,
-    }
     let (expanded, closed) = listing_fit(rows, operations, options.site_tolerance);
-    let fully_expanded = expanded && closed;
+    let mut joining = Joining {
+        fully_expanded: expanded && closed,
+        occupancy_tolerance: options.occupancy_tolerance,
+        listed_again: Vec::new(),
+        overfilling: Vec::new(),
+    };
     let mut drafts: Vec<Draft> = Vec::new();
     let mut grid = Grid::new(options.site_tolerance);
-    let (mut listed_again, mut overfilling) = (Vec::new(), Vec::new());
     for row in rows {
         let occupant = Occupant {
             label: row.label.clone(),
@@ -789,53 +832,218 @@ fn assemble(
             occupancy: row.occupancy,
             b_iso: row.b_iso,
         };
-        let Some((j, image)) = grid.site_of(&images, row.position) else {
-            grid.insert(row.position);
-            drafts.push(Draft {
-                row,
-                occupants: vec![occupant],
-            });
-            continue;
-        };
-        let occupants = &mut drafts[j].occupants;
-        let total: f64 = occupants.iter().map(|o| o.occupancy).sum();
-        let Some(same) = occupants
-            .iter_mut()
-            .find(|o| o.element == occupant.element && o.oxidation == occupant.oxidation)
-        else {
-            occupants.push(occupant);
-            continue;
-        };
-        if image && fully_expanded {
-            listed_again.push(row.label.clone());
-        } else if total + occupant.occupancy > options.occupancy_tolerance + 1e-9
-            && (same.occupancy - occupant.occupancy).abs() <= 1e-3
-        {
-            overfilling.push(row.label.clone());
-        } else {
-            same.occupancy += occupant.occupancy;
+        match grid.site_of(&images, row.position) {
+            Some((j, image)) => joining.add(&mut drafts[j].occupants, occupant, image),
+            None => {
+                grid.insert(row.position);
+                drafts.push(Draft {
+                    row,
+                    occupants: vec![occupant],
+                });
+            }
         }
     }
-    if !listed_again.is_empty() {
+
+    // Sites the file lists apart can end on one position, up to symmetry,
+    // once on their special positions (N1 and N1' of COD 7234017, both on
+    // (x, 2x, ¼)). Those are one site too, by the same rules, placed again
+    // as one, as reading what cifmi writes of them would make them. Where
+    // no site moved, the sites are where their rows were compared above. How
+    // a site merged away was placed stays reported.
+    let (mut merged, mut placed_before) = (Vec::new(), Vec::new());
+    let placement = loop {
+        let mut placement = place(&drafts, operations, lattice, options, declared)?;
+        let moved = drafts
+            .iter()
+            .zip(&placement.sites)
+            .any(|(draft, site)| site.position != draft.row.position);
+        let onto = if moved {
+            on_one_position(&placement.sites, &images, options)
+        } else {
+            Vec::new()
+        };
+        if onto.is_empty() {
+            break placement;
+        }
+        for (k, j, image) in onto {
+            merged.push(format!(
+                "{} on {}",
+                drafts[k].row.label, drafts[j].row.label
+            ));
+            placed_before.extend(placement.open[k].take());
+            for occupant in std::mem::take(&mut drafts[k].occupants) {
+                joining.add(&mut drafts[j].occupants, occupant, image);
+            }
+        }
+        drafts.retain(|draft| !draft.occupants.is_empty());
+    };
+    if !joining.listed_again.is_empty() {
         diagnostics.push(Diagnostic::new(
             DiagnosticKind::RepeatedAtom,
             format!(
                 "the listing is already expanded: {} repeat atoms at symmetry images; each atom is read once",
-                some_of(&listed_again)
+                some_of(&joining.listed_again)
             ),
         ));
     }
-    if !overfilling.is_empty() {
+    if !joining.overfilling.is_empty() {
         diagnostics.push(Diagnostic::new(
             DiagnosticKind::RepeatedAtom,
             format!(
                 "{}: rows repeating an atom of their site, whose occupancies would otherwise add up to more than {}; each atom is read once",
-                some_of(&overfilling),
+                some_of(&joining.overfilling),
                 options.occupancy_tolerance
             ),
         ));
     }
+    if !merged.is_empty() {
+        diagnostics.push(Diagnostic::new(
+            DiagnosticKind::MergedSites,
+            format!(
+                "{}: sites listed apart that are on one position, up to symmetry, on their special positions; read as one site",
+                some_of(&merged)
+            ),
+        ));
+    }
 
+    let Placement {
+        sites,
+        listed,
+        overfull,
+        open,
+    } = placement;
+    let (mut settled_by_contents, mut read_by_distance) = (Vec::new(), Vec::new());
+    for (by_contents, entry) in placed_before.into_iter().chain(open.into_iter().flatten()) {
+        if by_contents {
+            settled_by_contents.push(entry);
+        } else {
+            read_by_distance.push(entry);
+        }
+    }
+    let mut atoms = Vec::new();
+    let mut multiplicity_mismatches = Vec::new();
+    for (k, (site, listed)) in sites.iter().zip(listed).enumerate() {
+        let images = orbit(operations, site.position);
+        let size = images.len();
+        atoms.extend(images.into_iter().map(|image| Atom {
+            site: k,
+            position: image,
+        }));
+        if let Some(listed) = listed {
+            if listed != size {
+                multiplicity_mismatches
+                    .push(format!("{} (listed {listed}, orbit {size})", site.label));
+            }
+        }
+    }
+    if !overfull.is_empty() {
+        diagnostics.push(Diagnostic::new(
+            DiagnosticKind::OverfullSite,
+            format!(
+                "{}: occupancies add up to more than 1; scaled to a full site",
+                some_of(&overfull)
+            ),
+        ));
+    }
+    if !settled_by_contents.is_empty() {
+        diagnostics.push(Diagnostic::new(
+            DiagnosticKind::AmbiguousSpecialPosition,
+            format!(
+                "partly occupied sites near a special position, which the file does not place on it or off it, settled by the cell's declared contents: {}",
+                some_of(&settled_by_contents)
+            ),
+        ));
+    }
+    if !read_by_distance.is_empty() {
+        let unsettled = if declared.is_some() {
+            " and the declared contents do not settle"
+        } else {
+            ""
+        };
+        diagnostics.push(Diagnostic::new(
+            DiagnosticKind::AmbiguousSpecialPosition,
+            format!(
+                "partly occupied sites near a special position, which the file does not place on it or off it{unsettled}, read by their distance from it ({ROUNDING_DISTANCE} Å): {}",
+                some_of(&read_by_distance)
+            ),
+        ));
+    }
+    if !multiplicity_mismatches.is_empty() {
+        diagnostics.push(Diagnostic::new(
+            DiagnosticKind::MultiplicityMismatch,
+            format!(
+                "{}: listed multiplicities differ from the orbits",
+                some_of(&multiplicity_mismatches)
+            ),
+        ));
+    }
+    let (collisions, example) = collisions(lattice, &sites, &atoms);
+    if let Some((a, b, d)) = example {
+        diagnostics.push(Diagnostic::new(
+            DiagnosticKind::CollidingAtoms,
+            format!(
+                "{collisions} pair(s) of atoms closer than {COLLISION_DISTANCE} Å, more than one full atom between them, such as {} and {}, {d:.3} Å apart",
+                sites[atoms[a].site].label, sites[atoms[b].site].label
+            ),
+        ));
+    }
+    Ok(Assembly {
+        sites,
+        atoms,
+        diagnostics,
+        collisions,
+        multiplicity_mismatches: multiplicity_mismatches.len(),
+    })
+}
+
+/// Each site on the position of an earlier one, up to symmetry, with that
+/// site and whether through an image. The positions are compared as cifmi
+/// writes them, where reading the written text compares them, so that
+/// rounding in a mean cannot put two sites the tolerance apart (S1 and Se1
+/// of COD 1526224, 1e-4 apart on a three-fold axis) on one position in one
+/// reading and apart in the other.
+fn on_one_position(
+    sites: &[Site],
+    images: &[&SymOp],
+    options: &CifOptions,
+) -> Vec<(usize, usize, bool)> {
+    let mut grid = Grid::new(options.site_tolerance);
+    let (mut owners, mut onto) = (Vec::new(), Vec::new());
+    for (k, site) in sites.iter().enumerate() {
+        let position = read_back(&written(site.position), options.frac_tolerance);
+        match grid.site_of(images, position) {
+            Some((i, image)) => onto.push((k, owners[i], image)),
+            None => {
+                grid.insert(position);
+                owners.push(k);
+            }
+        }
+    }
+    onto
+}
+
+/// The sites as the reading places them, and what it reports.
+struct Placement {
+    sites: Vec<Site>,
+    /// Each site's listed multiplicity.
+    listed: Vec<Option<usize>>,
+    overfull: Vec<String>,
+    /// For each site the file places neither on its special position nor off
+    /// it, whether the declared contents settled it (else the distance), and
+    /// the report's entry.
+    open: Vec<Option<(bool, String)>>,
+}
+
+/// Each site placed by the rules of §6: its occupancies, scaled to a full
+/// site where they add up to a little more than 1, and its position, on its
+/// special position or split around it.
+fn place(
+    drafts: &[Draft<'_>],
+    operations: &[SymOp],
+    lattice: &Lattice,
+    options: &CifOptions,
+    declared: Option<&[(Element, f64)]>,
+) -> Result<Placement, Error> {
     // Each site's exact position (images within the site tolerance merged
     // onto their mean) with its stabilizers: the operations fixing it there,
     // and those bringing an image within the special-position distance.
@@ -843,7 +1051,12 @@ fn assemble(
     let stabilizers: Vec<([f64; 3], usize, usize)> = drafts
         .iter()
         .map(|draft| {
-            let exact = snap_within(operations, draft.row.position, options.site_tolerance);
+            let exact = snap_within(
+                lattice,
+                operations,
+                draft.row.position,
+                options.site_tolerance,
+            );
             let same = operations
                 .iter()
                 .filter(|op| {
@@ -911,9 +1124,9 @@ fn assemble(
     }
     let mut prepared = Vec::with_capacity(drafts.len());
     let mut overfull = Vec::new();
-    for (k, draft) in drafts.into_iter().enumerate() {
+    for (k, draft) in drafts.iter().enumerate() {
         let label = draft.row.label.clone();
-        let mut occupants = draft.occupants;
+        let mut occupants = draft.occupants.clone();
         let total: f64 = occupants.iter().map(|o| o.occupancy).sum();
         if total > options.occupancy_tolerance + 1e-9 {
             return Err(Error::cif(format!(
@@ -1030,13 +1243,12 @@ fn assemble(
     };
 
     let mut sites = Vec::with_capacity(prepared.len());
-    let mut atoms = Vec::new();
-    let mut multiplicity_mismatches = Vec::new();
-    let (mut settled_by_contents, mut read_by_distance) = (Vec::new(), Vec::new());
+    let mut listed = Vec::with_capacity(prepared.len());
+    let mut open_readings = Vec::with_capacity(prepared.len());
     let mut next_open = 0;
-    for (k, p) in prepared.into_iter().enumerate() {
-        let position = match p.reading {
-            Reading::Settled(position) => position,
+    for p in prepared {
+        let (position, open_reading) = match p.reading {
+            Reading::Settled(position) => (position, None),
             Reading::Open {
                 exact,
                 snapped,
@@ -1051,93 +1263,23 @@ fn assemble(
                     p.total,
                     if on { "on it" } else { "split around it" }
                 );
-                if settled.is_some() {
-                    settled_by_contents.push(entry);
-                } else {
-                    read_by_distance.push(entry);
-                }
-                if on {
-                    snapped
-                } else {
-                    exact
-                }
+                let position = if on { snapped } else { exact };
+                (position, Some((settled.is_some(), entry)))
             }
         };
-        let images = orbit(operations, position);
-        let size = images.len();
-        atoms.extend(images.into_iter().map(|image| Atom {
-            site: k,
-            position: image,
-        }));
-        if let Some(listed) = p.listed {
-            if listed != size {
-                multiplicity_mismatches
-                    .push(format!("{} (listed {listed}, orbit {size})", p.label));
-            }
-        }
+        listed.push(p.listed);
+        open_readings.push(open_reading);
         sites.push(Site {
             label: p.label,
             position,
             occupants: p.occupants,
         });
     }
-    if !overfull.is_empty() {
-        diagnostics.push(Diagnostic::new(
-            DiagnosticKind::OverfullSite,
-            format!(
-                "{}: occupancies add up to more than 1; scaled to a full site",
-                some_of(&overfull)
-            ),
-        ));
-    }
-    if !settled_by_contents.is_empty() {
-        diagnostics.push(Diagnostic::new(
-            DiagnosticKind::AmbiguousSpecialPosition,
-            format!(
-                "partly occupied sites near a special position, which the file does not place on it or off it, settled by the cell's declared contents: {}",
-                some_of(&settled_by_contents)
-            ),
-        ));
-    }
-    if !read_by_distance.is_empty() {
-        let unsettled = if declared.is_some() {
-            " and the declared contents do not settle"
-        } else {
-            ""
-        };
-        diagnostics.push(Diagnostic::new(
-            DiagnosticKind::AmbiguousSpecialPosition,
-            format!(
-                "partly occupied sites near a special position, which the file does not place on it or off it{unsettled}, read by their distance from it ({ROUNDING_DISTANCE} Å): {}",
-                some_of(&read_by_distance)
-            ),
-        ));
-    }
-    if !multiplicity_mismatches.is_empty() {
-        diagnostics.push(Diagnostic::new(
-            DiagnosticKind::MultiplicityMismatch,
-            format!(
-                "{}: listed multiplicities differ from the orbits",
-                some_of(&multiplicity_mismatches)
-            ),
-        ));
-    }
-    let (collisions, example) = collisions(lattice, &sites, &atoms);
-    if let Some((a, b, d)) = example {
-        diagnostics.push(Diagnostic::new(
-            DiagnosticKind::CollidingAtoms,
-            format!(
-                "{collisions} pair(s) of atoms closer than {COLLISION_DISTANCE} Å, more than one full atom between them, such as {} and {}, {d:.3} Å apart",
-                sites[atoms[a].site].label, sites[atoms[b].site].label
-            ),
-        ));
-    }
-    Ok(Assembly {
+    Ok(Placement {
         sites,
-        atoms,
-        diagnostics,
-        collisions,
-        multiplicity_mismatches: multiplicity_mismatches.len(),
+        listed,
+        overfull,
+        open: open_readings,
     })
 }
 

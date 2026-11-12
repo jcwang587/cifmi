@@ -100,9 +100,9 @@ files), one file whose Hall and Hermann-Mauguin symbols disagree, and one
 naming the cubic `P 42 3 2` for an orthorhombic cell, all read right or
 refused since.
 
-The whole archive, all 521,901 files: no crash; cifmi reads 519,196,
+The whole archive, all 521,901 files: no crash; cifmi reads 519,195,
 every refusal class counted (no atom sites 1,571, a site over 1.1 full
-692, modulated 295, a cell without the symmetry of its operations 53, no
+693, modulated 295, a cell without the symmetry of its operations 53, no
 cell 46, and 48 one-offs); 0.46% of the files carry colliding atoms, 0.3%
 an overfull site, 0.16% listed multiplicities that differ from their
 orbits, 0.05% a cell that departs slightly from the symmetry of its
@@ -205,8 +205,8 @@ nothing falls back to another reading.
 | Symmetry | listed operations: every one must be readable, and together they must close as a group, else an error; translations within 0.001 of a multiple of 1/24 (`0.3333`) are read as it; a repeated operation is dropped and reported. Else the settings table by Hall symbol, Hermann-Mauguin symbol (with `:1`, `:2`, `:S`, `:Z`, `:H`, `:R`, `e` glides, and the old cubic `F d 3 m` for `F d -3 m`; a short monoclinic symbol on unique axis b where the table knows it so, on the axis `:a`, `:b` or `:c` names, and otherwise on every axis that has it: `P 21/b` is `P 1 1 21/b` or `P 21/b 1 1`), then number; nothing given: P1, reported. A name the table lacks is an error; names that disagree with each other are reported and the settings of each stay candidates for the atoms to settle (next row); names that disagree with the listed operations are reported |
 | Setting left open | the settings the name admits, and the other origin choice or axes of a setting it names exactly, settled by the atoms (an expanded listing fits only its own setting; otherwise the setting without colliding atoms whose orbits match the listed multiplicities), then the cell's declared contents (`_chemical_formula_sum` × `_cell_formula_units_Z`, within 1.5 %), then the cell (rhombohedral or hexagonal axes; the unique axis of a monoclinic cell), then the setting the file names, then the table's reference setting; the choice is reported |
 | Elements | the type symbol, else the label: the first two characters in title case when they name an element (`FE1` is Fe), else the first alone (`O2-` is O), else a capital with its lowercase letters; `Ow` and `Hw` are water's O and H; the pseudo-atoms `Wat`, `OH` and `OH2` are read as O and `NO3` as N, each reported; deuterium stays D; a symbol naming no element is an error |
-| Coordinates | values within 1e-4 (relative) of 1/3 or 2/3 snap to them. Images within the site tolerance are one atom, onto their mean over the subgroup the operations that bring them there generate (a tolerance can cut between two mirror images of a site; the subgroup restores the other). Images within 0.05 Å are one atom on the special position where the site's occupancy forbids separate atoms there; where it allows them, the file's site symmetry order or multiplicity decides, then the cell's declared contents (the formula × Z: the reading that holds them, where every reading holding them agrees; such sites are settled together, up to 16 at a time), and failing those the distance does (on it within 0.015 Å, an atom split around it beyond), reported |
-| Rows on one position | merged up to symmetry, their occupancies adding, except that a row repeats its site's atom, read once and reported, when the listing is already expanded or when adding it would fill the site past the occupancy tolerance with an equal occupancy |
+| Coordinates | values within 1e-4 (relative) of 1/3 or 2/3 snap to them, and stay thirds as the site moves onto its special position. Images within the site tolerance are one atom, onto their mean over the subgroup the operations that bring them there generate (a tolerance can cut between two mirror images of a site; the subgroup restores the other); where the special position ties a third to a coordinate the file lists less precisely, so that the mean would move the third (F1 of COD 1528562 on (x, ½ − x, ¼), listed at (−0.1667, 0.6667)), onto the point of the special position nearest the mean with the thirds kept, (−⅙, ⅔). Images within 0.05 Å are one atom on the special position where the site's occupancy forbids separate atoms there; where it allows them, the file's site symmetry order or multiplicity decides, then the cell's declared contents (the formula × Z: the reading that holds them, where every reading holding them agrees; such sites are settled together, up to 16 at a time), and failing those the distance does (on it within 0.015 Å, an atom split around it beyond), reported |
+| Rows on one position | merged up to symmetry, their occupancies adding, except that a row repeats its site's atom, read once and reported, when the listing is already expanded or when adding it would fill the site past the occupancy tolerance with an equal occupancy. Sites the file lists apart that end on one position, within the site tolerance up to symmetry, once on their special positions (N1 and N1' of COD 7234017, listed 1e-4 apart, both onto (x, 2x, ¼)) are one site by the same rules, placed again as one, and reported; their positions are compared as cifmi writes them (§7), where reading the written text compares them |
 | Expansion | per site, exact orbits |
 | Dummy atoms | skipped (`_atom_site_calc_flag dum`), reported |
 | Occupancy above 1 | a site total up to 1.1 is scaled to a full site and reported; beyond, an error, a hydrogen placed on its oxygen included |
@@ -248,27 +248,38 @@ within 0.001 of a multiple of 1/24 is read as that multiple, and a site
 within the site tolerance of a special position, or a coordinate within the
 tolerance of a third, moves onto it.
 
-Evidence: the whole COD archive, 521,901 files, of which cifmi reads 519,196
+Evidence: the whole COD archive, 521,901 files, of which cifmi reads 519,195
 (§2). Each structure is written, read back, compared with the structure it
-was written from, and written again. 517,070 read back as the same
-structure, with no new diagnostic, and write again as the same text. 2,107
-have repeated labels, written unique (COD 2001310's second `H9aA` as
-`H9aA_2`). 14 have a site whose reading is not a fixed point of the reading:
-a coordinate within 1e-4 of a third on a special position that ties it to
-another axis (COD 1528562's F1 on (x, ½ − x, ¼) of `R -3 c :R`, listed at
-(−0.1667, 0.6667)). The reader snaps 0.6667 to ⅔, then averages the site
-onto its special position, which moves it off ⅔ again, so each reading moves
-the site half way on to (−⅙, ⅔), here by 4e-6 to 2e-5. 5 are refused: two
-sites the file lists apart, which the reading snaps onto one position (COD
-7234017's `N1` and `N1'`, both onto (x, 2x, ¼)), and which reading the
-written text would make one site. 300 have operations in no setting of the
-table, their origins shifted from every setting (COD 9002552,
-`C m c m (a-1/4,b-1/4,c)`), and are written without names; they read back
-unchanged. A random sample of 50,000 of the files (seed 20260111) gives the
-same picture: 49,714 read, 49,512 unchanged, 198 with repeated labels and 4
-sites that are no fixed point. On one thread over the sample, reading takes 579 µs
-per file and writing 124 µs per structure; reading the written text back
-takes 316 µs.
+was written from, and written again. 517,088 read back as the same
+structure, with no new diagnostic, and write again as the same text. The
+other 2,107 have repeated labels, written unique (COD 2001310's second
+`H9aA` as `H9aA_2`). 300 have operations in no setting of the table, their
+origins shifted from every setting (COD 9002552, `C m c m (a-1/4,b-1/4,c)`),
+and are written without names; they read back unchanged. No site moves on
+reading back by more than the written rounding, 5e-9. A random sample of
+50,000 of the files (seed 20260111) gives the same picture: 49,714 read,
+49,516 unchanged and 198 with repeated labels. On one thread over the
+sample, reading takes 579 µs per file and writing 124 µs per structure;
+reading the written text back takes 316 µs.
+
+The first round trip found two rules of the reading that did not give the
+reading back, both changed since (§6, §12). In 14 files a coordinate within
+1e-4 of a third lay on a special position that ties it to another axis
+(COD 1528562's F1 on (x, ½ − x, ¼) of `R -3 c :R`, listed at (−0.1667,
+0.6667)): the reader snapped 0.6667 to ⅔, then averaged the site onto its
+special position, which moved it off ⅔ again, so that each reading moved
+the site half way on to (−⅙, ⅔). Their 15 such sites now read on their
+thirds, 3e-6 to 3e-5 from where they read before. In 5 files two sites the
+file lists apart ended on one position, up to symmetry, on their special
+positions (COD 7234017's `N1` and `N1'`, both on (x, 2x, ¼)), and the
+writer refused them, as reading the written text would make them one site.
+Four now read with each pair as one site. COD 9001611 is refused: its Mg2
+and Si2_2, both full, end on one position, a site 2 full. A fingerprint of
+every reading of the archive (cell, lattice, names, operations, sites,
+atoms, diagnostics, errors) taken before and after the change differs in
+those 19 files, and in one more, COD 1101168, only in the reason its setting
+is chosen: its other origin choice, which put Al3 on top of O, now makes
+them one site 1.4 full, and so cannot hold the listed atoms.
 
 ## 8. Data model and APIs
 
@@ -329,6 +340,8 @@ involved.
 - `placeholder-row`, `dummy-atom`, `pseudo-atom`, `zero-occupancy`: rows
   skipped, or read as another element.
 - `repeated-atom`: rows repeating their site's atom, read once.
+- `merged-sites`: sites the file lists apart that are on one position, up
+  to symmetry, on their special positions, read as one site.
 - `overfull-site`: a site total above 1, up to 1.1, scaled to a full site.
 - `ambiguous-special-position`: partly occupied sites near a special
   position that the file places neither on it nor off it, settled by the
@@ -397,6 +410,24 @@ Settled:
   an atom split around it. Sites are snapped where the occupancy forbids
   separate atoms; where it allows them, the file's site symmetry order or
   multiplicity decides, and failing those a distance of 0.015 Å, reported.
+- **A reading reads back as itself.** Reading the text cifmi writes of a
+  reading gives that reading again (§7). The first round trip of the archive
+  found two rules that did not, and both changed. A coordinate snapped to a
+  third now stays a third as its site moves onto its special position,
+  where the mean of the site's images moved it off, within the tolerance,
+  and each reading moved the site half way on (14 files). Sites the file
+  lists apart that end on one position once on their special positions are
+  now one site, by the rules for rows on one position, and reported, where
+  they were two sites that reading the written text made one (5 files, which
+  the writer refused). Those sites are compared at the positions cifmi
+  writes, as reading the written text compares them: two sites the tolerance
+  apart would otherwise be one site in one reading and two in the other, by
+  rounding in a mean (COD 1526224). Only a site that placing moved can end
+  on another's position, so the comparison runs only where one moved (5% of
+  the files), and reading takes no longer. Every other reading of the
+  archive is bit for bit the same but for one setting's reason (§7): a mean
+  that moves a third by no more than rounding (1e-12, as in 4,678 files) is
+  kept as it is.
 - **Settings the file leaves open** are settled by the atoms, then the cell,
   then the setting the file names, then the table's
   reference setting, and the choice is reported, rather than refusing the
