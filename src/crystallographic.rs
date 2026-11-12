@@ -13,7 +13,7 @@ use crate::structure::{
 };
 use crate::symmetry::{self, Candidate, Source};
 use crate::symop::SymOp;
-use crate::writer::{read_back, written};
+use crate::writer::{read_back, reads_back, written};
 use crate::Error;
 use rustc_hash::FxHashMap;
 use std::f64::consts::PI;
@@ -846,17 +846,17 @@ fn assemble(
 
     // Sites the file lists apart can end on one position, up to symmetry,
     // once on their special positions (N1 and N1' of COD 7234017, both on
-    // (x, 2x, ¼)). Those are one site too, by the same rules, placed again
-    // as one, as reading what cifmi writes of them would make them. Where
-    // no site moved, the sites are where their rows were compared above. How
-    // a site merged away was placed stays reported.
+    // (x, 2x, ¼)), or once written to the decimals cifmi writes. Those are
+    // one site too, by the same rules, placed again as one, as reading what
+    // cifmi writes of them would make them. Where placing moved no site and
+    // writing moves none, the sites are where their rows were compared
+    // above. How a site merged away was placed stays reported.
     let (mut merged, mut placed_before) = (Vec::new(), Vec::new());
     let placement = loop {
         let mut placement = place(&drafts, operations, lattice, options, declared)?;
-        let moved = drafts
-            .iter()
-            .zip(&placement.sites)
-            .any(|(draft, site)| site.position != draft.row.position);
+        let moved = drafts.iter().zip(&placement.sites).any(|(draft, site)| {
+            site.position != draft.row.position || !site.position.into_iter().all(reads_back)
+        });
         let onto = if moved {
             on_one_position(&placement.sites, &images, options)
         } else {
@@ -900,7 +900,7 @@ fn assemble(
         diagnostics.push(Diagnostic::new(
             DiagnosticKind::MergedSites,
             format!(
-                "{}: sites listed apart that are on one position, up to symmetry, on their special positions; read as one site",
+                "{}: sites listed apart that are on one position, up to symmetry, on their special positions or to the decimals cifmi writes; read as one site",
                 some_of(&merged)
             ),
         ));

@@ -216,7 +216,8 @@ pub enum DiagnosticKind {
     /// already expanded), each atom read once.
     RepeatedAtom,
     /// Sites the file lists apart that are on one position, up to symmetry,
-    /// on their special positions, read as one site.
+    /// on their special positions or to the decimals cifmi writes, read as
+    /// one site.
     MergedSites,
     /// Sites whose occupancies add up to more than 1, within the tolerance,
     /// scaled to a full site.

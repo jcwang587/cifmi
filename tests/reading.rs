@@ -806,4 +806,12 @@ fn sites_that_end_on_one_position_are_one_site() {
         err.contains("site Fe1: occupancies add up to 2, more than 1.1"),
         "{err}"
     );
+    // Rows listed 1.00008e-4 apart, to more decimals than cifmi writes, are
+    // 1e-4 apart, within the tolerance, once written: one site too.
+    let p1 = "_symmetry_space_group_name_H-M 'P 1'\n";
+    let rows = "Na1 Na 0.199999996 0.3 0.4 0.5\nNa2 Na 0.200100004 0.3 0.4 0.5\n";
+    let written_close = read_text(&cif(p1, rows));
+    assert_eq!(written_close.sites.len(), 1);
+    assert_eq!(written_close.sites[0].occupants[0].occupancy, 1.0);
+    assert_eq!(kinds(&written_close), [DiagnosticKind::MergedSites]);
 }

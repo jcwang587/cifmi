@@ -5,7 +5,7 @@
 use crate::crystallographic::{cell_lattice, cell_symmetry, OCCUPANCY_ROUNDING};
 use crate::lattice::Lattice;
 use crate::options::CifOptions;
-use crate::sites::{moving, orbit, snap_thirds, Grid};
+use crate::sites::{is_third, moving, orbit, snap_thirds, Grid};
 use crate::spacegroups::Setting;
 use crate::structure::{CellParameters, Occupant, Site, Structure};
 use crate::symmetry::{check_group, gcd, setting_of, xyz};
@@ -366,6 +366,15 @@ pub(crate) fn read_back(written: &[String; 3], thirds: f64) -> [f64; 3] {
     written
         .each_ref()
         .map(|text| snap_thirds(text.parse().expect("a written coordinate"), thirds))
+}
+
+/// Whether a coordinate a reading holds reads back as itself, up to a
+/// lattice translation, once written: a third, or a number to no more than
+/// [`DECIMALS`] decimals. Told without writing it, and never true of a
+/// coordinate that writing moves.
+pub(crate) fn reads_back(value: f64) -> bool {
+    let scale = 10f64.powi(DECIMALS as i32);
+    is_third(value) || (value * scale).round() / scale == value
 }
 
 /// A coordinate to [`DECIMALS`] decimals; one that rounds to 1 or -0 is the

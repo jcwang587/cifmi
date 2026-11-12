@@ -206,7 +206,7 @@ nothing falls back to another reading.
 | Setting left open | the settings the name admits, and the other origin choice or axes of a setting it names exactly, settled by the atoms (an expanded listing fits only its own setting; otherwise the setting without colliding atoms whose orbits match the listed multiplicities), then the cell's declared contents (`_chemical_formula_sum` × `_cell_formula_units_Z`, within 1.5 %), then the cell (rhombohedral or hexagonal axes; the unique axis of a monoclinic cell), then the setting the file names, then the table's reference setting; the choice is reported |
 | Elements | the type symbol, else the label: the first two characters in title case when they name an element (`FE1` is Fe), else the first alone (`O2-` is O), else a capital with its lowercase letters; `Ow` and `Hw` are water's O and H; the pseudo-atoms `Wat`, `OH` and `OH2` are read as O and `NO3` as N, each reported; deuterium stays D; a symbol naming no element is an error |
 | Coordinates | values within 1e-4 (relative) of 1/3 or 2/3 snap to them, and stay thirds as the site moves onto its special position. Images within the site tolerance are one atom, onto their mean over the subgroup the operations that bring them there generate (a tolerance can cut between two mirror images of a site; the subgroup restores the other); where the special position ties a third to a coordinate the file lists less precisely, so that the mean would move the third (F1 of COD 1528562 on (x, ½ − x, ¼), listed at (−0.1667, 0.6667)), onto the point of the special position nearest the mean with the thirds kept, (−⅙, ⅔). Images within 0.05 Å are one atom on the special position where the site's occupancy forbids separate atoms there; where it allows them, the file's site symmetry order or multiplicity decides, then the cell's declared contents (the formula × Z: the reading that holds them, where every reading holding them agrees; such sites are settled together, up to 16 at a time), and failing those the distance does (on it within 0.015 Å, an atom split around it beyond), reported |
-| Rows on one position | merged up to symmetry, their occupancies adding, except that a row repeats its site's atom, read once and reported, when the listing is already expanded or when adding it would fill the site past the occupancy tolerance with an equal occupancy. Sites the file lists apart that end on one position, within the site tolerance up to symmetry, once on their special positions (N1 and N1' of COD 7234017, listed 1e-4 apart, both onto (x, 2x, ¼)) are one site by the same rules, placed again as one, and reported; their positions are compared as cifmi writes them (§7), where reading the written text compares them |
+| Rows on one position | merged up to symmetry, their occupancies adding, except that a row repeats its site's atom, read once and reported, when the listing is already expanded or when adding it would fill the site past the occupancy tolerance with an equal occupancy. Sites the file lists apart that end on one position, within the site tolerance up to symmetry, once on their special positions (N1 and N1' of COD 7234017, listed 1e-4 apart, both onto (x, 2x, ¼)) or once written to the decimals cifmi writes (§7) are one site by the same rules, placed again as one, and reported: their positions are compared as written, where reading the written text compares them |
 | Expansion | per site, exact orbits |
 | Dummy atoms | skipped (`_atom_site_calc_flag dum`), reported |
 | Occupancy above 1 | a site total up to 1.1 is scaled to a full site and reported; beyond, an error, a hydrogen placed on its oxygen included |
@@ -341,7 +341,8 @@ involved.
   skipped, or read as another element.
 - `repeated-atom`: rows repeating their site's atom, read once.
 - `merged-sites`: sites the file lists apart that are on one position, up
-  to symmetry, on their special positions, read as one site.
+  to symmetry, on their special positions or to the decimals cifmi writes,
+  read as one site.
 - `overfull-site`: a site total above 1, up to 1.1, scaled to a full site.
 - `ambiguous-special-position`: partly occupied sites near a special
   position that the file places neither on it nor off it, settled by the
@@ -416,18 +417,19 @@ Settled:
   third now stays a third as its site moves onto its special position,
   where the mean of the site's images moved it off, within the tolerance,
   and each reading moved the site half way on (14 files). Sites the file
-  lists apart that end on one position once on their special positions are
-  now one site, by the rules for rows on one position, and reported, where
-  they were two sites that reading the written text made one (5 files, which
-  the writer refused). Those sites are compared at the positions cifmi
-  writes, as reading the written text compares them: two sites the tolerance
-  apart would otherwise be one site in one reading and two in the other, by
-  rounding in a mean (COD 1526224). Only a site that placing moved can end
-  on another's position, so the comparison runs only where one moved (5% of
-  the files), and reading takes no longer. Every other reading of the
-  archive is bit for bit the same but for one setting's reason (§7): a mean
-  that moves a third by no more than rounding (1e-12, as in 4,678 files) is
-  kept as it is.
+  lists apart that end on one position once on their special positions, or
+  once written to the decimals cifmi writes, are now one site, by the rules
+  for rows on one position, and reported, where they were two sites that
+  reading the written text made one (5 files, which the writer refused).
+  Those sites are compared at the positions cifmi writes, as reading the
+  written text compares them: two sites the tolerance apart would otherwise
+  be one site in one reading and two in the other, by rounding in a mean
+  (COD 1526224). Writing moves a site only where placing moved it or where
+  the file lists more decimals than cifmi writes, so the comparison runs
+  only there (5% of the files), and reading takes no longer. Every other
+  reading of the archive is bit for bit the same but for one setting's
+  reason (§7): a mean that moves a third by no more than rounding (1e-12, as
+  in 4,678 files) is kept as it is.
 - **Settings the file leaves open** are settled by the atoms, then the cell,
   then the setting the file names, then the table's
   reference setting, and the choice is reported, rather than refusing the

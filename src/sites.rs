@@ -150,6 +150,11 @@ pub(crate) fn snap_thirds(v: f64, tolerance: f64) -> f64 {
     v
 }
 
+/// Whether `v` is exactly a third, as [`snap_thirds`] makes one.
+pub(crate) fn is_third(v: f64) -> bool {
+    v == ONE_THIRD || v == TWO_THIRDS
+}
+
 /// Move `x` to the mean of its images under the operations that map it
 /// within `tolerance` Å of itself (its site symmetry), so those operations
 /// fix it exactly and its orbit has the crystallographic multiplicity; the
@@ -264,11 +269,10 @@ const ROUNDING: f64 = 1e-12;
 /// snap it back and move it half way on: keeping the thirds puts the site
 /// where reading it again leaves it, (−⅙, ⅔).
 fn keep_thirds(lattice: &Lattice, group: &[SymOp], x: [f64; 3], mean: [f64; 3]) -> [f64; 3] {
-    let third = |a: usize| x[a] == ONE_THIRD || x[a] == TWO_THIRDS;
-    if (0..3).all(|a| !third(a) || (mean[a] - x[a]).abs() <= ROUNDING) {
+    if (0..3).all(|a| !is_third(x[a]) || (mean[a] - x[a]).abs() <= ROUNDING) {
         return mean;
     }
-    let thirds: Vec<usize> = (0..3).filter(|&a| third(a)).collect();
+    let thirds: Vec<usize> = (0..3).filter(|&a| is_third(x[a])).collect();
     // Averaging over the group projects onto the special position: the mean
     // rotation R takes a displacement onto the special position's
     // directions, perpendicularly in Å. Column a of R G*, G* the reciprocal
