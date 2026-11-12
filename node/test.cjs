@@ -96,6 +96,9 @@ assert.throws(changed((c) => { c.name = 'Cs Cl' }), /cannot be a data block code
     assert.equal(fs.readFileSync(target, 'latin1'), cifmi.writeCifStr(y2ru2o7))
     assert.equal((await cifmi.readCifFile(target)).atoms.length, 88)
     await assert.rejects(cifmi.writeCifFile(path.join(directory, 'missing', 'x.cif'), y2ru2o7), /IO error/)
+    // What cannot be written rejects the promise, as a file that cannot be read does.
+    const unnamed = { ...y2ru2o7, name: '' }
+    await assert.rejects(cifmi.writeCifFile(target, unnamed), /cannot be a data block code: it is empty/)
   } finally {
     fs.rmSync(directory, { recursive: true, force: true })
   }

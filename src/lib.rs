@@ -104,9 +104,11 @@ pub fn write_cif<P: AsRef<Path>>(path: P, structure: &Structure) -> Result<(), E
 /// sites as they are. The space group is named where the table of settings
 /// has its operations' setting; every operation is listed; each species of
 /// each site is a row of the atom-site loop with its site's multiplicity.
-/// cifmi reads the text back as the same structure, and writing that again
-/// gives the same text. A structure that cannot be written as such a CIF is
-/// an error with the reason (see [`Structure::new`]).
+/// A structure cifmi read reads back from the text as the same structure,
+/// with repeated labels made unique, and writing that again gives the same
+/// text; one built from its parts is read by the reading's rules. A
+/// structure that cannot be written as a CIF that cifmi reads is an error
+/// with the reason (see [`Structure::new`]).
 pub fn write_cif_str(structure: &Structure) -> Result<String, Error> {
     writer::write(structure)
 }

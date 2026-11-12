@@ -144,7 +144,7 @@ export interface SymmetrySource {
 
 /**
  * Write a structure to a CIF file off the main thread, as `writeCifStr`
- * writes it.
+ * writes it; a structure that cannot be written rejects the promise.
  */
 export declare function writeCifFile(path: string, structure: StructureParts): Promise<void>
 

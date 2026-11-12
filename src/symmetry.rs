@@ -509,18 +509,20 @@ pub(crate) fn same_group(a: &[SymOp], b: &[SymOp]) -> bool {
     a.len() == b.len() && a.iter().all(|x| b.iter().any(|y| same_op(x, y)))
 }
 
-/// `a` after `b`: x ↦ a(b(x)).
-fn compose(a: &SymOp, b: &SymOp) -> SymOp {
+/// `a` after `b`: x ↦ a(b(x)); `None` where a rotation entry overflows.
+fn compose(a: &SymOp, b: &SymOp) -> Option<SymOp> {
     let mut rotation = [[0; 3]; 3];
     for (i, row) in rotation.iter_mut().enumerate() {
         for (j, value) in row.iter_mut().enumerate() {
-            *value = (0..3).map(|k| a.rotation[i][k] * b.rotation[k][j]).sum();
+            *value = (0..3).try_fold(0i32, |sum, k| {
+                sum.checked_add(a.rotation[i][k].checked_mul(b.rotation[k][j])?)
+            })?;
         }
     }
-    SymOp {
+    Some(SymOp {
         rotation,
         translation: a.apply(b.translation),
-    }
+    })
 }
 
 /// Listed operations with near-1/24 translations made exact and repeats
@@ -564,7 +566,13 @@ pub(crate) fn check_group(operations: &[SymOp]) -> Result<(), String> {
     }
     for a in operations {
         for b in operations {
-            let c = compose(a, b);
+            let Some(c) = compose(a, b) else {
+                return Err(format!(
+                    "the operations do not form a group: {} after {} overflows a rotation entry",
+                    xyz(a, ","),
+                    xyz(b, ",")
+                ));
+            };
             let listed = by_rotation
                 .get(&c.rotation)
                 .is_some_and(|ops| ops.iter().any(|op| same_op(op, &c)));
@@ -913,6 +921,13 @@ mod tests {
         assert_eq!(
             check_group(&ops(&["x,y,z", "x+1/3,y,z"])),
             Err("the operations do not form a group: x+1/3,y,z after x+1/3,y,z gives x+2/3,y,z, which is not listed".to_string())
+        );
+        // Entries too large to compose are no group, not an overflow.
+        let mut huge = SymOp::IDENTITY;
+        huge.rotation[0][0] = 50000;
+        assert_eq!(
+            check_group(&[SymOp::IDENTITY, huge]),
+            Err("the operations do not form a group: 50000x,y,z after 50000x,y,z overflows a rotation entry".to_string())
         );
     }
 }

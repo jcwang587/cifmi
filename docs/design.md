@@ -243,8 +243,10 @@ is an error with the reason.
 The multiplicities tell the reader how each site was read (§6): a site split
 around a special position reads back split, without the cell's declared
 contents. A structure built from its parts (§8) is written as it is given,
-and its text is read by the rules of §6: a coordinate within the tolerance
-of a third, for one, snaps to it.
+and its text is read by the rules of §6, as any file is: a translation
+within 0.001 of a multiple of 1/24 is read as that multiple, and a site
+within the site tolerance of a special position, or a coordinate within the
+tolerance of a third, moves onto it.
 
 Evidence: the whole COD archive, 521,901 files, of which cifmi reads 519,196
 (§2). Each structure is written, read back, compared with the structure it

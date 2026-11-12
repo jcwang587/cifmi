@@ -118,8 +118,7 @@ pub struct Diagnostic {
 /// as they are by `Structure(name, cell, operations, sites)`: the vectors set
 /// from the cell and the atoms as the sites' orbits, with no space-group
 /// names, the symmetry source "given" and no diagnostics. Parts that cannot
-/// be written as a CIF that reads back as them raise ValueError with the
-/// reason.
+/// be written as a CIF that cifmi reads raise ValueError with the reason.
 #[pyclass(module = "cifmi._core", frozen, get_all)]
 pub struct Structure {
     /// Name of the data block, without `data_`.
@@ -390,8 +389,9 @@ fn write_cif(path: PathBuf, structure: PyRef<'_, Structure>) -> PyResult<()> {
 
 /// A structure, read or built, as CIF 1.1 text: one data block in the core
 /// dictionary's names, in the structure's own setting, which `read_cif_str`
-/// reads back as the same structure. A structure that cannot be written so
-/// raises ValueError with the reason.
+/// reads back as the same structure for one cifmi read. A structure that
+/// cannot be written as a CIF that cifmi reads raises ValueError with the
+/// reason.
 #[pyfunction]
 fn write_cif_str(structure: PyRef<'_, Structure>) -> PyResult<String> {
     crate::write_cif_str(&to_write(&structure)?).map_err(to_py_err)

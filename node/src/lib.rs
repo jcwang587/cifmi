@@ -273,7 +273,7 @@ fn triple(values: &[f64], what: &str) -> napi::Result<[f64; 3]> {
 
 /// The structure of plain parts, checked as `cifmi::Structure::new` checks
 /// them.
-fn structure(parts: StructureParts) -> napi::Result<cifmi::Structure> {
+fn structure(parts: &StructureParts) -> napi::Result<cifmi::Structure> {
     let operations = parts
         .operations
         .iter()
@@ -297,7 +297,7 @@ fn structure(parts: StructureParts) -> napi::Result<cifmi::Structure> {
         .collect::<napi::Result<Vec<_>>>()?;
     let sites = parts
         .sites
-        .into_iter()
+        .iter()
         .map(|site| {
             let position = triple(
                 &site.fractional,
@@ -305,11 +305,11 @@ fn structure(parts: StructureParts) -> napi::Result<cifmi::Structure> {
             )?;
             let occupants = site
                 .species
-                .into_iter()
+                .iter()
                 .map(|s| {
                     Ok(Occupant {
                         element: Element::from_symbol(&s.element).map_err(to_napi_error)?,
-                        label: s.label,
+                        label: s.label.clone(),
                         oxidation: s.oxidation,
                         occupancy: s.occupancy,
                         b_iso: s.b_iso,
@@ -317,15 +317,15 @@ fn structure(parts: StructureParts) -> napi::Result<cifmi::Structure> {
                 })
                 .collect::<napi::Result<_>>()?;
             Ok(cifmi::Site {
-                label: site.label,
+                label: site.label.clone(),
                 position,
                 occupants,
             })
         })
         .collect::<napi::Result<Vec<_>>>()?;
-    let cell = parts.cell;
+    let cell = &parts.cell;
     cifmi::Structure::new(
-        parts.name,
+        parts.name.clone(),
         CellParameters {
             a: cell.a,
             b: cell.b,
@@ -342,24 +342,26 @@ fn structure(parts: StructureParts) -> napi::Result<cifmi::Structure> {
 
 /// A structure as CIF 1.1 text (synchronous): one data block in the core
 /// dictionary's names, in the structure's own setting, which `readCifStr`
-/// reads back as the same structure. A structure that cannot be written so
-/// is an error with the reason.
+/// reads back as the same structure for one it read. A structure that cannot
+/// be written as a CIF that cifmi reads is an error with the reason.
 #[napi]
 pub fn write_cif_str(structure: StructureParts) -> napi::Result<String> {
-    cifmi::write_cif_str(&self::structure(structure)?).map_err(to_napi_error)
+    cifmi::write_cif_str(&self::structure(&structure)?).map_err(to_napi_error)
 }
 
 pub struct WriteFile {
     path: String,
-    structure: cifmi::Structure,
+    structure: StructureParts,
 }
 
 impl Task for WriteFile {
     type Output = ();
     type JsValue = ();
 
+    /// Checks the parts and writes them, off the main thread.
     fn compute(&mut self) -> napi::Result<Self::Output> {
-        cifmi::write_cif(&self.path, &self.structure).map_err(to_napi_error)
+        let structure = self::structure(&self.structure)?;
+        cifmi::write_cif(&self.path, &structure).map_err(to_napi_error)
     }
 
     fn resolve(&mut self, _env: Env, _output: Self::Output) -> napi::Result<Self::JsValue> {
@@ -368,14 +370,8 @@ impl Task for WriteFile {
 }
 
 /// Write a structure to a CIF file off the main thread, as `writeCifStr`
-/// writes it.
+/// writes it; a structure that cannot be written rejects the promise.
 #[napi(ts_return_type = "Promise<void>")]
-pub fn write_cif_file(
-    path: String,
-    structure: StructureParts,
-) -> napi::Result<AsyncTask<WriteFile>> {
-    Ok(AsyncTask::new(WriteFile {
-        path,
-        structure: self::structure(structure)?,
-    }))
+pub fn write_cif_file(path: String, structure: StructureParts) -> AsyncTask<WriteFile> {
+    AsyncTask::new(WriteFile { path, structure })
 }

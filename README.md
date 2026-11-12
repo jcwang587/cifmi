@@ -57,8 +57,9 @@ take any object of the shape `readCifStr` returns.
 
 Every file is read one way, by crystallographic rules, and a file cifmi
 cannot read is an error with the reason. A structure is written as it is,
-in its own setting with the standard names, for cifmi to read back as the
-same structure. See the
+in its own setting with the standard names. One cifmi reads writes as a CIF
+that reads back as the same structure, with repeated labels made unique; the
+design's §7 lists the few that read back otherwise or are refused. See the
 [design](https://github.com/jcwang587/cifmi/blob/main/docs/design.md) for
 the rules and the evidence behind them, and
 [CONTRIBUTING.md](https://github.com/jcwang587/cifmi/blob/main/CONTRIBUTING.md)
