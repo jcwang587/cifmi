@@ -5,7 +5,7 @@
 use crate::crystallographic::{cell_lattice, cell_symmetry, OCCUPANCY_ROUNDING};
 use crate::lattice::Lattice;
 use crate::options::CifOptions;
-use crate::sites::{moving, orbit, snap_thirds, Grid};
+use crate::sites::{is_third, moving, orbit, snap_thirds, Grid};
 use crate::spacegroups::Setting;
 use crate::structure::{CellParameters, Occupant, Site, Structure};
 use crate::symmetry::{check_group, gcd, setting_of, xyz};
@@ -85,11 +85,8 @@ pub(crate) fn check(
     let mut grid = Grid::new(reading.site_tolerance);
     let mut coordinates = Vec::with_capacity(sites.len());
     for site in sites {
-        let written = site.position.map(coordinate);
-        let position = written.each_ref().map(|text| {
-            let read = text.parse().expect("a written coordinate");
-            snap_thirds(read, reading.frac_tolerance)
-        });
+        let written = written(site.position);
+        let position = read_back(&written, reading.frac_tolerance);
         if let Some((j, _)) = grid.site_of(&images, position) {
             return Err(Error::cif(format!(
                 "sites {} and {} are on one position, up to symmetry, which reading makes one site",
@@ -356,6 +353,28 @@ fn fixed(value: f64) -> String {
 /// Whether a number as written is 0.
 fn is_zero(written: &str) -> bool {
     written.bytes().all(|b| matches!(b, b'0' | b'.' | b'-'))
+}
+
+/// A position's coordinates as cifmi writes them.
+pub(crate) fn written(position: [f64; 3]) -> [String; 3] {
+    position.map(coordinate)
+}
+
+/// A written position as reading takes it: a coordinate within the relative
+/// tolerance `thirds` of a third snapped to it (§6).
+pub(crate) fn read_back(written: &[String; 3], thirds: f64) -> [f64; 3] {
+    written
+        .each_ref()
+        .map(|text| snap_thirds(text.parse().expect("a written coordinate"), thirds))
+}
+
+/// Whether a coordinate a reading holds reads back as itself, up to a
+/// lattice translation, once written: a third, or a number to no more than
+/// [`DECIMALS`] decimals. Told without writing it, and never true of a
+/// coordinate that writing moves.
+pub(crate) fn reads_back(value: f64) -> bool {
+    let scale = 10f64.powi(DECIMALS as i32);
+    is_third(value) || (value * scale).round() / scale == value
 }
 
 /// A coordinate to [`DECIMALS`] decimals; one that rounds to 1 or -0 is the

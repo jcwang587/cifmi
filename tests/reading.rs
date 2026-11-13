@@ -217,6 +217,70 @@ fn a_site_whose_mirror_images_straddle_the_merge_tolerance_is_one_atom() {
 }
 
 #[test]
+fn a_third_stays_as_its_site_moves_onto_its_special_position() {
+    // F1 lies on (x, ½ − x, ¼) of R -3 c in rhombohedral axes, listed at
+    // (−0.1667, 0.6667). 0.6667 is ⅔, which the mean of F1's images would
+    // move to 0.666683, for reading again to snap back and move half way
+    // on. The third stays, and x follows it along the special position.
+    let path = fixture("cod__1528562.cif");
+    let read = read_cif(&path, &CifOptions::default()).unwrap();
+    let f1 = read.sites[0].position;
+    assert_eq!((f1[1], f1[2]), (2.0 / 3.0, 0.25));
+    assert!((f1[0] + 1.0 / 6.0).abs() < 1e-15, "{f1:?}");
+    // F3 In, Z = 2.
+    assert_eq!(composition(&read), formula(&[("F", 6.0), ("In", 2.0)]));
+    assert!(kinds(&read).is_empty(), "{:?}", kinds(&read));
+}
+
+#[test]
+fn a_site_read_onto_another_is_one_site_with_it() {
+    // Cr2 is listed at (0.83, 0.6614, ¼), 0.004 Å off (x, 2x, ¼), and the
+    // distance reads it onto the special position, where Fe2 is: one site,
+    // holding both, as rows on one position make.
+    let path = fixture("cod__1539664.cif");
+    let read = read_cif(&path, &CifOptions::default()).unwrap();
+    let fe2 = read.sites.iter().find(|s| s.label == "Fe2").unwrap();
+    let species: Vec<(&str, f64)> = fe2
+        .occupants
+        .iter()
+        .map(|o| (o.label.as_str(), o.occupancy))
+        .collect();
+    assert_eq!(species, [("Fe2", 0.757), ("Cr2", 0.243)]);
+    assert!(read.sites.iter().all(|s| s.label != "Cr2"));
+    let elements = composition(&read);
+    assert_eq!((elements["Cr"], elements["Fe"]), (1.946, 6.054));
+    assert_eq!(
+        kinds(&read),
+        [
+            DiagnosticKind::MergedSites,
+            DiagnosticKind::AmbiguousSpecialPosition
+        ]
+    );
+    assert!(read.diagnostics[0].message.starts_with("Cr2 on Fe2: "));
+    assert!(read.diagnostics[1]
+        .message
+        .ends_with("Cr2 (occupancy 0.243, 0.004 Å from it) on it"));
+}
+
+#[test]
+fn sites_as_far_apart_as_the_tolerance_once_on_their_special_positions_stay_two() {
+    // Se1 is listed at (0.8632, 0.8635, 0.8635), off the three-fold axis S1
+    // is on at 0.8635, and its occupancy puts it on the axis, at 0.8634:
+    // 1e-4 from S1, which the site tolerance keeps apart. The positions are
+    // compared as written, where reading the written text compares them, so
+    // rounding in the mean cannot put the two on one position in one
+    // reading and apart in the other.
+    let path = fixture("cod__1526224.cif");
+    let read = read_cif(&path, &CifOptions::default()).unwrap();
+    let labels: Vec<&str> = read.sites.iter().map(|s| s.label.as_str()).collect();
+    assert_eq!(labels, ["S2", "S1", "V1", "Se1", "Ga1"]);
+    // Ga0.5 S2 Se2 V2, Z = 8.
+    let expected = formula(&[("Ga", 4.0), ("S", 16.0), ("Se", 16.0), ("V", 16.0)]);
+    assert_eq!(composition(&read), expected);
+    assert!(kinds(&read).is_empty(), "{:?}", kinds(&read));
+}
+
+#[test]
 fn half_atoms_at_mirror_images_add_up_to_full_ones() {
     // SHELX lists the two H of a CH2 on a mirror at half occupancy each; they
     // add up to full atoms, as the formula says.
@@ -679,4 +743,75 @@ fn sites_near_special_positions_snap_where_the_file_says_so() {
     assert_eq!(listed(2).atoms.len(), 1);
     assert_eq!(listed(1).atoms.len(), 2);
     assert!(listed(1).diagnostics.is_empty());
+}
+
+/// A 5 × 5 × 7 Å tetragonal cell with `symmetry` and the atom rows `atoms`,
+/// as [`cif`] gives them.
+fn tetragonal(symmetry: &str, atoms: &str) -> String {
+    cif(symmetry, atoms).replace("_cell_length_b 6\n", "_cell_length_b 5\n")
+}
+
+#[test]
+fn thirds_stay_on_a_special_position_that_ties_them_to_another_coordinate() {
+    // Na1 on the mirror x + y = ½, listed at (0.1667, 0.33333): 0.33333 is
+    // ⅓, and the mean of Na1 and its image, (0.166683, 0.333317), would
+    // move it off again. The third stays, and x follows along the mirror.
+    let mirror = operations("x,y,z\n-y+1/2,-x+1/2,z\n");
+    let read = read_text(&tetragonal(&mirror, "Na1 Na 0.1667 0.33333 0.1 1\n"));
+    let na1 = read.sites[0].position;
+    assert_eq!((na1[1], na1[2]), (1.0 / 3.0, 0.1));
+    assert!((na1[0] - 1.0 / 6.0).abs() < 1e-15, "{na1:?}");
+    assert_eq!(read.atoms.len(), 1);
+    // On the three-fold axis (x, x, x) of a cube, two thirds and a
+    // coordinate listed less precisely, which they set to ⅓ too.
+    let axis = operations("x,y,z\nz,x,y\ny,z,x\n");
+    let cube = tetragonal(&axis, "Na1 Na 0.33333 0.33333 0.33337 1\n")
+        .replace("_cell_length_c 7\n", "_cell_length_c 5\n");
+    let na1 = read_text(&cube).sites[0].position;
+    assert_eq!((na1[0], na1[1]), (1.0 / 3.0, 1.0 / 3.0));
+    assert!((na1[2] - 1.0 / 3.0).abs() < 1e-15, "{na1:?}");
+}
+
+#[test]
+fn sites_that_end_on_one_position_are_one_site() {
+    // Fe1 on the mirror x = y; Cr1 listed 1.3e-4 from it, beyond the site
+    // tolerance, but 9e-5 from it once on the mirror. They are one site, by
+    // the rules for rows on one position, reported.
+    let mirror = operations("x,y,z\ny,x,z\n");
+    let read = |rows: &str| read_cif_str(&tetragonal(&mirror, rows), &CifOptions::default());
+    let mixed = read("Fe1 Fe 0.2 0.2 0.1 0.6\nCr1 Cr 0.20013 0.20005 0.1 0.4\n").unwrap();
+    assert_eq!(mixed.sites.len(), 1);
+    assert_eq!(mixed.sites[0].position, [0.2, 0.2, 0.1]);
+    let species: Vec<(&str, f64)> = mixed.sites[0]
+        .occupants
+        .iter()
+        .map(|o| (o.label.as_str(), o.occupancy))
+        .collect();
+    assert_eq!(species, [("Fe1", 0.6), ("Cr1", 0.4)]);
+    assert_eq!(kinds(&mixed), [DiagnosticKind::MergedSites]);
+    assert!(
+        mixed.diagnostics[0].message.starts_with("Cr1 on Fe1: "),
+        "{}",
+        mixed.diagnostics[0].message
+    );
+    // Halves of one species add up to a full atom.
+    let halves = read("Na1 Na 0.2 0.2 0.1 0.5\nNa2 Na 0.20013 0.20005 0.1 0.5\n").unwrap();
+    assert_eq!(halves.sites.len(), 1);
+    assert_eq!(halves.sites[0].occupants[0].occupancy, 1.0);
+    // Two full atoms cannot share a position.
+    let err = read("Fe1 Fe 0.2 0.2 0.1 1\nCr1 Cr 0.20013 0.20005 0.1 1\n")
+        .unwrap_err()
+        .to_string();
+    assert!(
+        err.contains("site Fe1: occupancies add up to 2, more than 1.1"),
+        "{err}"
+    );
+    // Rows listed 1.00008e-4 apart, to more decimals than cifmi writes, are
+    // 1e-4 apart, within the tolerance, once written: one site too.
+    let p1 = "_symmetry_space_group_name_H-M 'P 1'\n";
+    let rows = "Na1 Na 0.199999996 0.3 0.4 0.5\nNa2 Na 0.200100004 0.3 0.4 0.5\n";
+    let written_close = read_text(&cif(p1, rows));
+    assert_eq!(written_close.sites.len(), 1);
+    assert_eq!(written_close.sites[0].occupants[0].occupancy, 1.0);
+    assert_eq!(kinds(&written_close), [DiagnosticKind::MergedSites]);
 }

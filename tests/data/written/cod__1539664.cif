@@ -1,0 +1,57 @@
+#\#CIF_1.1
+data_1539664
+_space_group_IT_number   194
+_space_group_name_H-M_alt   'P 63/m m c'
+_space_group_name_Hall   '-P 6c 2c'
+_cell_length_a   5.27600000
+_cell_length_b   5.27600000
+_cell_length_c   8.59700000
+_cell_angle_alpha   90.00000000
+_cell_angle_beta   90.00000000
+_cell_angle_gamma   120.00000000
+_chemical_formula_sum   'Cr1.946 D9.18 Fe6.054 Zr4'
+_cell_formula_units_Z   1
+loop_
+ _space_group_symop_id
+ _space_group_symop_operation_xyz
+  1  'x, y, z'
+  2  'x-y, x, z+1/2'
+  3  '-y, x-y, z'
+  4  '-x, -y, z+1/2'
+  5  '-x+y, -x, z'
+  6  'y, -x+y, z+1/2'
+  7  '-y, -x, -z+1/2'
+  8  'x-y, -y, -z'
+  9  'x, x-y, -z+1/2'
+  10  'y, x, -z'
+  11  '-x+y, y, -z+1/2'
+  12  '-x, -x+y, -z'
+  13  '-x, -y, -z'
+  14  '-x+y, -x, -z-1/2'
+  15  'y, -x+y, -z'
+  16  'x, y, -z-1/2'
+  17  'x-y, x, -z'
+  18  '-y, x-y, -z-1/2'
+  19  'y, x, z-1/2'
+  20  '-x+y, y, z'
+  21  '-x, -x+y, z-1/2'
+  22  '-y, -x, z'
+  23  'x-y, -y, z-1/2'
+  24  'x, x-y, z'
+loop_
+ _atom_site_label
+ _atom_site_type_symbol
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  D3  D  12  0.54370000  0.08740000  0.13580000  0.27000000
+  D1  D  6  0.18690000  0.37380000  0.25000000  0.03000000
+  D4  D  24  0.04710000  0.32640000  0.56620000  0.16000000
+  Fe2  Fe  6  0.83070000  0.66140000  0.25000000  0.75700000
+  Cr2  Cr  6  0.83070000  0.66140000  0.25000000  0.24300000
+  D2  D  6  0.47230000  0.94460000  0.25000000  0.32000000
+  Fe1  Fe  2  0.00000000  0.00000000  0.00000000  0.75600000
+  Cr1  Cr  2  0.00000000  0.00000000  0.00000000  0.24400000
+  Zr1  Zr  4  0.33333333  0.66666667  0.06300000  1.00000000

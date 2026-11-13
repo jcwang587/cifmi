@@ -349,6 +349,17 @@ fn split_sites_stay_split() {
 }
 
 #[test]
+fn sites_on_one_position_as_written_are_read_as_one_and_written() {
+    // Na1 and Na2 are listed 1.00008e-4 apart, beyond the site tolerance, to
+    // more decimals than cifmi writes, and are within it written: read as
+    // one site, the structure is written and reads back as itself.
+    let text = "data_decimals\n_cell_length_a 5\n_cell_length_b 6\n_cell_length_c 7\n_cell_angle_alpha 90\n_cell_angle_beta 90\n_cell_angle_gamma 90\n_space_group_name_H-M_alt 'P 1'\nloop_\n_atom_site_label\n_atom_site_type_symbol\n_atom_site_fract_x\n_atom_site_fract_y\n_atom_site_fract_z\n_atom_site_occupancy\nNa1 Na 0.199999996 0.3 0.4 0.5\nNa2 Na 0.200100004 0.3 0.4 0.5\n";
+    let structure = read_text(text);
+    assert_eq!(structure.sites.len(), 1);
+    round_trip(&structure);
+}
+
+#[test]
 fn repeated_labels_are_made_unique() {
     // Two rows labelled O1 at different positions, and a third labelled
     // O1_2: the second O1 is written as the first label no row has, O1_3.
