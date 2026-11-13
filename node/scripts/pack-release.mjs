@@ -15,14 +15,17 @@ const outputDir = resolve(outputArg)
 const pkg = JSON.parse(readFileSync(join(nodeDir, 'package.json'), 'utf8'))
 const targets = localTarget ? [localTarget] : pkg.napi.targets
 assert(targets.every(target => pkg.napi.targets.includes(target)), 'Unknown native target')
+// Users install the main package alone. It lists the platform packages, which
+// are under the scope, as optional dependencies, and npm installs the one for
+// the system.
+assert.match(pkg.napi.packageName ?? '', /^@[^/]+\/[^/]+$/, 'napi.packageName must name the platform packages\' scope')
+const nativeName = target => `${pkg.napi.packageName}-${parseTriple(target).platformArchABI}`
 const staging = mkdtempSync(join(tmpdir(), 'cifmi-pack-'))
 const notices = ['LICENSE', 'THIRD_PARTY_NOTICES.md']
 mkdirSync(outputDir, { recursive: true })
 
 try {
-  pkg.optionalDependencies = Object.fromEntries(pkg.napi.targets.map(target => [
-    `${pkg.name}-${parseTriple(target).platformArchABI}`, pkg.version,
-  ]))
+  pkg.optionalDependencies = Object.fromEntries(pkg.napi.targets.map(target => [nativeName(target), pkg.version]))
   pkg.files = [...new Set([...pkg.files, ...notices])]
   writeFileSync(join(staging, 'package.json'), JSON.stringify(pkg, null, 2) + '\n')
   copyFileSync(join(nodeDir, '..', 'README.md'), join(staging, 'README.md'))
@@ -60,8 +63,17 @@ try {
     copyFileSync(join(built, binary), join(nativeDir, binary))
     const nativeManifestPath = join(nativeDir, 'package.json')
     const nativeManifest = JSON.parse(readFileSync(nativeManifestPath, 'utf8'))
+    assert.equal(nativeManifest.name, nativeName(target), `Unexpected package name for ${target}`)
+    assert.equal(nativeManifest.publishConfig?.access, 'public', `${nativeManifest.name} must publish publicly`)
+    assert(generatedWrapper.includes(`require('${nativeManifest.name}')`),
+      `Generated loader does not require ${nativeManifest.name}`)
     nativeManifest.files = [...new Set([...nativeManifest.files, ...notices])]
     writeFileSync(nativeManifestPath, JSON.stringify(nativeManifest, null, 2) + '\n')
+    // The readme napi writes calls this the binary of napi.packageName, which
+    // is no package: name the package users install.
+    writeFileSync(join(nativeDir, 'README.md'), `# \`${nativeManifest.name}\`\n\n` +
+      `The **${target}** binary of \`${pkg.name}\`. Install \`${pkg.name}\`, and npm installs this package ` +
+      `with it on that platform.\n`)
     for (const notice of notices) {
       copyFileSync(join(staging, notice), join(nativeDir, notice))
     }
