@@ -113,24 +113,35 @@ Before running the release workflow:
   workflow `publish-pypi.yml`, and environment `pypi`.
 - Wait for the complete `Check packages` run on the release commit to pass.
 
+On npm, users install `cifmi` alone. Its binaries are five packages under
+the `@cifmi` scope, `@cifmi/cifmi-win32-x64-msvc`,
+`@cifmi/cifmi-win32-arm64-msvc`, `@cifmi/cifmi-darwin-arm64`,
+`@cifmi/cifmi-linux-x64-gnu` and `@cifmi/cifmi-linux-arm64-gnu`, named by
+`napi.packageName` in `node/package.json`. `cifmi` lists them as optional
+dependencies, so npm installs the one for the user's system, and its loader
+requires that one.
+
 npm trusted publishing requires the six packages to exist first. The
 initial tag-triggered `publish npm` run builds and tests all six tarballs,
 then its publish step refuses to continue while registry entries are
 missing. Bootstrap from that run's `node-packages` artifact:
 
-1. Download the artifact from the **tag-triggered `publish npm` run** whose
+1. On npm, create the organization `cifmi`, which owns the `@cifmi` scope,
+   with the account that publishes.
+2. Download the artifact from the **tag-triggered `publish npm` run** whose
    package checks all passed. Keep its run ID and original tarballs.
-2. Log in to npm locally and publish the five native tarballs in the order
-   listed in `packages.json`, then the `cifmi` wrapper last. For each tarball,
-   run `npm publish PATH_TO_TARBALL --ignore-scripts --access public`.
-3. For every package name in `packages.json`, configure its trusted
-   publisher:
+3. Log in to npm locally and publish the five platform tarballs in the order
+   listed in `packages.json`, then `cifmi` last. For each tarball, run
+   `npm publish PATH_TO_TARBALL --ignore-scripts --access public`: a scoped
+   package is private unless it is published with public access.
+4. For every package name in `packages.json`, the scoped ones in full,
+   configure its trusted publisher:
 
    ```sh
    npm trust github PACKAGE_NAME --repo jcwang587/cifmi --file publish-npm.yml --allow-publish
    ```
 
-4. Verify the original artifacts through the recovery workflow:
+5. Verify the original artifacts through the recovery workflow:
 
    ```sh
    gh workflow run publish-npm.yml --ref v0.1.0 -f publishToNPM=yes -f sourceRunId=RUN_ID

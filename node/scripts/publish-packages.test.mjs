@@ -11,10 +11,11 @@ function fixture(t) {
   t.after(() => rmSync(root, { recursive: true, force: true }))
   const directory = join(root, 'packages')
   mkdirSync(directory)
-  const names = ['cifmi-win32-x64-msvc', 'cifmi-win32-arm64-msvc', 'cifmi-darwin-arm64',
-    'cifmi-linux-x64-gnu', 'cifmi-linux-arm64-gnu', 'cifmi']
-  const packages = names.map((name, index) => ({ name, version: '1.0.1', filename: `${name}.tgz`,
-    target: index === 5 ? null : `target-${index}` }))
+  const names = ['@cifmi/cifmi-win32-x64-msvc', '@cifmi/cifmi-win32-arm64-msvc', '@cifmi/cifmi-darwin-arm64',
+    '@cifmi/cifmi-linux-x64-gnu', '@cifmi/cifmi-linux-arm64-gnu', 'cifmi']
+  // npm pack names a scoped tarball scope-name-version.tgz.
+  const packages = names.map((name, index) => ({ name, version: '1.0.1',
+    filename: `${name.replace(/^@/, '').replace('/', '-')}-1.0.1.tgz`, target: index === 5 ? null : `target-${index}` }))
   const metadata = new Map()
   for (const pkg of packages) {
     const bytes = Buffer.from(`tested tarball for ${pkg.name}`)
@@ -41,6 +42,17 @@ test('recovery skips matching Windows tarballs and publishes the remaining four 
   const published = []
   await publishPackages(f.directory, { fetchMetadata: f.fetchMetadata, publish: entry => published.push(entry.pkg.name) })
   assert.deepEqual(published, f.packages.slice(2).map(pkg => pkg.name))
+})
+
+test('scoped names are looked up as one escaped registry path segment', async t => {
+  const f = fixture(t)
+  const paths = []
+  await planPublishes(f.packages, f.directory, url => {
+    paths.push(new URL(url).pathname)
+    return f.fetchMetadata(url)
+  })
+  assert.deepEqual(paths.slice(0, 2), ['/%40cifmi%2Fcifmi-win32-x64-msvc', '/%40cifmi%2Fcifmi-win32-arm64-msvc'])
+  assert.deepEqual(paths.map(path => decodeURIComponent(path.slice(1))), f.packages.map(pkg => pkg.name))
 })
 
 test('an integrity mismatch in a later package aborts before any publish', async t => {
