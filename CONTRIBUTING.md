@@ -141,10 +141,11 @@ missing. Bootstrap from that run's `node-packages` artifact:
    npm trust github PACKAGE_NAME --repo jcwang587/cifmi --file publish-npm.yml --allow-publish
    ```
 
-5. Verify the original artifacts through the recovery workflow:
+5. Verify the original artifacts through the recovery workflow, from the
+   release's own tag (`v0.2.0` for the first npm release):
 
    ```sh
-   gh workflow run publish-npm.yml --ref v0.1.0 -f publishToNPM=yes -f sourceRunId=RUN_ID
+   gh workflow run publish-npm.yml --ref vX.Y.Z -f publishToNPM=yes -f sourceRunId=RUN_ID
    ```
 
 Recovery validates the source run and downloads its original tested
