@@ -50,7 +50,7 @@ impl Structure {
     /// the operations a group, each once, of which the cell has the
     /// symmetry; each site labelled as its first species, on a position of
     /// its own up to symmetry, at finite coordinates, holding each species
-    /// once, with occupancies above 0 adding up to at most 1, B at least 0
+    /// once, with occupancies above 0 adding up to at most 1, U at least 0
     /// and finite oxidation states. Anything else is an error with the
     /// reason. The CIF is read by the reading's rules, as any file is: a
     /// translation within 0.001 of a multiple of 1/24 is read as that
@@ -149,8 +149,8 @@ pub struct Occupant {
     pub oxidation: f64,
     /// Fraction of the site this species occupies.
     pub occupancy: f64,
-    /// Isotropic displacement B = 8π²U in Å²; 0 when absent.
-    pub b_iso: f64,
+    /// Isotropic displacement U in Å²; 0 when absent.
+    pub u_iso: f64,
 }
 
 /// An atom of the unit cell: one image of a site.

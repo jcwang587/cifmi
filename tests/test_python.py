@@ -114,7 +114,7 @@ def plain(structure: cifmi.Structure) -> cifmi.Structure:
                 site.label,
                 list(site.fractional),
                 [
-                    cifmi.Species(s.label, s.element, s.occupancy, s.oxidation, s.b_iso)
+                    cifmi.Species(s.label, s.element, s.occupancy, s.oxidation, s.u_iso)
                     for s in site.species
                 ],
             )
@@ -161,7 +161,7 @@ def test_a_structure_built_from_its_parts():
                 ],
             ),
             cifmi.Site(
-                "O1", (0.25, 0.1, 0.3), [cifmi.Species("O1", "O", 1, b_iso=1.2)]
+                "O1", (0.25, 0.1, 0.3), [cifmi.Species("O1", "O", 1, u_iso=0.0152)]
             ),
         ],
     )
@@ -172,6 +172,11 @@ def test_a_structure_built_from_its_parts():
     text = cifmi.write_cif_str(built)
     assert "_space_group_name_H-M_alt   'P -1'\n" in text
     assert "  M1  Fe3+  1  0.00000000  0.00000000  0.00000000  0.50000000  ?\n" in text
+    assert " _atom_site_U_iso_or_equiv\n" in text
+    assert (
+        "  O1  O  2  0.25000000  0.10000000  0.30000000  1.00000000  0.01520000\n"
+        in text
+    )
     read = cifmi.read_cif_str(text)
     assert [
         (s.label, s.element, s.occupancy, s.oxidation) for s in read.sites[0].species
@@ -179,7 +184,7 @@ def test_a_structure_built_from_its_parts():
         ("M1", "Fe", 0.5, 3.0),
         ("Mn1", "Mn", 0.5, 0.0),
     ]
-    assert read.sites[1].species[0].b_iso == 1.2
+    assert read.sites[1].species[0].u_iso == 0.0152
 
 
 def test_structures_that_cannot_be_written_are_refused_with_the_reason():

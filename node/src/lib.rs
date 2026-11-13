@@ -60,8 +60,8 @@ pub struct Species {
     pub occupancy: f64,
     /// Oxidation state from the file; 0 when absent.
     pub oxidation: f64,
-    /// Isotropic displacement B = 8π²U in Å²; 0 when absent.
-    pub b_iso: f64,
+    /// Isotropic displacement U in Å²; 0 when absent.
+    pub u_iso: f64,
 }
 
 /// A site of the asymmetric unit.
@@ -162,7 +162,7 @@ impl From<cifmi::Structure> for Structure {
                             element: o.element.symbol().to_string(),
                             occupancy: o.occupancy,
                             oxidation: o.oxidation,
-                            b_iso: o.b_iso,
+                            u_iso: o.u_iso,
                         })
                         .collect(),
                 })
@@ -312,7 +312,7 @@ fn structure(parts: &StructureParts) -> napi::Result<cifmi::Structure> {
                         label: s.label.clone(),
                         oxidation: s.oxidation,
                         occupancy: s.occupancy,
-                        b_iso: s.b_iso,
+                        u_iso: s.u_iso,
                     })
                 })
                 .collect::<napi::Result<_>>()?;

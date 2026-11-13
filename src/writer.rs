@@ -15,7 +15,7 @@ use rustc_hash::FxHashSet;
 use std::borrow::Cow;
 use std::fmt::Write;
 
-/// Decimals of the cell, the coordinates, the occupancies and B: enough for
+/// Decimals of the cell, the coordinates, the occupancies and U: enough for
 /// a site on a special position to read back onto it.
 const DECIMALS: usize = 8;
 
@@ -42,7 +42,7 @@ pub(crate) struct Parts {
 /// reader takes; operations that form a group, each once, of which the cell
 /// has the symmetry; and sites each labelled as its first species, on a
 /// position of its own up to symmetry, at finite coordinates, holding each
-/// species once, with occupancies above 0 adding up to at most 1, B at least
+/// species once, with occupancies above 0 adding up to at most 1, U at least
 /// 0, finite oxidation states and labels CIF 1.1 can write.
 pub(crate) fn check(
     name: &str,
@@ -156,8 +156,8 @@ fn check_site(site: &Site) -> Result<(), Error> {
             format!("occupancy {} is not above 0 and at most 1", o.occupancy)
         } else if is_zero(&fixed(o.occupancy)) {
             format!("occupancy {} is 0 to {DECIMALS} decimals", o.occupancy)
-        } else if !(o.b_iso >= 0.0 && o.b_iso.is_finite()) {
-            format!("B {} is not a finite number of at least 0", o.b_iso)
+        } else if !(o.u_iso >= 0.0 && o.u_iso.is_finite()) {
+            format!("U {} is not a finite number of at least 0", o.u_iso)
         } else if !o.oxidation.is_finite() {
             format!("oxidation state {} is not a finite number", o.oxidation)
         } else {
@@ -186,9 +186,9 @@ struct Row<'s> {
     multiplicity: usize,
     /// The occupancy as written.
     occupancy: String,
-    /// B as written; `None` where the species has none to the decimals
+    /// U as written; `None` where the species has none to the decimals
     /// written.
-    b_iso: Option<String>,
+    u_iso: Option<String>,
 }
 
 /// The structure as one CIF 1.1 data block (§7 of the design document).
@@ -226,7 +226,7 @@ pub(crate) fn write(structure: &Structure) -> Result<String, Error> {
             coordinates,
             multiplicity,
             occupancy: fixed(occupant.occupancy),
-            b_iso: Some(fixed(occupant.b_iso)).filter(|b| !is_zero(b)),
+            u_iso: Some(fixed(occupant.u_iso)).filter(|u| !is_zero(u)),
         })
         .collect();
 
@@ -283,7 +283,7 @@ pub(crate) fn write(structure: &Structure) -> Result<String, Error> {
         }
     }
 
-    let with_b = rows.iter().any(|row| row.b_iso.is_some());
+    let with_u = rows.iter().any(|row| row.u_iso.is_some());
     loop_header(
         &mut out,
         &[
@@ -296,8 +296,8 @@ pub(crate) fn write(structure: &Structure) -> Result<String, Error> {
             "_atom_site_occupancy",
         ],
     );
-    if with_b {
-        out.push_str(" _atom_site_B_iso_or_equiv\n");
+    if with_u {
+        out.push_str(" _atom_site_U_iso_or_equiv\n");
     }
     for row in &rows {
         let _ = write!(
@@ -311,8 +311,8 @@ pub(crate) fn write(structure: &Structure) -> Result<String, Error> {
             let _ = write!(out, "  {value}");
         }
         let _ = write!(out, "  {}", row.occupancy);
-        if with_b {
-            let _ = write!(out, "  {}", row.b_iso.as_deref().unwrap_or("?"));
+        if with_u {
+            let _ = write!(out, "  {}", row.u_iso.as_deref().unwrap_or("?"));
         }
         out.push('\n');
     }
@@ -584,7 +584,7 @@ mod tests {
                     element: Element::from_symbol(symbol).unwrap(),
                     oxidation: 0.0,
                     occupancy,
-                    b_iso: 0.0,
+                    u_iso: 0.0,
                 })
                 .collect();
             let rows: Vec<Row> = occupants
@@ -597,7 +597,7 @@ mod tests {
                     coordinates: &origin,
                     multiplicity,
                     occupancy: fixed(occupant.occupancy),
-                    b_iso: None,
+                    u_iso: None,
                 })
                 .collect();
             formula(&rows)

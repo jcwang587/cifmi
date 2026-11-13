@@ -32,6 +32,9 @@ const COLLISION_DISTANCE: f64 = 0.5;
 /// site fuller than that is overfull.
 pub(crate) const OCCUPANCY_ROUNDING: f64 = 1e-6;
 
+/// B = 8π²U: a displacement B per U, both in Å².
+const B_PER_U: f64 = 8.0 * PI * PI;
+
 /// A partly occupied site whose file says nothing of its site symmetry, and
 /// whose cell's declared contents do not settle it, is on a special position
 /// when it lies closer than this, in Å: farther, its images there are read
@@ -384,7 +387,7 @@ struct Row {
     element: Element,
     oxidation: f64,
     occupancy: f64,
-    b_iso: f64,
+    u_iso: f64,
     position: [f64; 3],
     /// `_atom_site_symmetry_multiplicity`.
     multiplicity: Option<usize>,
@@ -510,7 +513,7 @@ fn anisotropic(block: &Block<'_>) -> FxHashMap<String, [f64; 6]> {
     };
     let (columns, scale) = match names("u").map(|n| block.column(&n)) {
         columns if columns.iter().all(Option::is_some) => (columns, 1.0),
-        _ => (names("b").map(|n| block.column(&n)), 1.0 / (8.0 * PI * PI)),
+        _ => (names("b").map(|n| block.column(&n)), 1.0 / B_PER_U),
     };
     if !columns
         .iter()
@@ -646,21 +649,18 @@ fn rows(
             let base = oxidation.get(&symbol).copied().unwrap_or(0.0);
             oxidation.get(raw_symbol).copied().unwrap_or(base)
         };
-        // B, else 8π²U, else 8π²U_eq from the anisotropic displacement.
-        let eight_pi2 = 8.0 * PI * PI;
+        // U, else B/8π², else U_eq from the anisotropic displacement.
         let given = [
-            at(&b_iso, i).and_then(number),
-            at(&u_iso, i)
+            at(&u_iso, i).and_then(number),
+            at(&b_iso, i)
                 .and_then(number)
-                .map(|r| r.map(|u| eight_pi2 * u)),
-            aniso
-                .get(&label)
-                .map(|u| Ok(eight_pi2 * u_equivalent(*u, lattice))),
+                .map(|r| r.map(|b| b / B_PER_U)),
+            aniso.get(&label).map(|u| Ok(u_equivalent(*u, lattice))),
         ];
-        let b = match given.iter().flatten().find(|r| r.is_ok()) {
-            Some(Ok(b)) if *b >= 0.0 => *b,
-            Some(Ok(b)) => {
-                ignored.push(format!("{label} (B = {b:.3} Å²)"));
+        let u = match given.iter().flatten().find(|r| r.is_ok()) {
+            Some(Ok(u)) if *u >= 0.0 => *u,
+            Some(Ok(u)) => {
+                ignored.push(format!("{label} (U = {u:.5} Å²)"));
                 0.0
             }
             _ => {
@@ -684,7 +684,7 @@ fn rows(
             element,
             oxidation,
             occupancy,
-            b_iso: b,
+            u_iso: u,
             position,
             multiplicity,
             site_symmetry_order,
@@ -830,7 +830,7 @@ fn assemble(
             element: row.element,
             oxidation: row.oxidation,
             occupancy: row.occupancy,
-            b_iso: row.b_iso,
+            u_iso: row.u_iso,
         };
         match grid.site_of(&images, row.position) {
             Some((j, image)) => joining.add(&mut drafts[j].occupants, occupant, image),

@@ -45,7 +45,7 @@ assert.deepEqual(s.sites[1].fractional, [0.5, 0.5, 0.5])
 const [cs] = s.sites[0].species
 assert.equal(cs.element, 'Cs')
 assert.equal(cs.occupancy, 1)
-assert.ok(Math.abs(cs.bIso - 8 * Math.PI ** 2 * 0.02) < 1e-12)
+assert.equal(cs.uIso, 0.02)
 assert.equal(s.atoms.length, 2)
 assert.deepEqual(s.diagnostics, [])
 assert.deepEqual(JSON.parse(JSON.stringify(s)), s, 'survives JSON')
@@ -67,7 +67,9 @@ for (const file of fs.readdirSync(written).sort()) {
 }
 const csclText = cifmi.writeCifStr(s)
 assert.match(csclText, /^_space_group_name_H-M_alt {3}'P m -3 m'$/m)
-assert.match(csclText, /^ {2}Cs1 {2}Cs {2}1 {2}0\.00000000 {2}0\.00000000 {2}0\.00000000 {2}1\.00000000 {2}1\.57913670$/m)
+// U is written as read.
+assert.match(csclText, /^ _atom_site_U_iso_or_equiv$/m)
+assert.match(csclText, /^ {2}Cs1 {2}Cs {2}1 {2}0\.00000000 {2}0\.00000000 {2}0\.00000000 {2}1\.00000000 {2}0\.02000000$/m)
 // What cannot be written is an error with the reason.
 const changed = (change) => {
   const copy = structuredClone(s)

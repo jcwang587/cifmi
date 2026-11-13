@@ -90,8 +90,8 @@ export interface Species {
   occupancy: number
   /** Oxidation state from the file; 0 when absent. */
   oxidation: number
-  /** Isotropic displacement B = 8π²U in Å²; 0 when absent. */
-  bIso: number
+  /** Isotropic displacement U in Å²; 0 when absent. */
+  uIso: number
 }
 
 /** A crystal structure read from one CIF data block. */
@@ -151,7 +151,7 @@ export declare function writeCifFile(path: string, structure: StructureParts): P
 /**
  * A structure as CIF 1.1 text (synchronous): one data block in the core
  * dictionary's names, in the structure's own setting, which `readCifStr`
- * reads back as the same structure. A structure that cannot be written so
- * is an error with the reason.
+ * reads back as the same structure for one it read. A structure that cannot
+ * be written as a CIF that cifmi reads is an error with the reason.
  */
 export declare function writeCifStr(structure: StructureParts): string

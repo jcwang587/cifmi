@@ -72,8 +72,8 @@ pub struct Species {
     occupancy: f64,
     /// Oxidation state from the file; 0 when absent.
     oxidation: f64,
-    /// Isotropic displacement B = 8π²U in Å²; 0 when absent.
-    b_iso: f64,
+    /// Isotropic displacement U in Å²; 0 when absent.
+    u_iso: f64,
 }
 
 /// A site of the asymmetric unit.
@@ -158,20 +158,20 @@ impl Cell {
 impl Species {
     /// `element` is a symbol such as "Fe", or "D" for deuterium.
     #[new]
-    #[pyo3(signature = (label, element, occupancy, oxidation=0.0, b_iso=0.0))]
+    #[pyo3(signature = (label, element, occupancy, oxidation=0.0, u_iso=0.0))]
     fn new(
         label: String,
         element: &str,
         occupancy: f64,
         oxidation: f64,
-        b_iso: f64,
+        u_iso: f64,
     ) -> PyResult<Self> {
         Ok(Species {
             label,
             element: Element::from_symbol(element).map_err(to_py_err)?.symbol(),
             occupancy,
             oxidation,
-            b_iso,
+            u_iso,
         })
     }
 }
@@ -244,7 +244,7 @@ fn core_structure(
                         element: Element::from_symbol(s.element)?,
                         oxidation: s.oxidation,
                         occupancy: s.occupancy,
-                        b_iso: s.b_iso,
+                        u_iso: s.u_iso,
                     })
                 })
                 .collect::<Result<_, Error>>()?;
@@ -315,7 +315,7 @@ impl From<crate::Structure> for Structure {
                             element: o.element.symbol(),
                             occupancy: o.occupancy,
                             oxidation: o.oxidation,
-                            b_iso: o.b_iso,
+                            u_iso: o.u_iso,
                         })
                         .collect(),
                 })
