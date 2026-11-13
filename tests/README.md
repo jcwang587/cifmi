@@ -19,7 +19,7 @@ the public domain, one per case that needs a rule of its own:
 
 | File | Case |
 | --- | --- |
-| `cod__1000126.cif` | Anisotropic U only: B comes from U_eq |
+| `cod__1000126.cif` | Anisotropic U only: U is U_eq |
 | `cod__1010642.cif` | A dummy atom (`_atom_site_calc_flag dum`) at occupancy 2 |
 | `cod__1100217.cif` | A listing already expanded (rows such as `Br1F*`), read once |
 | `cod__2003493.cif` | The Hall symbol names origin choice 1 of F d -3 m, the coordinates are origin choice 2's; the symbol is the old `F d 3 m` |

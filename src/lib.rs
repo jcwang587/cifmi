@@ -17,7 +17,7 @@
 //! names, in the structure's own setting; cifmi reads it back as the same
 //! structure.
 //!
-//! Units: lengths in Å, angles in degrees, displacement parameters B in Å²,
+//! Units: lengths in Å, angles in degrees, displacement parameters U in Å²,
 //! occupancies as site fractions.
 //!
 //! ```

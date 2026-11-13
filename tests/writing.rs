@@ -76,7 +76,7 @@ fn assert_same(written: &Structure, read: &Structure) {
                 (&a.label, a.element, a.oxidation)
             );
             assert!(close(a.occupancy, b.occupancy), "{a:?} read as {b:?}");
-            assert!(close(a.b_iso, b.b_iso), "{a:?} read as {b:?}");
+            assert!(close(a.u_iso, b.u_iso), "{a:?} read as {b:?}");
         }
     }
     assert_eq!(read.atoms.len(), written.atoms.len());
@@ -135,14 +135,14 @@ fn every_fixture_is_written_as_expected_and_reads_back_as_itself() {
     assert_eq!(expected, written);
 }
 
-/// A P -1 structure with a mixed site, oxidation states and B.
+/// A P -1 structure with a mixed site, oxidation states and U.
 fn mixed() -> Structure {
-    let occupant = |label: &str, symbol: &str, oxidation, occupancy, b_iso| Occupant {
+    let occupant = |label: &str, symbol: &str, oxidation, occupancy, u_iso| Occupant {
         label: label.into(),
         element: Element::from_symbol(symbol).unwrap(),
         oxidation,
         occupancy,
-        b_iso,
+        u_iso,
     };
     let site = |label: &str, position, occupants| Site {
         label: label.into(),
@@ -165,14 +165,14 @@ fn mixed() -> Structure {
                 "M1",
                 [0.0, 0.0, 0.0],
                 vec![
-                    occupant("M1", "Fe", 3.0, 0.5, 0.5),
+                    occupant("M1", "Fe", 3.0, 0.5, 0.005),
                     occupant("Mn1", "Mn", 2.0, 0.5, 0.0),
                 ],
             ),
             site(
                 "O1",
                 [0.25, 0.1, 1.0 / 3.0],
-                vec![occupant("O1", "O", -2.0, 1.0, 1.2)],
+                vec![occupant("O1", "O", -2.0, 1.0, 0.0125)],
             ),
             site(
                 "O2",
@@ -226,10 +226,10 @@ loop_
  _atom_site_fract_y
  _atom_site_fract_z
  _atom_site_occupancy
- _atom_site_B_iso_or_equiv
-  M1  Fe3+  1  0.00000000  0.00000000  0.00000000  0.50000000  0.50000000
+ _atom_site_U_iso_or_equiv
+  M1  Fe3+  1  0.00000000  0.00000000  0.00000000  0.50000000  0.00500000
   Mn1  Mn2+  1  0.00000000  0.00000000  0.00000000  0.50000000  ?
-  O1  O2-  2  0.25000000  0.10000000  0.33333333  1.00000000  1.20000000
+  O1  O2-  2  0.25000000  0.10000000  0.33333333  1.00000000  0.01250000
   O2  O  2  0.60000000  -0.70000000  0.00000000  1.00000000  ?
   'H 1'  D  2  0.10000000  0.20000000  0.30000000  0.25000000  ?
 ";
@@ -434,8 +434,8 @@ fn structures_that_cannot_be_written_are_refused_with_the_reason() {
         "site M1: occupancies add up to 1.1, more than 1",
     );
     refused(
-        &|s| s.sites[1].occupants[0].b_iso = -1.0,
-        "O1: B -1 is not a finite number of at least 0",
+        &|s| s.sites[1].occupants[0].u_iso = -1.0,
+        "O1: U -1 is not a finite number of at least 0",
     );
     refused(
         &|s| {

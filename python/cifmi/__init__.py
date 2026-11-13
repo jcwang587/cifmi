@@ -16,7 +16,7 @@ Example::
 A :class:`Structure` keeps the asymmetric unit (``sites``, rows on one
 position merged), the symmetry ``operations`` and every atom of the unit cell
 (``atoms``, each an image of a site). Lengths are in Å, angles in degrees,
-displacements B in Å², occupancies as site fractions. A structure can also be
+displacements U in Å², occupancies as site fractions. A structure can also be
 built from its parts, ``Structure(name, cell, operations, sites)``, with
 :class:`Cell`, :class:`Operation`, :class:`Site` and :class:`Species`.
 """

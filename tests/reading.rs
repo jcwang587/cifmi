@@ -3,6 +3,7 @@
 
 use cifmi::{read_cif, read_cif_str, CifOptions, DiagnosticKind, Structure, SymmetrySource};
 use std::collections::BTreeMap;
+use std::f64::consts::PI;
 use std::path::PathBuf;
 
 fn fixture(name: &str) -> PathBuf {
@@ -135,16 +136,16 @@ fn the_cell_settles_the_unique_axis_of_a_short_monoclinic_symbol() {
 // Real files.
 
 #[test]
-fn anisotropic_displacements_give_b_where_no_isotropic_one_is_listed() {
+fn anisotropic_displacements_give_u_where_no_isotropic_one_is_listed() {
     let path = fixture("cod__1000126.cif");
     let read = read_cif(&path, &CifOptions::default()).unwrap();
-    let b = |s: &Structure| -> Vec<f64> {
-        s.sites.iter().map(|site| site.occupants[0].b_iso).collect()
+    let u = |s: &Structure| -> Vec<f64> {
+        s.sites.iter().map(|site| site.occupants[0].u_iso).collect()
     };
     assert!(
-        b(&read).iter().all(|&v| v > 0.1 && v < 3.0),
+        u(&read).iter().all(|&v| v > 0.001 && v < 0.04),
         "{:?}",
-        b(&read)
+        u(&read)
     );
 }
 
@@ -412,9 +413,37 @@ Na1 0 0 0 -0.01
 Cl1 0.5 0.5 0.5 0.01
 ";
     let read = read_text(text);
-    assert_eq!(read.sites[0].occupants[0].b_iso, 0.0);
-    assert!(read.sites[1].occupants[0].b_iso > 0.78);
+    assert_eq!(read.sites[0].occupants[0].u_iso, 0.0);
+    assert_eq!(read.sites[1].occupants[0].u_iso, 0.01);
     assert!(kinds(&read).contains(&DiagnosticKind::IgnoredDisplacement));
+}
+
+#[test]
+fn b_is_read_as_u_and_a_listed_u_comes_first() {
+    let text = "data_b
+_cell_length_a 5
+_cell_length_b 5
+_cell_length_c 5
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_B_iso_or_equiv
+_atom_site_U_iso_or_equiv
+Na1 0 0 0 1.5 ?
+Cl1 0.5 0.5 0.5 1.5 0.02
+";
+    let read = read_text(text);
+    let u: Vec<f64> = read
+        .sites
+        .iter()
+        .map(|site| site.occupants[0].u_iso)
+        .collect();
+    assert_eq!(u, [1.5 / (8.0 * PI * PI), 0.02]);
 }
 
 #[test]

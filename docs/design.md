@@ -173,8 +173,8 @@ Structure (read, or built from its parts) ─▶ checks ─▶ writer ─▶ CIF
    their CIF 1 spelling; `data_` lines inside text fields are text; save
    frames are skipped.
 3. **Extraction.** The cell, the space group as the file names it, the atom
-   rows (label, type symbol, coordinates, occupancy and its uncertainty, B or
-   U, calc flag, multiplicity), the atom types' oxidation numbers and the
+   rows (label, type symbol, coordinates, occupancy and its uncertainty, U or
+   B, calc flag, multiplicity), the atom types' oxidation numbers and the
    anisotropic displacements, joined by label.
 4. **Symmetry.** Operations from the file or from a space-group table, and a
    record of where they came from (§6). Every operation must be an
@@ -210,7 +210,7 @@ nothing falls back to another reading.
 | Expansion | per site, exact orbits |
 | Dummy atoms | skipped (`_atom_site_calc_flag dum`), reported |
 | Occupancy above 1 | a site total up to 1.1 is scaled to a full site and reported; beyond, an error, a hydrogen placed on its oxygen included |
-| Displacement | B, or 8π²U, or U_eq from anisotropic U when no isotropic value is listed; a nonpositive value is ignored and reported |
+| Displacement | U, or B/8π² where a row lists no U, or U_eq from the anisotropic displacements when no isotropic value is listed; a nonpositive value is ignored and reported |
 | Modulated and magnetic structures | an error |
 | Checks | listed multiplicities against the orbits (a column of site-symmetry orders under `_atom_site_symmetry_multiplicity`, as SHELXL-97 and -93 write it, is read as orders); atoms closer than 0.5 Å holding more than one atom between them (reported) |
 
@@ -234,11 +234,11 @@ is an error with the reason.
 | Cell | `_cell_length_a` to `_cell_angle_gamma`, as the structure has them |
 | Contents | `_chemical_formula_sum` in Hill order (C, H, then the other elements alphabetically; without carbon, all alphabetically) and `_cell_formula_units_Z`, from the multiplicities and the occupancies as written: Z is the greatest common divisor of the amounts where all are whole to the written precision, else 1 |
 | Operations | `_space_group_symop_id` and `_space_group_symop_operation_xyz`: every operation, centring included, in the structure's order, as `-x+1/2, y, -z+3/4`; translations that are multiples of 1/24 as fractions, others as decimals |
-| Atom sites | a row per species of each site, in order: `_atom_site_label`, `_type_symbol`, `_symmetry_multiplicity` (the size of the site's orbit), `_fract_x`, `_y`, `_z` and `_occupancy`, with `_atom_site_B_iso_or_equiv` where a species has B (`?` for those without). A site's first row carries its label; a label already used takes the first of `_2`, `_3`... that no row has |
+| Atom sites | a row per species of each site, in order: `_atom_site_label`, `_type_symbol`, `_symmetry_multiplicity` (the size of the site's orbit), `_fract_x`, `_y`, `_z` and `_occupancy`, with `_atom_site_U_iso_or_equiv` where a species has U (`?` for those without). A site's first row carries its label; a label already used takes the first of `_2`, `_3`... that no row has |
 | Oxidation states | where a species has one, the type symbols carry them (`Fe3+`, `O2-`), and `_atom_type_symbol` and `_atom_type_oxidation_number` list every type, at 0 for those without |
-| Numbers | the cell, coordinates, occupancies and B to 8 decimals; a coordinate that rounds to 1 or -0 as 0 |
+| Numbers | the cell, coordinates, occupancies and U to 8 decimals; a coordinate that rounds to 1 or -0 as 0 |
 | Values | bare where CIF 1.1 allows, else in quotes, else a text field |
-| Refused | a name that is no block code; a cell the reader refuses; operations that repeat one, do not form a group, or whose symmetry the cell does not have; no sites; a site without species, labelled other than its first species, or at coordinates that are not finite; two sites on one position up to symmetry, within the site tolerance, or a species twice on a site, which reading would make one; an occupancy outside (0, 1], or a site's adding up to more than 1; B below 0 or not finite; an oxidation state that is not finite; characters outside CIF 1.1's set; a line longer than 2,048 characters |
+| Refused | a name that is no block code; a cell the reader refuses; operations that repeat one, do not form a group, or whose symmetry the cell does not have; no sites; a site without species, labelled other than its first species, or at coordinates that are not finite; two sites on one position up to symmetry, within the site tolerance, or a species twice on a site, which reading would make one; an occupancy outside (0, 1], or a site's adding up to more than 1; U below 0 or not finite; an oxidation state that is not finite; characters outside CIF 1.1's set; a line longer than 2,048 characters |
 
 The multiplicities tell the reader how each site was read (§6): a site split
 around a special position reads back split, without the cell's declared
@@ -295,7 +295,7 @@ impl Structure {
 }
 ```
 
-An occupant is an element with its oxidation state, occupancy, B and the
+An occupant is an element with its oxidation state, occupancy, U and the
 label of the row it comes from; a site's label is its first occupant's.
 `Structure::new` builds a structure from a crystal model's parts as they
 are: the lattice from the cell and the atoms as the sites' orbits, with no
@@ -433,9 +433,14 @@ Settled:
   settled the first time (§6).
 - **Unique labels.** A label names its row; a repeated one takes the first
   free `_2`, `_3`... suffix.
-- **B as B.** The structure holds B (8π²U), written as
-  `_atom_site_B_iso_or_equiv` without a conversion; `?` where a species has
-  none.
+- **U, not B.** The structure holds the isotropic displacement as U, which
+  the writer writes as it is under `_atom_site_U_iso_or_equiv`, `?` where a
+  species has none. The core dictionary prefers U, after the IUCr Commission
+  on Nomenclature, and most files give it: 501,015 of COD's 521,901 list
+  `_atom_site_U_iso_or_equiv`, 2,696 `_atom_site_B_iso_or_equiv`. Reading
+  takes a row's U as it is, before its B, so the usual file is read and
+  written without a conversion; a B is read as B/8π², and anisotropic
+  displacements give U_eq.
 - **Oxidation states as atom types.** The type symbol carries the state, and
   every type is listed with its number, 0 for those without. Reading takes a
   type listed under its own symbol at its own number (`Fe` beside `Fe3+`),
