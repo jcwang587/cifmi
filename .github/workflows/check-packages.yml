@@ -21,3 +21,20 @@ jobs:
   node:
     name: Check Node distributions
     uses: ./.github/workflows/check-node.yml
+  all:
+    # The rules for main require this one job, not every check by name. It
+    # runs when a check before it fails or is skipped too, since a skipped
+    # required job would count as passed.
+    name: All package checks
+    if: always()
+    needs: [rust, python, node]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every package check to succeed
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Package check results: $RESULTS"
+          for result in $RESULTS; do
+            [ "$result" = success ] || exit 1
+          done
