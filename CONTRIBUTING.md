@@ -52,6 +52,11 @@ same checks run before a release is tagged. Locally,
 file carries the version in `Cargo.toml`, and `pre-commit run --all-files`
 runs the formatters.
 
+A pull request merges into `main` once two checks pass: `All package checks`,
+which passes when every job of `Check packages` has, and `Rust format, lint
+and test` from the `Rust` workflow. The rules for `main` also refuse force
+pushes and deleting the branch.
+
 ## The space-group table
 
 `src/spacegroups.rs` is generated from gemmi's table of settings. Regenerate
