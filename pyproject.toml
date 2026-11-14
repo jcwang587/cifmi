@@ -6,7 +6,7 @@ build-backend = "maturin"
 name = "cifmi"
 description = "Reads CIF 1.1 and 2.0 files into crystal structures, and writes crystal structures as CIF 1.1"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 keywords = ["cif", "crystallography", "crystal structure", "parser", "rust"]
@@ -33,6 +33,6 @@ module-name = "cifmi._core"
 testpaths = ["tests"]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 # Naming via pep8-naming ("N"), import order via isort ("I").
 lint.select = ["E4", "E7", "E9", "F", "I", "N"]

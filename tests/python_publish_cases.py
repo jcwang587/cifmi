@@ -29,7 +29,7 @@ class SelectionTests(unittest.TestCase):
                 )
             else:
                 host = next(host for host in publish.HOSTS if host in artifact)
-                filename = f"cifmi-0.1.0-cp310-abi3-{host}.whl"
+                filename = f"cifmi-0.1.0-cp311-abi3-{host}.whl"
                 with zipfile.ZipFile(directory / filename, "w") as wheel:
                     wheel.writestr("payload", artifact)
         self.candidates = publish.checked_files(self.artifacts, self.version)

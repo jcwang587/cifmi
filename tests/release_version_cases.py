@@ -4,15 +4,11 @@ import io
 import json
 import os
 import shutil
-import sys
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
-
-if sys.version_info < (3, 11):
-    raise unittest.SkipTest("Release validation runs under Python 3.12 in CI")
 
 import check_release_version as gate
 

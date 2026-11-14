@@ -25,22 +25,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: version
     env:
-      # The wheels are abi3, tagged cp310-abi3 by pyo3's abi3-py310 feature:
+      # The wheels are abi3, tagged cp311-abi3 by pyo3's abi3-py311 feature:
       # each platform builds one wheel with the oldest supported Python and
       # tests it with the oldest and the newest.
-      OLDEST_PYTHON: ${{ matrix.oldest-python || '3.10' }}
+      OLDEST_PYTHON: "3.11"
       NEWEST_PYTHON: "3.15"
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest, windows-11-arm]
-        include:
-          # CPython 3.10 has no Windows Arm64 build, so this platform builds
-          # and tests with 3.11, the oldest it has. Its wheel is still tagged
-          # cp310-abi3: the tag comes from the pyo3 feature, not from the
-          # Python that builds the wheel.
-          - os: windows-11-arm
-            oldest-python: "3.11"
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
