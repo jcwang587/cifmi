@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- PyPI has wheels for Linux and Windows on Arm64, so pip installs cifmi there without Rust.
+- Python 3.10 is no longer supported. pip on Python 3.10 keeps installing 0.2.0.
+- Node.js 18 is no longer supported. On Node.js 18, `npm install cifmi` keeps installing 0.2.0.
+
 ## 0.2.0
 
 - cifmi writes crystal structures as CIF 1.1, with `write_cif` and `write_cif_str` in Rust and Python and `writeCifFile` and `writeCifStr` in Node.js.
