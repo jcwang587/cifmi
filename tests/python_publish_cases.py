@@ -29,7 +29,7 @@ class SelectionTests(unittest.TestCase):
                 )
             else:
                 host = next(host for host in publish.HOSTS if host in artifact)
-                filename = f"cifmi-0.1.0-cp310-abi3-{host}.whl"
+                filename = f"cifmi-0.1.0-cp311-abi3-{host}.whl"
                 with zipfile.ZipFile(directory / filename, "w") as wheel:
                     wheel.writestr("payload", artifact)
         self.candidates = publish.checked_files(self.artifacts, self.version)
@@ -49,39 +49,33 @@ class SelectionTests(unittest.TestCase):
             ],
         }
 
-    def test_first_release_selects_one_intact_310_wheel_per_platform(self):
+    def test_first_release_selects_one_wheel_per_platform_and_the_sdist(self):
         selected = publish.plan_uploads(self.candidates, None, self.version)
-        self.assertEqual(len(selected), 4)
-        self.assertTrue(
-            all(
-                path.parent.name.endswith("3.10")
-                for path in selected
-                if path.suffix == ".whl"
-            )
+        self.assertEqual(len(selected), len(publish.HOSTS) + 1)
+        self.assertEqual(
+            {path.parent.name for path in selected}, publish.EXPECTED_ARTIFACTS
         )
 
-    def test_partial_release_preserves_matching_alternate_build(self):
-        macos = next(
-            paths for name, paths in self.candidates.items() if "macos" in name
-        )
+    def test_partial_release_uploads_only_the_missing_files(self):
+        macos = next(path for name, path in self.candidates.items() if "macos" in name)
         selected = publish.plan_uploads(
-            self.candidates, self.metadata([macos[1]]), self.version
+            self.candidates, self.metadata([macos]), self.version
         )
-        self.assertEqual(len(selected), 3)
-        self.assertFalse(any("macos" in path.name for path in selected))
+        self.assertEqual(len(selected), len(publish.HOSTS))
+        self.assertNotIn(macos, selected)
 
     def test_complete_release_has_no_uploads(self):
-        metadata = self.metadata([paths[0] for paths in self.candidates.values()])
+        metadata = self.metadata(self.candidates.values())
         self.assertEqual(
             publish.plan_uploads(self.candidates, metadata, self.version), []
         )
 
     def test_digest_mismatch_aborts_before_creating_output(self):
-        metadata = self.metadata([next(iter(self.candidates.values()))[0]])
+        metadata = self.metadata([next(iter(self.candidates.values()))])
         metadata["urls"][0]["digests"]["sha256"] = "0" * 64
         output = self.root / "dist"
         with patch.object(publish, "read_json", return_value=metadata):
-            with self.assertRaisesRegex(ValueError, "differs from every original"):
+            with self.assertRaisesRegex(ValueError, "differs from its original"):
                 publish.prepare(self.artifacts, output, self.version)
         self.assertFalse(output.exists())
 
@@ -101,15 +95,16 @@ class SelectionTests(unittest.TestCase):
         error = urllib.error.HTTPError("https://pypi.org", 404, "absent", {}, None)
         output = self.root / "dist"
         with patch.object(publish, "read_json", side_effect=error):
-            self.assertEqual(publish.prepare(self.artifacts, output, self.version), 4)
-        for path in output.iterdir():
             self.assertEqual(
-                path.read_bytes(), self.candidates[path.name][0].read_bytes()
+                publish.prepare(self.artifacts, output, self.version),
+                len(publish.HOSTS) + 1,
             )
+        for path in output.iterdir():
+            self.assertEqual(path.read_bytes(), self.candidates[path.name].read_bytes())
 
     def test_existing_unrelated_or_yanked_files_fail(self):
         for mutation in ("name", "version", "filename", "yanked"):
-            metadata = self.metadata([next(iter(self.candidates.values()))[0]])
+            metadata = self.metadata([next(iter(self.candidates.values()))])
             if mutation in ("name", "version"):
                 metadata["info"][mutation] = "unexpected"
             elif mutation == "filename":
@@ -136,6 +131,13 @@ class SelectionTests(unittest.TestCase):
     def test_missing_or_extra_artifact_is_rejected(self):
         (self.artifacts / "unexpected").mkdir()
         with self.assertRaisesRegex(ValueError, "each expected artifact"):
+            publish.checked_files(self.artifacts, self.version)
+
+    def test_one_wheel_from_two_platforms_is_rejected(self):
+        (x64,) = (self.artifacts / "checked-python-wheel-ubuntu-latest").iterdir()
+        (arm64,) = (self.artifacts / "checked-python-wheel-ubuntu-24.04-arm").iterdir()
+        arm64.rename(arm64.with_name(x64.name))
+        with self.assertRaisesRegex(ValueError, "Two platforms built the same"):
             publish.checked_files(self.artifacts, self.version)
 
 
@@ -173,7 +175,7 @@ class SourceTests(unittest.TestCase):
         }
 
     def test_failed_publish_with_all_checks_passed_can_recover(self):
-        self.assertEqual(publish.validate_source(**self.source()), "1,2,3,4,5,6,7")
+        self.assertEqual(publish.validate_source(**self.source()), "1,2,3,4,5,6")
 
     def test_recovery_rejects_unverified_sources(self):
         source = self.source()
@@ -204,16 +206,17 @@ class SourceTests(unittest.TestCase):
 
     def test_expected_matrix_matches_workflow(self):
         workflow = (publish.ROOT / ".github/workflows/check-python.yml").read_text()
-        for key, expected in (
-            ("os", publish.HOSTS),
-            ("python-version", publish.PYTHONS),
+        match = re.search(r"^        os: \[([^\]]+)\]$", workflow, re.MULTILINE)
+        self.assertIsNotNone(match)
+        self.assertEqual(
+            tuple(value.strip() for value in match[1].split(",")), publish.HOSTS
+        )
+        # The check and artifact names a recovery expects are the wheel job's.
+        for line in (
+            "    name: Wheel / ${{ matrix.os }}",
+            "          name: checked-python-wheel-${{ matrix.os }}",
         ):
-            match = re.search(rf"^        {key}: \[([^\]]+)\]$", workflow, re.MULTILINE)
-            self.assertIsNotNone(match)
-            self.assertEqual(
-                tuple(value.strip().strip('"') for value in match[1].split(",")),
-                expected,
-            )
+            self.assertIn(f"\n{line}\n", workflow)
 
 
 if __name__ == "__main__":

@@ -42,9 +42,12 @@ package entry point or a compiled `.node` file before the test command.
 ### Everything a release checks
 
 The `Check packages` workflow packages the crate and tests the packaged copy,
-builds and tests the wheels and the source distribution, and builds the Node
-addon for every target, packs the npm packages and installs them. The same
-checks run before a release is tagged. Locally,
+builds and tests one abi3 wheel per platform and the source distribution, and
+builds the Node addon for every target, packs the npm packages and installs
+them. The wheels on PyPI and the binaries on npm cover the same five
+platforms: Windows x64 and Arm64, macOS Arm64, and Linux x64 and Arm64 with
+glibc. Elsewhere pip builds the source distribution, which needs Rust. The
+same checks run before a release is tagged. Locally,
 `python tests/check_release_version.py` checks that every manifest and lock
 file carries the version in `Cargo.toml`, and `pre-commit run --all-files`
 runs the formatters.
@@ -160,15 +163,15 @@ through the configured trusted publishers.
 
 Keep the original tag and checked artifacts. The PyPI workflow accepts a
 `sourceRunId` from a completed, tag-triggered `publish pypi` run whose package
-checks passed. Dispatch recovery from a ref containing the recovery workflow
-and the same package version; for the initial 0.1.0 release, use `main`:
+checks passed. Dispatch recovery from the release's own tag, whose workflow
+expects the checks and artifacts that release ran:
 
 ```sh
-gh workflow run publish-pypi.yml --ref main -f publishToPyPI=yes -f sourceRunId=RUN_ID
+gh workflow run publish-pypi.yml --ref vX.Y.Z -f publishToPyPI=yes -f sourceRunId=RUN_ID
 ```
 
 Recovery verifies the original repository, tag, commit, checks and artifact
-metadata. It downloads each artifact separately because the Python 3.10 and
-3.14 builds produce the same ABI3 wheel filename. It selects one intact
-wheel per platform, and excludes an existing PyPI file only when its SHA256
-matches an original checked artifact. It uploads only the missing files.
+metadata. It downloads each artifact into its own directory and requires one
+intact wheel per platform and the source distribution. It excludes an
+existing PyPI file only when its SHA256 matches its original checked
+artifact, and uploads only the missing files.
