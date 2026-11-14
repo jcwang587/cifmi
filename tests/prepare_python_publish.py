@@ -1,7 +1,7 @@
 """Select intact checked distributions and safely resume a partial PyPI release.
 
-Keep artifacts in separate directories: independently built ABI3 wheels share
-filenames, and concurrent extraction into one directory can corrupt their bytes.
+Keep artifacts in separate directories, one per checked distribution, so that
+a missing, extra or repeated distribution stops the release before any upload.
 """
 
 import argparse
@@ -18,14 +18,21 @@ from pathlib import Path
 from check_release_version import check_versions
 
 ROOT = Path(__file__).resolve().parents[1]
-HOSTS = ("ubuntu-latest", "macos-latest", "windows-latest")
-PYTHONS = ("3.10", "3.14")
-EXPECTED_ARTIFACTS = {
-    f"checked-python-wheel-{host}-{python}" for host in HOSTS for python in PYTHONS
-} | {"checked-python-sdist"}
-EXPECTED_CHECKS = {
-    f"check / Wheel / {host} / Python {python}" for host in HOSTS for python in PYTHONS
-} | {"check / Package version agreement", "check / Source distribution / Python 3.12"}
+# The runners of check-python.yml, each building and checking one abi3 wheel.
+HOSTS = (
+    "ubuntu-latest",
+    "ubuntu-24.04-arm",
+    "macos-latest",
+    "windows-latest",
+    "windows-11-arm",
+)
+EXPECTED_ARTIFACTS = {f"checked-python-wheel-{host}" for host in HOSTS} | {
+    "checked-python-sdist"
+}
+EXPECTED_CHECKS = {f"check / Wheel / {host}" for host in HOSTS} | {
+    "check / Package version agreement",
+    "check / Source distribution / Python 3.12",
+}
 
 
 def require(condition, message):
@@ -123,7 +130,6 @@ def checked_files(directory, version):
         "Download each expected artifact into its own directory",
     )
     candidates = {}
-    host_names = {}
     for artifact_name in sorted(EXPECTED_ARTIFACTS):
         files = list((directory / artifact_name).iterdir())
         require(
@@ -138,11 +144,6 @@ def checked_files(directory, version):
                 path.name.startswith(f"cifmi-{version}-") and path.suffix == ".whl",
                 "Wrong wheel version or filename",
             )
-            host = next(host for host in HOSTS if f"-{host}-" in artifact_name)
-            require(
-                host_names.setdefault(host, path.name) == path.name,
-                "ABI3 wheel names differ across Python versions",
-            )
             data = path.read_bytes()
             end = data.rfind(b"PK\x05\x06")
             require(
@@ -154,10 +155,10 @@ def checked_files(directory, version):
             )
             with zipfile.ZipFile(path) as wheel:
                 require(wheel.testzip() is None, f"Wheel CRC failure: {path}")
-        candidates.setdefault(path.name, []).append(path)
-    require(
-        len(candidates) == len(HOSTS) + 1, "Expected three unique wheels and one sdist"
-    )
+        require(
+            path.name not in candidates, f"Two platforms built the same {path.name}"
+        )
+        candidates[path.name] = path
     return candidates
 
 
@@ -178,18 +179,13 @@ def plan_uploads(candidates, metadata, version):
             require(not file.get("yanked", False), "Published file is yanked")
             digest = file["digests"]["sha256"]
             require(
-                any(
-                    hashlib.sha256(path.read_bytes()).hexdigest() == digest
-                    for path in candidates[name]
-                ),
-                f"Published {name} differs from every original checked artifact",
+                hashlib.sha256(candidates[name].read_bytes()).hexdigest() == digest,
+                f"Published {name} differs from its original checked artifact",
             )
             published[name] = digest
-    # Artifact names sort Python 3.10 before 3.14. Copy one intact original;
-    # an already published file may match either checked build and stays untouched.
-    return [
-        paths[0] for name, paths in sorted(candidates.items()) if name not in published
-    ]
+    # Copy the intact original of every file PyPI lacks. A published file
+    # matches its original and stays untouched.
+    return [path for name, path in sorted(candidates.items()) if name not in published]
 
 
 def prepare(directory, output, version):

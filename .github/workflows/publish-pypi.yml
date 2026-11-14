@@ -54,8 +54,8 @@ jobs:
         with:
           pattern: checked-python-*
           path: checked-dists
-          # ABI3 builds have identical filenames across Python versions.
-          # Separate directories prevent concurrent extraction from corrupting them.
+          # One directory per artifact, so that the selection can require one
+          # wheel from each platform and the source distribution.
           merge-multiple: false
       - name: Download original checked distributions
         if: inputs.sourceRunId != ''
