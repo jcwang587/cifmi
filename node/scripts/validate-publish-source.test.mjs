@@ -15,6 +15,8 @@ test('recovery install checks match the workflow matrix, including exclusions an
     return match[1].split(',').map(value => value.trim().replace(/^"|"$/g, ''))
   }
   function entries(key) {
+    // A matrix without exclude or include entries has none to apply.
+    if (!new RegExp(`^        ${key}:`, 'm').test(matrix)) return []
     const section = matrix.match(new RegExp(`^        ${key}:\\n([\\s\\S]*?)(?=^        \\w|$(?![\\s\\S]))`, 'm'))?.[1]
     assert(section, `Expected matrix ${key}`)
     const pairs = [...section.matchAll(/^          - host: ([^\n]+)\n            node-version: "([^"]+)"$/gm)]
